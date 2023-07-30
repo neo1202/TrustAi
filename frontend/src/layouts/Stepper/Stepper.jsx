@@ -42,9 +42,7 @@ function Stepper() {
               : setCurrentStep((prev) => prev + 1);
           }}
         >
-          {currentStep === steps.length
-            ? "Finish"
-            : `Next ${steps[currentStep]}`}
+          {currentStep === steps.length ? "Finish" : `To ${steps[currentStep]}`}
         </button>
       )}
     </>
