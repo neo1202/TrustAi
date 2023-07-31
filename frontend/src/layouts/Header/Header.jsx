@@ -1,20 +1,30 @@
 import { Link, Outlet } from "react-router-dom";
 
 import Logo from "../../assets/logo.jpeg";
+import { IoPersonCircle } from "react-icons/io5";
 
 function Header() {
   return (
     <>
       <nav
         aria-label="Global"
-        className="flex items-center justify-between h-20 py-4 mx-auto bg-white-300 max-w-7xl lg:px-8"
+        className="flex items-center justify-around w-full h-20 py-4 mx-auto bg-white-300"
       >
-        <a className="-m-1.5 p-1.5 mt-16" href="/">
-          <img alt="" className="w-24 h-24" src={Logo} />
+        <a className="w-16 h-16 mt-1 ml-24 align-center" href="/">
+          <img alt="" className="rounded-full" src={Logo} />
         </a>
-        <Link to="/">HomePage</Link>
-        <Link to="/training">TrainingPage</Link>
-        <Link to="/shap">ShapPage</Link>
+        <Link to="/" className="w-32">
+          Home
+        </Link>
+        <Link to="/training" className="w-32">
+          Active Learning
+        </Link>
+        <Link to="/shap" className="w-32">
+          Shap Explanation
+        </Link>
+        <a className="w-16 h-16 mr-24 rounded-full" href="/profile">
+          <IoPersonCircle size={"4em"} />
+        </a>
       </nav>
       <Outlet />
     </>

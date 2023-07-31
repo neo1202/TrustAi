@@ -4,16 +4,19 @@ import { TiTick } from "react-icons/ti";
 
 function Stepper() {
   const steps = [
-    "Home Page",
-    "Method Choose",
+    "Initial Setup",
+    "Method Select",
     "Training Process",
+    "Result",
+    "Knowledge Distill",
+    "KD Result",
     "Shap Explanation",
   ];
   const [currentStep, setCurrentStep] = useState(1);
   const [allComplete, setAllComplete] = useState(false);
   return (
     <>
-      <div className="flex justify-between w-4/6 mx-auto mt-6">
+      <div className="flex justify-between mx-auto mt-6 w-6/6">
         {steps?.map((step, i) => (
           <div
             key={i}
