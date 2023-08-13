@@ -5,10 +5,11 @@ import ShapPage from "./pages/ShapPage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import TrainingRoutes from "./TrainingRoutes";
+import PageInfoContext, { StepProvider } from "./context/pageInfo";
 
 function App() {
   return (
-    <>
+    <StepProvider>
       <div className="flex flex-col justify-start h-screen gap-4 bg-gray-400 item-center">
         <Routes>
           <Route path="/training/*" element={<Header />} />
@@ -20,7 +21,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
-    </>
+    </StepProvider>
   );
 }
 export default App;

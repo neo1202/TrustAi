@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Stepper from "./layouts/Stepper/Stepper";
 import StepperButton from "./layouts/StepperButton/StepperButton";
+import PageInfoContext, { StepProvider } from "./context/pageInfo";
 
 import SetUpPage from "./pages/TrainingPages/SetUpPage";
 import TrainingProcessPage from "./pages/TrainingPages/TrainingProcessPage";
@@ -18,14 +19,11 @@ function TrainingRoutes() {
     "TrainingProcess",
     "Result",
   ];
-  const [currentStep, setCurrentStep] = useState(1);
-  const [allComplete, setAllComplete] = useState(false);
-  const totalPages = 5; // 替换为你的总页数
+  const { currentContextStep } = useContext(PageInfoContext);
   const navigate = useNavigate();
 
-  const handleButtonClick = (nextStep) => {
-    setCurrentStep(nextStep); // 更新 currentStep 的状态
-    navigate(`/training/${trainingPages[currentStep]}`); // 导航到currentStep頁
+  const handleButtonClick = () => {
+    navigate(`/training/${trainingPages[currentContextStep]}`); // 导航到currentStep頁
   };
 
   return (
@@ -39,12 +37,7 @@ function TrainingRoutes() {
         <Route path="TrainingProcess" element={<TrainingProcessPage />} />
         <Route path="Result" element={<ResultPage />} />
       </Routes>
-      <StepperButton
-        currentStep={currentStep}
-        allComplete={allComplete}
-        totalPages={totalPages}
-        onClick={handleButtonClick}
-      />
+      <StepperButton handlePageChange={handleButtonClick} />
     </>
   );
 }

@@ -1,36 +1,26 @@
 import React from "react";
+import { useContext } from "react";
+import PageInfoContext from "../../context/pageInfo";
+import { stepsConfig } from "../../config/config.jsx";
 
-function StepperButton({ currentStep, allComplete, totalPages, onClick }) {
-  const steps = [
-    "Home Page",
-    "Method Choose",
-    "Training Process",
-    "Shap Explanation",
-  ];
+function StepperButton({ handlePageChange }) {
+  const { currentContextStep, incrementCurrentContextStep } =
+    useContext(PageInfoContext);
+  const steps = stepsConfig;
   const handleButtonClick = () => {
-    if (currentStep < totalPages) {
-      onClick(currentStep + 1); // 调用传入的 onClick 回调函数，传递更新后的 currentStep
-    } else {
-      onClick(1); // 如果已经在最后一页，则回到第一页
-    }
+    handlePageChange();
+    incrementCurrentContextStep();
   };
 
   return (
-    // {!allComplete && (
-    //   <button
-    //     className="bg-white btn"
-    //     onClick={() => {
-    //       currentStep === steps.length
-    //         ? setAllComplete(true)
-    //         : setCurrentStep((prev) => prev + 1);
-    //     }}
-    //   >
-    //     {currentStep === steps.length ? "Finish" : `To ${steps[currentStep]}`}
-    //   </button>
-    // )}
-    <button className="bg-white btn" onClick={handleButtonClick}>
-      {currentStep === totalPages ? "Finish" : `To ${steps[currentStep]}`}
-    </button>
+    <>
+      <p>Now step from Context:{currentContextStep}</p>
+      <button className="bg-white btn" onClick={handleButtonClick}>
+        {currentContextStep === steps.length
+          ? "Finish"
+          : `To ${steps[currentContextStep]}`}
+      </button>
+    </>
   );
 }
 
