@@ -1,17 +1,10 @@
 import React, { useState } from "react";
 import "./stepper.css";
 import { TiTick } from "react-icons/ti";
+import { stepsConfig } from "../../config/config.jsx";
 
 function Stepper() {
-  const steps = [
-    "Initial Setup",
-    "Method Select",
-    "Training Process",
-    "Result",
-    "Knowledge Distill",
-    "KD Result",
-    "Shap Explanation",
-  ];
+  const steps = stepsConfig;
   const [currentStep, setCurrentStep] = useState(1);
   const [allComplete, setAllComplete] = useState(false);
   return (

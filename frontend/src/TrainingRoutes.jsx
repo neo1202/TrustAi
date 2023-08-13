@@ -8,13 +8,15 @@ import SetUpPage from "./pages/TrainingPages/SetUpPage";
 import TrainingProcessPage from "./pages/TrainingPages/TrainingProcessPage";
 import ResultPage from "./pages/TrainingPages/ResultPage";
 import MethodSelectPage from "./pages/TrainingPages/MethodSelectPage";
+import UserTypeLabelPage from "./pages/TrainingPages/UserTypeLabelPage";
 
 function TrainingRoutes() {
   const trainingPages = [
     "SetUpPage",
-    "ChooseModelPage",
-    "TrainingPage",
-    "ResultPage",
+    "MethodSelect",
+    "UserTypeLabel",
+    "TrainingProcess",
+    "Result",
   ];
   const [currentStep, setCurrentStep] = useState(1);
   const [allComplete, setAllComplete] = useState(false);
@@ -33,14 +35,15 @@ function TrainingRoutes() {
         <Route index element={<SetUpPage />} />
         {/* index代表默認頁 */}
         <Route path="MethodSelect" element={<MethodSelectPage />} />
+        <Route path="UserTypeLabel" element={<UserTypeLabelPage />} />
         <Route path="TrainingProcess" element={<TrainingProcessPage />} />
-        <Route path="ResultPage" element={<ResultPage />} />
+        <Route path="Result" element={<ResultPage />} />
       </Routes>
       <StepperButton
         currentStep={currentStep}
         allComplete={allComplete}
         totalPages={totalPages}
-        onClick={handleButtonClick} // 将回调函数传递给按钮组件
+        onClick={handleButtonClick}
       />
     </>
   );
