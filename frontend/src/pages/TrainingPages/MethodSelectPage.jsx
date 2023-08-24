@@ -1,7 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../../components/Modal";
 
-function ChooseModelPage() {
+function MethodSelectPage() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    setCount((prev) => prev + 1);
+  }, []);
+  console.log(count);
+  console.log("進入MethodSelectPage!!wc");
+  console.log("對就是MethodSelect");
   const [showModal, setShowModal] = useState(false);
   const handleClick = () => {
     setShowModal(true);
@@ -29,4 +36,4 @@ function ChooseModelPage() {
   );
 }
 
-export default ChooseModelPage;
+export default MethodSelectPage;

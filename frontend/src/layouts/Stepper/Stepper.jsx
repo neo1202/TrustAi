@@ -7,13 +7,10 @@ import PageInfoContext from "../../context/pageInfo";
 
 function Stepper() {
   const steps = stepsConfig;
-  const { currentContextStep, incrementCurrentContextStep, allComplete } =
-    useContext(PageInfoContext);
-  // const [currentStep, setCurrentStep] = useState(1);
-  // const [allComplete, setAllComplete] = useState(false);
+  const { currentContextStep, allComplete } = useContext(PageInfoContext);
   return (
     <>
-      <div className="flex justify-between mx-auto mt-6 w-6/6">
+      <div className="flex justify-between mx-auto w-6/6">
         {steps?.map((step, i) => (
           <div
             key={i}

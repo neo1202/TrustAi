@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Stepper from "./layouts/Stepper/Stepper";
 import StepperButton from "./layouts/StepperButton/StepperButton";
 import PageInfoContext, { StepProvider } from "./context/pageInfo";
+import Header from "./layouts/Header/Header";
 
 import SetUpPage from "./pages/TrainingPages/SetUpPage";
 import TrainingProcessPage from "./pages/TrainingPages/TrainingProcessPage";
@@ -28,6 +29,7 @@ function TrainingRoutes() {
 
   return (
     <>
+      <Header />
       <Stepper />
       <Routes>
         <Route index element={<SetUpPage />} />

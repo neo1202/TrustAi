@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import Table from "../../components/Table";
+//import Table from "../../components/Table";
+import SortableTable from "../../components/SortableTable";
 
 function UserTypeLabelPage() {
   const data = [
@@ -11,15 +12,25 @@ function UserTypeLabelPage() {
       columnName: "instance_id",
       render: (oneInstanceData) => oneInstanceData.id,
     },
-    { columnName: "width", render: (oneInstanceData) => oneInstanceData.width },
+    {
+      columnName: "width",
+      render: (oneInstanceData) => oneInstanceData.width,
+    },
     {
       columnName: "color",
       render: (oneInstanceData) => (
         <div className={`p-3 m-2 ${oneInstanceData.color}`} />
       ),
     },
-    { columnName: "score", render: (oneInstanceData) => oneInstanceData.score },
-    { columnName: "label", render: (oneInstanceData) => oneInstanceData.label },
+    {
+      columnName: "score",
+      render: (oneInstanceData) => oneInstanceData.score,
+      sortValue: (oneInstanceData) => oneInstanceData.score,
+    },
+    {
+      columnName: "label",
+      render: (oneInstanceData) => oneInstanceData.label,
+    },
   ];
   const keyFn = (oneInstanceData) => {
     return oneInstanceData.id;
@@ -27,7 +38,7 @@ function UserTypeLabelPage() {
   return (
     <div className="relative">
       <div>UserTypeLabelPage</div>
-      <Table data={data} config={tableConfig} keyFn={keyFn} />
+      <SortableTable data={data} config={tableConfig} keyFn={keyFn} />
     </div>
   );
 }
