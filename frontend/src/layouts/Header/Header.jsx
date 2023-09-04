@@ -19,7 +19,10 @@ function Header() {
         <Link to="/" className="flex items-center justify-center w-32">
           Home
         </Link>
-        <Link to="/training" className="flex items-center justify-center w-32">
+        <Link
+          to="/training"
+          className="flex items-center justify-center w-32 text-indigo-800"
+        >
           Active Learning
         </Link>
         <Link to="/shap" className="flex items-center justify-center w-32">

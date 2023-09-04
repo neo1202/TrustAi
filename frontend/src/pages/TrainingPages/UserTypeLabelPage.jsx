@@ -1,12 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 //import Table from "../../components/Table";
 import SortableTable from "../../components/SortableTable";
 
 function UserTypeLabelPage() {
-  const data = [
-    { id: 3, width: 300, color: "bg-red-500", score: 4, label: "橘子" },
-    { id: 4, width: 2500, color: "bg-green-500", score: 0.2, label: "檸檬" },
-  ];
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get("/api/getTestData");
+        console.log(response);
+        setData(response.data); // 将响应数据存储在 state 中
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+    fetchData();
+  }, []);
+  // const data = [
+  //   { id: 3, width: 300, color: "bg-red-500", score: 4, label: "橘子" },
+  //   { id: 4, width: 2500, color: "bg-green-500", score: 0.2, label: "檸檬" },
+  // ];
   const tableConfig = [
     {
       columnName: "instance_id",
