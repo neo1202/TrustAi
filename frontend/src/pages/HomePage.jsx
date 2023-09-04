@@ -32,6 +32,7 @@ function HomePage() {
       console.error("Error uploading file:", error);
     }
   };
+
   return (
     <>
       <div>It's HomePage</div>

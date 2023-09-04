@@ -11,6 +11,8 @@ import (
 func main() {
 	http.HandleFunc("/api/getTestData", handlers.GetTestData)
 	http.HandleFunc("/upload", uploadFile)
+	port := ":8080"
+	fmt.Printf("Server is running on port %s\n", port)
 	http.ListenAndServe(":8080", nil)
 }
 
