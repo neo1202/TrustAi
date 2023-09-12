@@ -4,38 +4,75 @@ TrustAi website
 
 > frontend: React, Tailwind
 
-> backend: Golang, Python
+> backend: Python Django
 
 ## To start the Website
 
-Go to frontend
+### Virtual Environment
+Stay in the directory, create `.venv` folder
+
+```
+python3 -m venv .venv
+```
+
+Activate `.venv`
+
+```
+. .venv/bin/activate
+```
+
+Check activated Python
+
+```
+which python3
+```
+
+Upgrade `pip` 
+
+```
+pip install --upgrade pip
+```
+
+Install packages
+
+```
+pip install -r requirements.txt
+```
+
+---
+
+### Frontend
+Go to frontend and install packages
 
 ```
 cd frontend
+yarn install
 ```
+or `npm install` (whatever works)
 
-Open the frontend...
+Start the frontend...
 
 ```
-npm run dev
+yarn run dev
 ```
 
 the website runs on http://localhost:5173/
 
 ---
 
+### Backend
 Go to backend
 
 ```
 cd backend
 ```
 
-run the golang server
+run the Django server
 
 ```
-go run main.go
+python3 manage.py runserver
 ```
 
-and the server would runs on port http://localhost:8080
+and the server would run on port http://127.0.0.1:8000
 
 <i>The CORS policy is dealt by using vite proxy</i>
