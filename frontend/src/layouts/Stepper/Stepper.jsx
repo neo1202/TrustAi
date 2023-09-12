@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./stepper.css";
 import { TiTick } from "react-icons/ti";
-import { stepsConfig } from "../../config/config.jsx";
+import { stepsConfig } from "../../config/config";
 import { useContext } from "react";
 import PageInfoContext from "../../context/pageInfo";
 

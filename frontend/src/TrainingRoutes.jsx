@@ -11,14 +11,18 @@ import TrainingProcessPage from "./pages/TrainingPages/TrainingProcessPage";
 import ResultPage from "./pages/TrainingPages/ResultPage";
 import MethodSelectPage from "./pages/TrainingPages/MethodSelectPage";
 import UserTypeLabelPage from "./pages/TrainingPages/UserTypeLabelPage";
+import KDPage from "./pages/TrainingPages/KDPage";
+import ShapExpPage from "./pages/TrainingPages/ShapExpPage";
 
 function TrainingRoutes() {
   const trainingPages = [
     "SetUpPage",
     "MethodSelect",
     "UserTypeLabel",
-    "TrainingProcess",
+    // "TrainingProcess",
     "Result",
+    "KD",
+    "ShapExp",
   ];
   const { currentContextStep } = useContext(PageInfoContext);
   const navigate = useNavigate();
@@ -38,6 +42,8 @@ function TrainingRoutes() {
         <Route path="UserTypeLabel" element={<UserTypeLabelPage />} />
         <Route path="TrainingProcess" element={<TrainingProcessPage />} />
         <Route path="Result" element={<ResultPage />} />
+        <Route path="KD" element={<KDPage />} />
+        <Route path="ShapExp" element={<ShapExpPage />} />
       </Routes>
       <StepperButton handlePageChange={handleButtonClick} />
     </>

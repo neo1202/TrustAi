@@ -1,7 +1,7 @@
 import React from "react";
 import { useContext } from "react";
 import PageInfoContext from "../../context/pageInfo";
-import { stepsConfig } from "../../config/config.jsx";
+import { stepsConfig } from "../../config/config";
 
 function StepperButton({ handlePageChange }) {
   const { currentContextStep, incrementCurrentContextStep } =
