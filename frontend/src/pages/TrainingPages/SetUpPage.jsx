@@ -5,29 +5,49 @@ import SelectBlock from "../../components/SelectBlock";
 
 function SetUpPage() {
 
-  const [numRawData, setNumRawData] = useState(0);
+  const [numRows, setNumRows] = useState(54321);
+  const [numCols, setNumCols] = useState(20);
+
   const [inputValue, setInputValue] = useState('');
   const [displayText, setDisplayText] = useState('');
   const [selectedInitData, setSelectedInitData] = useState('');
   const [selectedModel, setSelectedModel] = useState('');
 
+  const [initAcc, setInitAcc] = useState(100);
+
   useEffect(() => {
     getNumberOfData()
   }, [])
 
-  const getNumberOfData = async() => {
+  const deleteDataset = async () => {
     const response = await fetch(
-        `${API_URL}/numData/`, 
+        `${API_URL}/deleteTest/`, 
         {
-        method: "GET",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        // body: JSON.stringify(note)
-    })
+            method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            // body: JSON.stringify(note)
+        })
     
     const data = await response.json()
-    setNumRawData(data.num)
+    console.log(data)
+  }
+
+  const getNumberOfData = async () => {
+    const response = await fetch(
+        `${API_URL}/numData/raw`, 
+        {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            // body: JSON.stringify(note)
+        })
+    
+    const data = await response.json()
+    setNumRows(data.numRows)
+    setNumCols(data.numCols)
   }
 
   const handleInputChange = (e) => {
@@ -78,12 +98,12 @@ function SetUpPage() {
     const response = await fetch(
         `${API_URL}/settings/`, 
         {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(setting)
-    })
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(setting)
+        })
     const data = await response.json()
     console.log("Settings...", data)
   };
@@ -104,12 +124,12 @@ function SetUpPage() {
     const response = await fetch(
         `${API_URL}/settings/`, 
         {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(setting)
-    })
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(setting)
+        })
     const data = await response.json()
     console.log("Settings...", data)
   };
@@ -122,23 +142,27 @@ function SetUpPage() {
     const response = await fetch(
         `${API_URL}/trainInitModel/`, 
         {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json' // to be confirmed
-        },
-        body: JSON.stringify(model)
-    })
-    const data = await response.json()
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json' // to be confirmed
+            },
+            body: JSON.stringify(model)
+        })
+    const data = await response.json() // accuracy
     console.log("training initial model...", data)
+
+    setInitAcc(data.acc)
   }
 
 
   return <div>
     <h1>SetUpPage</h1>
     <br/>
+    <button className="bg-white btn" onClick={deleteDataset} >delete all in Dataset model(test btn)</button>
     <br/>
-    <p>There are __{numRawData? numRawData:"__"}__ data in total.</p>
     <br/>
+    <p>There are __{numRows? numRows:"__"}__ rows in total.</p>
+    <p>There are __{numCols? numCols:"__"}__ columns in total.</p>
     <br/>
     <p>How many do you want to set in the beginning?  __{displayText? displayText:"__"}__</p>
     <textarea
@@ -157,8 +181,7 @@ function SetUpPage() {
                             onClick={handleSelectInitData} />
     })}
     <br/>
-    <br/>
-    <p>Choose Model</p>
+    <p>Choose Model(but currently not providing multiple model right?)</p>
     {models.map((model, i) => {
         return <SelectBlock key={i}
                             blockName={model}
@@ -167,6 +190,7 @@ function SetUpPage() {
     })}
     <br/>
     <button className="bg-white btn" onClick={trainInitModel}>Go to train initial model</button>
+    {initAcc === 100? <></>:<p>{`Accuracy of initial model: ${initAcc}`}</p>}
 
     
   </div>

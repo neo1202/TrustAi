@@ -7,7 +7,37 @@ function HomePage() {
   const [selectedFile, setSelectedFile] = useState(null);
 
   const navigate = useNavigate();
-  const handleTrainingButtonClick = () => {
+  const handleTrainingButtonClick = async () => {
+
+    // read data(the very first time)
+    const response = await fetch(
+        `${API_URL}/readData/`, 
+        {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            // body: formData
+        })
+
+    const data = await response.json()
+    console.log(data)
+
+    // initialize the process variables
+    // const response2 = await fetch(
+    //     `${API_URL}/initProcess/`, 
+    //     {
+    //         method: "POST",
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         // body: formData
+    //     })
+
+    // const data2 = await response.json()
+    // console.log(data2)
+
+
     navigate("/training");
   };
 
@@ -22,12 +52,12 @@ function HomePage() {
     const response = await fetch(
         `${API_URL}/upload/`, 
         {
-        method: "POST",
-        headers: {
-            'Content-Type': "multipart/form-data",
-        },
-        body: formData
-    })
+            method: "POST",
+            headers: {
+                'Content-Type': "multipart/form-data",
+            },
+            body: formData
+        })
 
     console.log(response)
 
@@ -56,12 +86,12 @@ function HomePage() {
     const response = await fetch(
         `${import.meta.env.VITE_API_URL}/upload/`, 
         {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(note)
-    })
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(note)
+        })
     
     const data = await response.json()
     console.log(data)
