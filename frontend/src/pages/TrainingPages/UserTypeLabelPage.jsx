@@ -7,66 +7,23 @@ import QueryTheOracle from "../../components/QueryTheOracle";
 
 function UserTypeLabelPage() {
 
-//   const [data, setData] = useState([]);
-
-//   useEffect(() => {
-//     async function fetchData() {
-//       try {
-//         const response = await axios.get("/api/getTestData");
-//         console.log(response);
-//         setData(response.data); // 将响应数据存储在 state 中
-//       } catch (error) {
-//         console.error("Error fetching data:", error);
-//       }
-//     }
-//     fetchData();
-//   }, []);
-//   const data = [
-//     { id: 3, width: 300, color: "bg-red-500", score: 4, label: "橘子" },
-//     { id: 4, width: 2500, color: "bg-green-500", score: 0.2, label: "檸檬" },
-//   ];
-//   const tableConfig = [
-//     {
-//       columnName: "instance_id",
-//       render: (oneInstanceData) => oneInstanceData.id,
-//     },
-//     {
-//       columnName: "width",
-//       render: (oneInstanceData) => oneInstanceData.width,
-//     },
-//     {
-//       columnName: "color",
-//       render: (oneInstanceData) => (
-//         <div className={`p-3 m-2 ${oneInstanceData.color}`} />
-//       ),
-//     },
-//     {
-//       columnName: "score",
-//       render: (oneInstanceData) => oneInstanceData.score,
-//       sortValue: (oneInstanceData) => oneInstanceData.score,
-//     },
-//     {
-//       columnName: "label",
-//       render: (oneInstanceData) => oneInstanceData.label,
-//     },
-//   ];
-
-//   const keyFn = (oneInstanceData) => {
-//     return oneInstanceData.id;
-//   };
-
-
   const [iterCount, setIterCount] = useState(1);  
   const [uncertaintyRank, setUncertaintyRank] = useState([])
+  const [cumulatedNumData, setCumulatedNumData] = useState(0)
+  const [currTrainAcc, setCurrTrainAcc] = useState(0.1)
+  const [currTestAcc, setCurrTestAcc] = useState(0.1)
   const [finishTraining, setFinishTraining] = useState(false)
+  const [queryResults, setQueryResults] = useState([])
 
   useEffect(() => {
     getUncertaintyRank()
   }, [iterCount])
 
   const getUncertaintyRank = async () => {
+    // 要拿「前一個」模型預測出的計算結果
+    // 一進頁面時會去拿初始模型（第 0 個模型）的預測結果
     const response = await fetch(
-        `${API_URL}/uncertaintyRank/${iterCount-1}/`, // 要拿前一個模型預測出的計算結果
+        `${API_URL}/uncertaintyRank/${iterCount-1}/`, 
         {
         method: "GET",
         headers: {
@@ -75,9 +32,9 @@ function UserTypeLabelPage() {
         // body: JSON.stringify(setting)
     })
     const data = await response.json()
-    console.log("Getting uncertainty rank...", data)
-
-    setUncertaintyRank([iterCount, iterCount, iterCount])
+    console.log("Getting uncertainty rank...", data.msg)
+    console.log("Rank id: ", data.uncertainIdx)
+    setUncertaintyRank(data.uncertainIdx)
   }
 
   const train = async () => {
@@ -88,10 +45,14 @@ function UserTypeLabelPage() {
         headers: {
             'Content-Type': 'application/json'
         },
-        // body: JSON.stringify(setting)
+        // body: JSON.stringify(uncertaintyRank)
     })
     const data = await response.json()
-    console.log("Training AL model...", data)
+    console.log("Training AL model...", data.msg)
+
+    setCumulatedNumData(data.cumuNumData)
+    setCurrTrainAcc(data.trainAcc)
+    setCurrTestAcc(data.testAcc)
 
     setFinishTraining(true)
   }
@@ -105,7 +66,7 @@ function UserTypeLabelPage() {
 
   const saveModel = async () => {
     const model = {
-        'model': `Model ${iterCount}`
+        'model': `AL Model ${iterCount}`
     }
 
     const response = await fetch(
@@ -139,7 +100,8 @@ function UserTypeLabelPage() {
       {uncertaintyRank.map((data, i) => {
         const key = `${iterCount}-${i}`
         return <QueryTheOracle key={key}
-                               data={data}/>
+                               data={data}
+                               setQueryResults={setQueryResults}/>
       })}
 
       <br/>
@@ -152,11 +114,11 @@ function UserTypeLabelPage() {
         <p>Iteration Result</p>
         <ul>
             <li>{`Iteration ${iterCount}`}</li>
-            <li>{`Teacher model selected: 17`}</li>
-            <li>{`How many train data: 880`}</li>
-            <li>{`Train accuracy: 0.6532`}</li>
-            <li>{`Train loss: 0.0129`}</li>
-            <li>{`Test accuracy: 0.8953`}</li>
+            {/* <li>{`Teacher model selected: 17`}</li> */}
+            <li>{`How many train data: ${cumulatedNumData}`}</li>
+            <li>{`Train accuracy: ${currTrainAcc}`}</li>
+            {/* <li>{`Train loss: 0.0129`}</li> */}
+            <li>{`Test accuracy: ${currTestAcc}`}</li>
         </ul>
         <button className="bg-white btn" onClick={saveModel}>Save the Model of This Iteration</button>
       </div> : <></>}

@@ -25,7 +25,7 @@ def loss_kd(student_logits, labels, teacher_logits, temparature=5, alpha=0.7):
     return total_loss
 
 
-def modify_valid_record(model, device, data_loader, dataset_valid):
+def modify_valid_record(model, device, data_loader, dataset_valid, uncertain_idx):
     model.eval()
     #print('prediction_record: ',dataset_valid.prediction_record)
     with torch.no_grad():
@@ -35,13 +35,31 @@ def modify_valid_record(model, device, data_loader, dataset_valid):
             outputs = model(datas)
             _, test_pred = torch.max(outputs, 1) # test_pred就是類別預測值
 
+            # idx = uncertain_idx
+            # idx = torch.tensor(uncertain_idx) # 這行解開註解會出問題
+            # print("\n\n\n\n ======== idx ========\n\n\n\n")
+            # print(idx)
+            update_idx = idx
+            update_records = []
+
+            # print(len(test_pred))
+            # print(test_pred)
+            # print(len(labels))
+            # print(labels)
+            # print(idx)
+
+            # labels[i] 是資料集本身的答案，但在 AL 中應該要是使用者的答案
             for i in range(len(idx)):
                 if test_pred[i] == labels[i]:
                   #print(f"Sample {idx[i]} prediction is correct")
-                  dataset_valid.update_prediction_record(idx[i], 1) #idx, prediction
+                #   dataset_valid.update_prediction_record(idx[i], 1) #idx, prediction
+                  update_records.append(1)
                 else:
                   #print(f"Sample {idx[i]} prediction is incorrect")
-                  dataset_valid.update_prediction_record(idx[i], 0) #idx, prediction
+                #   dataset_valid.update_prediction_record(idx[i], 0) #idx, prediction
+                  update_records.append(0)
+
+        return update_idx, update_records
 
 
 def choose_teacher(current_model, dataset_valid, valid_loader, previous_model_num): #previous_model_num=2代表有model_0, model_1 可供選擇

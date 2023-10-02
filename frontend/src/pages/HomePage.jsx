@@ -7,13 +7,13 @@ function HomePage() {
   const [selectedFile, setSelectedFile] = useState(null);
 
   const navigate = useNavigate();
-  const handleTrainingButtonClick = async () => {
 
-    // read data(the very first time)
+  const handleTrainingButtonClick = async () => {
+    // clear the previous process, i.e., the process id is always 1
     const response = await fetch(
-        `${API_URL}/readData/`, 
+        `${API_URL}/clearProcess/`, 
         {
-            method: "POST",
+            method: "DELETE",
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -24,18 +24,32 @@ function HomePage() {
     console.log(data)
 
     // initialize the process variables
-    // const response2 = await fetch(
-    //     `${API_URL}/initProcess/`, 
-    //     {
-    //         method: "POST",
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         // body: formData
-    //     })
+    const response2 = await fetch(
+        `${API_URL}/initProcess/`, 
+        {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            // body: formData
+        })
 
-    // const data2 = await response.json()
-    // console.log(data2)
+    const data2 = await response2.json()
+    console.log(data2)
+
+    // read data(the very first time)
+    const response3 = await fetch(
+        `${API_URL}/readData/`, 
+        {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            // body: formData
+        })
+
+    const data3 = await response3.json()
+    console.log(data3)
 
 
     navigate("/training");

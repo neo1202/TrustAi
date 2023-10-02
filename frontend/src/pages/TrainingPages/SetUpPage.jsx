@@ -36,7 +36,7 @@ function SetUpPage() {
 
   const getNumberOfData = async () => {
     const response = await fetch(
-        `${API_URL}/numData/raw`, 
+        `${API_URL}/numData/train-raw`, 
         {
             method: "GET",
             headers: {

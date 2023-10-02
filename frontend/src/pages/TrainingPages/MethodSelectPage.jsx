@@ -14,10 +14,14 @@ function MethodSelectPage() {
   const [inputIterValue, setInputIterValue] = useState('');
   const [inputLRValue, setInputLRValue] = useState('');
   const [inputPoolSizeValue, setInputPoolSizeValue] = useState('');
+  const [inputNumEpochValue, setInputNumEpochValue] = useState('');
+  const [inputBatchSizeValue, setInputBatchSizeValue] = useState('');
 
   const [displayIterText, setDisplayIterText] = useState('');
   const [displayLRText, setDisplayLRText] = useState('');
   const [displayPoolSizeText, setDisplayPoolSizeText] = useState('');
+  const [displayNumEpochText, setDisplayNumEpochText] = useState('');
+  const [displayBatchSizeText, setDisplayBatchSizeText] = useState('');
 
   useEffect(() => {
     setCount((prev) => prev + 1);
@@ -88,6 +92,16 @@ function MethodSelectPage() {
     setInputPoolSizeValue(e.target.value);
   };
 
+  const handleInputNumEpochChange = (e) => {
+    setInputNumEpochValue(e.target.value);
+  };
+
+  const handleInputBatchSizeChange = (e) => {
+    setInputBatchSizeValue(e.target.value);
+  };
+
+  // ================================= //
+
   const handleIterEnter = async () => {
     const setting = {
         'type': 'SetNumDataPerIter',
@@ -154,6 +168,52 @@ function MethodSelectPage() {
     setInputPoolSizeValue('');
   }
 
+  const handleNumEpochEnter = async () => {
+    const setting = {
+        'type': 'SetNumEpoch',
+        'value': inputNumEpochValue,
+    }
+
+    const response = await fetch(
+        `${API_URL}/settings/`, 
+        {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(setting)
+    })
+    const data = await response.json()
+    console.log("Settings...", data)
+
+    setDisplayNumEpochText(inputNumEpochValue);
+    setInputNumEpochValue('');
+  }
+
+  const handleBatchSizeEnter = async () => {
+    const setting = {
+        'type': 'SetBatchingSize',
+        'value': inputBatchSizeValue,
+    }
+
+    const response = await fetch(
+        `${API_URL}/settings/`, 
+        {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(setting)
+    })
+    const data = await response.json()
+    console.log("Settings...", data)
+
+    setDisplayBatchSizeText(inputBatchSizeValue);
+    setInputBatchSizeValue('');
+  }
+
+  // ================================= //
+
   const handleIterKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleIterEnter()
@@ -169,6 +229,18 @@ function MethodSelectPage() {
   const handlePoolSizeKeyPress = (e) => {
     if (e.key === 'Enter') {
         handlePoolSizeEnter()
+    }
+  };
+
+  const handleNumEpochKeyPress = (e) => {
+    if (e.key === 'Enter') {
+        handleNumEpochEnter()
+    }
+  };
+
+  const handleBatchSizeKeyPress = (e) => {
+    if (e.key === 'Enter') {
+        handleBatchSizeEnter()
     }
   };
 
@@ -227,6 +299,23 @@ function MethodSelectPage() {
       />
       <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handlePoolSizeEnter}>Enter</button>
 
+      <p>Number of Epoch __{displayNumEpochText? displayNumEpochText:"__"}__</p>
+      <textarea
+        value={inputNumEpochValue}
+        onChange={handleInputNumEpochChange}
+        onKeyDown={handleNumEpochKeyPress}
+        placeholder="Type a number and press Enter"
+      />
+      <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handleNumEpochEnter}>Enter</button>
+
+      <p>Batch Size __{displayBatchSizeText? displayBatchSizeText:"__"}__</p>
+      <textarea
+        value={inputBatchSizeValue}
+        onChange={handleInputBatchSizeChange}
+        onKeyDown={handleBatchSizeKeyPress}
+        placeholder="Type a number and press Enter"
+      />
+      <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handleBatchSizeEnter}>Enter</button>
       
 
     </div>

@@ -96,3 +96,5 @@ def query_the_oracle(model, device, dataset, query_size=20, query_strategy='rand
     # 更新哪些unlabeled 被標注
     for sample in sample_idx:
         dataset.update_label_from_idx(sample)
+
+    return sample_idx
