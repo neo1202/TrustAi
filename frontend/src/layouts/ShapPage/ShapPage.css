@@ -1,0 +1,24 @@
+h1{
+  text-align: center;
+  font-family: "Koulen"; /* Change "Your Desired Font" to the actual font you want to use */
+  font-size: 36px; /* Change the font size as needed */
+  font-weight: bold; /* You can adjust the font weight if necessary */
+  /* Add any other styles you want */
+}
+h2{
+  text-align: center;
+  font-family: "Koulen"; /* Change "Your Desired Font" to the actual font you want to use */
+  font-size: 24px; /* Change the font size as needed */
+  font-weight: bold; /* You can adjust the font weight if necessary */
+  /* Add any other styles you want */
+}
+h3{
+  font-family: "Koulen"; /* Change "Your Desired Font" to the actual font you want to use */
+  font-size: 24px; /* Change the font size as needed */
+  font-weight: bold; /* You can adjust the font weight if necessary */
+  /* Add any other styles you want */
+}
+
+h4{
+  text-align: center;
+}

@@ -1,0 +1,27 @@
+.sticky-navbar {
+    position: sticky;
+    top: 0;
+    background-color: #333; /* Customize the background color */
+    padding: 10px 0; /* Add padding to style the navbar */
+  }
+  
+  .sticky-navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* Center the navigation links horizontally */
+  }
+  
+  .sticky-navbar li {
+    margin: 0 15px;
+  }
+  
+  .sticky-navbar a {
+    text-decoration: none;
+    color: white; /* Customize the link color */
+  }
+  .nav-link {
+    color: #ffffff; /* Change to your desired color value, e.g., red (#FF0000) */
+    /* Add any other styles you want for the navigation links */
+  }

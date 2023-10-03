@@ -46,7 +46,7 @@ function Dropdown({ options, selection, onSelect }) {
         className="flex items-center justify-between w-full p-3 bg-white border rounded shadow cursor-pointer"
         onClick={handleClick}
       >
-        {selection?.label || "select..."}
+        {selection?.label || "select class..."}
         <GoChevronDown className="text-lg" />
       </div>
       {isOpen && (
