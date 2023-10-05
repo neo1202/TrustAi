@@ -515,7 +515,140 @@ def saveModel(request):
 
 
 @api_view(['POST'])
-def doKD(request):
+def trainFinalTeacher(request):
+    import numpy as np
 
-    data = {'msg': 'do KD...'}
+    import sys
+    sys.path.append('../pytorch/utils')
+    import torch
+    from torch.utils.data import DataLoader
+    from torch.utils.data.sampler import SubsetRandomSampler
+    from pytorch.utils.utils import connectDevice
+    from pytorch.utils.dataset import IndexedDataset
+    from pytorch.utils.modelStructures import ComplexModel
+    from pytorch.utils.trainModel import final_train_teacher
+
+    process = FullProcess.objects.all().order_by("-id")[0] 
+    num_epoch = process.numEpochs
+    batch_size = process.batchSize
+
+    device = connectDevice()
+
+    # get labeled training data indices
+    ds_train_db = Dataset.objects.get(name='train-raw')
+    labeled_idx = ds_train_db.labelOrNot
+
+    labeled_idx = np.array([i for i, x in enumerate(labeled_idx) if x == 1])
+    print(labeled_idx)
+
+    train_df = ds_train_db.df
+    dataset_train = IndexedDataset(train_df, TestOrValid=False, ReVealY=True, revealIdx=labeled_idx)
+    labeled_train_loader = DataLoader(dataset_train, batch_size=batch_size, num_workers=0, sampler=SubsetRandomSampler(labeled_idx))
+
+
+    # a new valid dataset and loader
+    df_valid = process.dataset.get(name='valid-raw').df
+    dataset_valid = IndexedDataset(df_valid, TestOrValid=True, Valid=True)
+    valid_loader = DataLoader(dataset_valid, batch_size=batch_size, shuffle=True, drop_last=True)
+
+    teacher_model = ComplexModel().to(device)
+    large_model_path = './trainingModels/LargeModel.ckpt'
+    trained_teacher_model = final_train_teacher(labeled_train_loader, valid_loader, teacher_model, "Teacher", epochs_num = num_epoch, save_model_path=large_model_path)
+
+    # Test teacher 測試集Acc
+    test_df = process.dataset.get(name='test-raw').df
+    dataset_test = IndexedDataset(test_df, TestOrValid=True)
+    test_loader = DataLoader(dataset_test, batch_size=batch_size,shuffle=False, drop_last=True)
+
+    test_acc = 0
+    teacher_model = ComplexModel().to(device)
+    teacher_model.load_state_dict(torch.load(large_model_path))
+    teacher_model.eval()
+
+    with torch.no_grad():
+        print("\nnow we can test the accuracy in the test set: ")
+        for datas, labels, _ in test_loader:
+            datas, labels = datas.to(device), labels.to(device)
+            outputs = teacher_model(datas)
+            _, test_pred = torch.max(outputs, 1)
+            test_acc += (test_pred.cpu() == labels.cpu()).sum().item() # get the index of the class with the highest probability
+        test_acc = test_acc/(len(dataset_test))
+        print(f"test acc: {test_acc}")
+
+
+    data = {
+        'msg':"train final teacher",
+        'testAcc': test_acc,
+    }
+    return Response(data)
+
+
+@api_view(['POST'])
+def doKD(request): # actually train final student
+    import numpy as np
+
+    import sys
+    sys.path.append('../pytorch/utils')
+    import torch
+    from torch.utils.data import DataLoader
+    from torch.utils.data.sampler import SubsetRandomSampler
+    from pytorch.utils.utils import connectDevice
+    from pytorch.utils.dataset import IndexedDataset
+    from pytorch.utils.modelStructures import ComplexModel, SimpleModel
+    from pytorch.utils.trainModel import final_train_student
+
+    process = FullProcess.objects.all().order_by("-id")[0] 
+    num_epoch = process.numEpochs
+    batch_size = process.batchSize
+
+    device = connectDevice()
+
+    # get labeled training data indices
+    ds_train_db = Dataset.objects.get(name='train-raw')
+    labeled_idx = ds_train_db.labelOrNot
+
+    labeled_idx = np.array([i for i, x in enumerate(labeled_idx) if x == 1])
+    print(labeled_idx)
+
+    train_df = ds_train_db.df
+    dataset_train = IndexedDataset(train_df, TestOrValid=False, ReVealY=True, revealIdx=labeled_idx)
+    labeled_train_loader = DataLoader(dataset_train, batch_size=batch_size, num_workers=0, sampler=SubsetRandomSampler(labeled_idx))
+
+
+    # a new valid dataset and loader
+    df_valid = process.dataset.get(name='valid-raw').df
+    dataset_valid = IndexedDataset(df_valid, TestOrValid=True, Valid=True)
+    valid_loader = DataLoader(dataset_valid, batch_size=batch_size, shuffle=True, drop_last=True)
+
+    student_model = SimpleModel().to(device)
+    small_model_path = './trainingModels/SmallModel.ckpt'
+    teacher_model = ComplexModel().to(device)
+    large_model_path = './trainingModels/LargeModel.ckpt'
+    teacher_model.load_state_dict(torch.load(large_model_path))
+    final_train_student(labeled_train_loader, valid_loader, student_model, teacher_model, "Student", epochs_num = num_epoch, save_model_path=small_model_path)
+
+    # Test student 測試集Acc
+    test_df = process.dataset.get(name='test-raw').df
+    dataset_test = IndexedDataset(test_df, TestOrValid=True)
+    test_loader = DataLoader(dataset_test, batch_size=batch_size,shuffle=False, drop_last=True)
+
+    test_acc = 0
+    student_model = SimpleModel().to(device)
+    student_model.load_state_dict(torch.load(small_model_path))
+    student_model.eval()
+    with torch.no_grad():
+        print("\nnow we can test the accuracy in the test set: ")
+        for datas, labels, _ in test_loader:
+            datas, labels = datas.to(device), labels.to(device)
+            outputs = student_model(datas)
+            _, test_pred = torch.max(outputs, 1)
+            test_acc += (test_pred.cpu() == labels.cpu()).sum().item() # get the index of the class with the highest probability
+        test_acc = test_acc/(len(dataset_test))
+        print(f"test acc: {test_acc}")
+
+
+    data = {
+        'msg': 'do KD...',
+        'testAcc': test_acc,
+    }
     return Response(data)

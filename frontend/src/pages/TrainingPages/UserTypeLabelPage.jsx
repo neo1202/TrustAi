@@ -60,8 +60,12 @@ function UserTypeLabelPage() {
   const trainNextIter = () => {
     // to be done
     // 用上次的 model 去 predict unlabeled 的資料（後端的事），前端拿到排名
-    setIterCount(iter => iter + 1);
-    setFinishTraining(false)
+    if (finishTraining) {
+        setIterCount(iter => iter + 1);
+        setFinishTraining(false)
+    } else {
+        console.log("Current iteration not finished, go to train it first!")
+    }
   }
 
   const saveModel = async () => {

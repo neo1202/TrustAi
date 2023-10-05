@@ -11,6 +11,7 @@ debugpy==1.6.7.post1
 decorator==5.1.1
 Django==4.2.5
 django-cors-headers==4.2.0
+django-jsonform==2.19.1
 django-picklefield==3.1
 djangorestframework==3.14.0
 et-xmlfile==1.1.0
@@ -66,6 +67,7 @@ statsmodels==0.14.0
 sympy==1.12
 threadpoolctl==3.2.0
 torch==2.0.1
+torchinfo==1.8.0
 torchvision==0.15.2
 tornado==6.3.3
 tqdm==4.66.1

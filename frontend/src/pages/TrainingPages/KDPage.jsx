@@ -4,6 +4,8 @@ import API_URL from "../../api";
 const KDPage = () => {
 
     const [finishKD, setFinishKD] = useState(false)
+    const [finalStudentTestAcc, setFinalStudentTestAcc] = useState(0)
+    
 
     const handleKD = async () => {
         const response = await fetch(
@@ -18,6 +20,7 @@ const KDPage = () => {
         const data = await response.json()
         console.log("Doing KD...", data)
 
+        setFinalStudentTestAcc(data.testAcc)
         setFinishKD(true)
     }
 
@@ -26,6 +29,8 @@ const KDPage = () => {
 
         <br/>
         <br/>
+        <p>{`Final Student Test Accuracy: ${finalStudentTestAcc? finalStudentTestAcc:'Not yet trained.'}`}</p>
+
         <br/>
         <p>Compress your model?</p>
         <button style={{marginRight:'20px'}} onClick={handleKD}>YES</button> <button>NO</button>

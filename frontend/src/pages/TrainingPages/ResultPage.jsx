@@ -6,6 +6,7 @@ function ResultPage() {
 
   const [savedModels, setSavedModels] = useState([])
   const [selectedModel, setSelectedModel] = useState('');
+  const [finalTeacherTestAcc, setFinalTeacherTestAcc] = useState(0)
 
   useEffect(() => {
     getSavedModels()
@@ -61,22 +62,40 @@ function ResultPage() {
     
   }
 
+  const trainFinalTeacherModel = async () => {
+    const response = await fetch(
+        `${API_URL}/trainFinalTeacher/`, 
+        {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        // body: JSON.stringify(model)
+    })
+    const data = await response.json()
+    console.log("Training final teacher model...", data)
+
+    setFinalTeacherTestAcc(data.testAcc)
+  }
+
   return <div>
     <h1>ResultPage</h1>
-    <h2>This page should include history of saved models. After the user selects one, the model is carried on to KD process</h2>
+    <h2>This page will train a final teacher model using the labeled training data accumulated from AL, and the student model will be shown on the next(KD) page</h2>
     
     <br/>
-    <p>Saved Model</p>
+    {/* <p>Saved Model</p>
     {savedModels.map((model, i) => { // show model info when hover 
       return <SelectBlock key={i}
                           blockName={model}
                           selected={selectedModel === model}
                           onClick={handleSelectModel} />
-    })}
+    })} */}
 
+    <p>{`Final Teacher Test Accuracy: ${finalTeacherTestAcc? finalTeacherTestAcc:'Not yet trained.'}`}</p>
     <br/>
     <br/>
-    <button className="bg-white btn" onClick={saveModel}>Save the Selected Model</button>
+    {/* <button className="bg-white btn" onClick={saveModel}>Save the Selected Model</button> */}
+    <button className="bg-white btn" onClick={trainFinalTeacherModel}>Train Final Teacher Model</button>
 
   </div>;
 }

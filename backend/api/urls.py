@@ -14,5 +14,6 @@ urlpatterns = [
     path('trainALModel/<str:iter>/', views.trainALModel, name='trainALModel'),
     path('uncertaintyRank/<str:iter>/', views.getUncertaintyRank, name='uncertaintyRank'),
     path('saveModel/', views.saveModel, name='saveModel'),
+    path('trainFinalTeacher/', views.trainFinalTeacher, name='trainFinalTeacher'),
     path('KD/', views.doKD, name='KD'),
 ]
