@@ -70,6 +70,13 @@ cd backend
 #### Set up PostgreSQL
 Note: MacOS instructions only
 
+##### Names for user, password, db, etc.
+- Host: `127.0.0.1` or `localhost`
+- Port: `5432`
+- User: `ntuimproject`
+- Password: `ntuim`
+- Database Name: `ntuimprojectdatabase`
+
 Install PostgreSQL and start it
 ```
 brew tap homebrew/services
@@ -127,7 +134,11 @@ postgres=> CREATE DATABASE database_name;
 
 check database and its user by `\l`
 
+#### Download PgAdmin4
+link: https://www.pgadmin.org/download/
 
+and refer to this page for creating a database 
+https://www.codementor.io/@engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb
 
 
 Finally, run the Django server
