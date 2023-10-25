@@ -30,10 +30,10 @@ Go to backend
 cd backend
 ```
 
-run the golang server
+run flask
 
 ```
-go run main.go
+python app.py
 ```
 
 and the server would runs on port http://localhost:8080
