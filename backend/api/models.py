@@ -22,6 +22,9 @@ class FullProcess(models.Model):
     numEpochs = models.PositiveIntegerField()
     batchSize = models.PositiveIntegerField()
 
+    finalTeacherAcc = models.FloatField(default=0)
+    finalStudentAcc = models.FloatField(default=0)
+
     def __str__(self) -> str:
         return f'{self.uncertaintyQueryMethod}'
 

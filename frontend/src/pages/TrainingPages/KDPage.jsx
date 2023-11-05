@@ -1,11 +1,12 @@
 import { useState } from "react";
 import API_URL from "../../api";
+import ComparisonTable from "../../components/ComparisonTable";
 
 const KDPage = () => {
 
     const [finishKD, setFinishKD] = useState(false)
     const [finalStudentTestAcc, setFinalStudentTestAcc] = useState(0)
-    
+    const [comparison, setComparison] = useState({})
 
     const handleKD = async () => {
         const response = await fetch(
@@ -21,6 +22,7 @@ const KDPage = () => {
         console.log("Doing KD...", data)
 
         setFinalStudentTestAcc(data.testAcc)
+        setComparison(data.comparison)
         setFinishKD(true)
     }
 
@@ -39,11 +41,7 @@ const KDPage = () => {
         
         {finishKD? <div>
             <p>KD Result</p>
-            <ul>
-                <li>Result 1</li>
-                <li>Result 2</li>
-                <li>Result 3</li>
-            </ul>
+            <ComparisonTable comparison={comparison} />
         </div> : <></>}
     </div>
 }

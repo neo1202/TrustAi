@@ -1,13 +1,50 @@
+# common packages
+import numpy as np
 import pandas as pd
-from django.shortcuts import render
+import matplotlib
+matplotlib.use('agg') 
+import matplotlib.pyplot as plt
 import json
+import os
+import sys
+sys.path.append('../pytorch/utils')
+
+# Django
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import FullProcess
 from .models import Dataset
 from .models import ActiveLearning
 
-# Create your views here.
+# torch
+import torch
+from torch.utils.data import DataLoader
+from torch.utils.data.sampler import SubsetRandomSampler
+from torchinfo import summary
+
+# functions from pytorch folder
+from pytorch.config import config
+from pytorch.utils.utils import connectDevice
+from pytorch.utils.dataset import IndexedDataset
+from pytorch.utils.functions import choose_teacher
+from pytorch.utils.functions import modify_valid_record
+from pytorch.utils.query import query_the_oracle
+from pytorch.utils.modelStructures import ComplexModel
+from pytorch.utils.modelStructures import SimpleModel
+from pytorch.utils.trainModel import use_labeled_to_train
+from pytorch.utils.trainModel import final_train_teacher
+from pytorch.utils.trainModel import final_train_student
+from pytorch.utils.trainModel import test
+
+# sklearn
+from sklearn.model_selection import train_test_split
+
+# shap
+import shap
+import dice_ml
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -52,9 +89,6 @@ def clearProcess(request):
 
 @api_view(['POST'])
 def initProcess(request):
-
-    print("\n\n============== initProcess ==============\n\n")
-
     process = FullProcess.objects.create(
         processID = 1, # just use as a foreign key
         initTrainingDataNum = 0,
@@ -66,6 +100,8 @@ def initProcess(request):
         learningRate = 1e-3,
         numEpochs = 100,
         batchSize = 16,
+        finalTeacherAcc = 0,
+        finalStudentAcc = 0,
     )
 
     # init the dataset
@@ -80,20 +116,16 @@ def initProcess(request):
         cumulatedNumData = [],
         trainAcc = [],
         testAcc = [],
-    )
-    
+    )    
     process.save()
 
     print("\n\n============== initProcess done ==============\n\n")
-
 
     return Response({'msg':"init process done"})
 
 
 @api_view(['POST'])
 def readData(request):
-    from sklearn.model_selection import train_test_split
-
     df = pd.read_csv(r'./pytorch/data/preprocessed_beans_train.csv')
     df_train, df_valid = train_test_split(df, test_size=0.2, random_state=42) # valid_ratio = 0.2
     df_train = df_train.reset_index(drop=True)
@@ -146,16 +178,20 @@ def readData(request):
 
 
 @api_view(['GET'])
-def getNumOfData(request, pk):
+def getData(request, pk):
     # 實際上，應該是丟進一個資料集，回傳長度。可能是初始資料、某一次迭代的訓練集等
     dataset = Dataset.objects.get(name=pk)
     if not Dataset.objects.filter(name=pk).exists():
         print(f"dataset {pk} does not exist!")
 
-    numRows = dataset.df.shape[0]
-    numCols = dataset.df.shape[1]
+    df = dataset.df
+    rawData = df.to_dict(orient='records')
+    numRows = df.shape[0]
+    numCols = df.shape[1] - 1 # 前端叫的是訓練集，所以欄位數量要扣掉標籤欄
 
-    data = {'numRows': numRows, 'numCols': numCols}
+    data = {
+        'rawData': rawData, 'keys': list(rawData[0].keys()),
+        'numRows': numRows, 'numCols': numCols}
     return Response(data)
 
 ######################################################
@@ -183,7 +219,6 @@ def setDataset(request):
 
 @api_view(['POST', 'PUT']) # 'DELETE'? 
 def setMethodsAndConfigs(request):
-    
     data = json.loads(request.body) 
     setting_type = data['type']
     setting_value = data['value']
@@ -215,24 +250,149 @@ def setMethodsAndConfigs(request):
     return Response(data)
 
 
+@api_view(['GET'])
+def getUncertaintyRank(request, iter):
+    # 拿前一次模型去對 test data 預測（回去看一下 pytorch 那邊怎寫的）
+    # 也要配合相對應的 uncertainty query method（conf, margin, ...）
+    # 模型：理想中會存在 backend 的一個資料夾
+
+    # get data from database
+    process = FullProcess.objects.all().order_by("-id")[0] 
+
+    # params
+    query_size = process.querySize
+    strategy = process.uncertaintyQueryMethod
+    pool_size = process.poolingSize
+    batch_size = process.batchSize
+
+    # datasets
+    df_train = process.dataset.get(name='train-raw').df
+    df_valid = process.dataset.get(name='valid-raw').df
+    dataset_train = IndexedDataset(df_train)
+    dataset_valid = IndexedDataset(df_valid, TestOrValid=True, Valid=True)
+    valid_loader = DataLoader(dataset_valid, batch_size=batch_size, shuffle=True, drop_last=True)
+
+    # cpu or gpu
+    device = connectDevice()
+    iteration = int(iter)
+
+    # model
+    model = ComplexModel().to(device=device)
+    model.load_state_dict(torch.load(f'./trainingModels/model_{iteration}.pt'))
+    
+
+    # query session
+    # 每個iteration的開始加入一些labeled data 到training，用上個迴圈還沒被重置的model
+    uncertain_idx = query_the_oracle(model, device, dataset_train, query_size=query_size, query_strategy=strategy, pool_size=pool_size) #用上一輪的model去拿到新的資料
+    # update_idx, update_records = modify_valid_record(model, device, valid_loader, dataset_valid, uncertain_idx) #用上一輪的model去更新valid上的預測至目前
+
+    # 這些 id 在 torch dataset 有紀錄「已 label」，但要在這邊再寫一次去更動資料庫那邊
+    ds_train_db = Dataset.objects.get(name='train-raw')
+    
+    for index in uncertain_idx:
+        ds_train_db.labelOrNot[index] = 1
+    ds_train_db.save()
+
+    # 回傳一個陣列，是 uncertainty 從最不確定到第 querySize 不確定的資料
+    print("\n ===== uncertain indices =====\n")
+    print(uncertain_idx)
+
+    # # modify validation record
+    # print("\n ===== update_idx =====\n")
+    # update_idx = update_idx.tolist()
+    # print(update_idx)
+    # print("\n ===== update_records =====\n")
+    # print(update_records)
+
+    # ds_valid_db = Dataset.objects.get(name='valid-raw')
+    # print(len(ds_valid_db.labelOrNot))
+    # print(ds_valid_db.labelOrNot)
+    # print(len(ds_valid_db.predictionRecord))
+    # print(ds_valid_db.predictionRecord)
+
+    # for i, pred_id in enumerate(update_idx):
+    #     ds_valid_db.predictionRecord[pred_id].append(update_records[i])
+    # ds_valid_db.save()
+
+    al = ActiveLearning.objects.all().order_by("-id")[0]
+    if len(al.queryIdxByIter) < iteration + 1:
+        al.queryIdxByIter.append(uncertain_idx)
+    else:
+        al.queryIdxByIter[iteration] = uncertain_idx
+    al.save()
+
+    # 包裝好的 uncertain 資料（包括欄位）
+    uncertain_data = []
+    features = df_train.columns
+    for idx in uncertain_idx:
+        # 從訓練資料集裡面，對照著 uncertain idx，把那行的資料全部顯示（或重要欄位）
+        row = {'trueId': idx}
+        for f in features:
+            row[f] = round(df_train[f][idx], 4)
+
+        uncertain_data.append(row)
+
+    keys = list(['trueId'] + list(features))
+    data = {
+        'msg': f"get uncertainty ranking iter {iteration}(an list or a bar chart figure)",
+        'uncertainIdx': uncertain_idx,
+        'uncertainData': uncertain_data, # 這裡要是包好的 uncertain 資料
+        'keys': keys,
+    }
+    return Response(data)
+
+
+@api_view(['GET'])
+def plotCumulation(request): # , iter
+    print(f"\n ================= plotCumulation ================= \n")
+    al = ActiveLearning.objects.all().order_by("-id")[0]
+    iters = al.nthIter
+    num_datas = al.cumulatedNumData
+    train_accs = al.trainAcc
+    test_accs = al.testAcc
+
+    dashboard_plots_path = './dashboard'
+    if not os.path.isdir(dashboard_plots_path):
+        print("\n === No folder for plots of dashboard, make one now === \n")
+        os.mkdir(dashboard_plots_path)
+
+    num_data_plot_name = 'iter-numData.png'
+    num_data_plot_path = f'{dashboard_plots_path}/{num_data_plot_name}'
+    plt.plot(iters, num_datas)
+    plt.xlabel('Iteration')
+    plt.ylabel('Number of Training Data')
+    plt.title('Cumulated Number of Training Data')
+    plt.savefig(f'{num_data_plot_path}')
+    plt.close()
+
+    train_acc_plot_name = 'iter-trainAcc.png'
+    train_acc_plot_path = f'{dashboard_plots_path}/{train_acc_plot_name}'
+    plt.plot(iters, train_accs)
+    plt.xlabel('Iteration')
+    plt.ylabel('Accuracy')
+    plt.title('Training Accuracy by Iteration')
+    plt.savefig(f'{train_acc_plot_path}')
+    plt.close()
+
+    test_acc_plot_name = 'iter-testAcc.png'
+    test_acc_plot_path = f'{dashboard_plots_path}/{test_acc_plot_name}'
+    plt.plot(iters, test_accs)
+    plt.xlabel('Iteration')
+    plt.ylabel('Accuracy')
+    plt.title('Test Accuracy by Iteration')
+    plt.savefig(f'{test_acc_plot_path}')
+    plt.close()
+
+    return Response({
+        'msg': 'plotting cumulated info...',
+        'cumuNumDataPlot': num_data_plot_name, 
+        'cumuTrainAccPlot': train_acc_plot_name,
+        'cumuTestAccPlot': test_acc_plot_name,
+    })
+
+
 @api_view(['POST'])
 def trainInitModel(request):
-    import os
-    import sys
-    sys.path.append('../pytorch/utils')
-
-    import pandas as pd
-    import numpy as np
-    from sklearn.model_selection import train_test_split
-    import torch
-    from torch.utils.data import DataLoader
-    from pytorch.config import config
-    from pytorch.utils.dataset import IndexedDataset
-    from pytorch.utils.utils import connectDevice
-    from pytorch.utils.modelStructures import ComplexModel
-    from pytorch.utils.query import query_the_oracle
-    from pytorch.utils.trainModel import use_labeled_to_train, test
-
     device = connectDevice()
 
     process = FullProcess.objects.all().order_by("-id")[0] 
@@ -309,39 +469,34 @@ def trainInitModel(request):
     
     al.save()
 
-    # data = json.loads(request.body)
-    data = {'acc':test_acc}
+    data = { 'acc':test_acc }
     return Response(data)
 
 
 @api_view(['POST'])
 def trainALModel(request, iter):
-    import os
-    import sys
-    sys.path.append('../pytorch/utils')
-
-    import numpy as np
-    import torch
-    from torch.utils.data import DataLoader
-    from pytorch.utils.utils import connectDevice
-    from pytorch.utils.dataset import IndexedDataset
-    from pytorch.utils.modelStructures import ComplexModel
-    from pytorch.utils.functions import choose_teacher
-    from pytorch.utils.trainModel import use_labeled_to_train, test
-
     process = FullProcess.objects.all().order_by("-id")[0] 
     al = ActiveLearning.objects.all().order_by("-id")[0]
+    iteration = int(iter)
 
     # check if the user has not moved on to next iteration
-    if al.nthIter[-1] == iter:
-        return Response({'msg': f'AL model {iter} has been trained, please move on to the next iteration'})
+    if iter in al.nthIter:
+        if iter == al.nthIter[-1]: # 連續按了兩次 train 按鈕
+            return Response({
+                'msg': f'AL model {iter} has been trained, please move on to the next iteration',
+                'status': 'repeated',
+                })
+        else:
+            iteration = int(al.nthIter[-1]) + 1
+    print(type(iter))
+    print(al.nthIter)
+    print(f"\n\n =============== {iteration} ===============\n\n") 
+    # elif iter != al.nthIter[-1] and iter in al.nthIter:
+    #     iter = al.nthIter[-1] + 1
     
     # training session
-
     batch_size = process.batchSize
-
     device = connectDevice()
-    iteration = int(iter)
 
     '''看看當今model會錯在哪裡用來更新C(correct consistency),也代表著這個被傳入的model不會是teacher(除了前面兩輪)
        同時找到過往的teacher -> '''
@@ -396,7 +551,7 @@ def trainALModel(request, iter):
     torch.save(model.state_dict(), model_path)  
     
     # store the results
-    al.nthIter.append(iter)
+    al.nthIter.append(iteration)
     al.cumulatedNumData.append(
         al.cumulatedNumData[-1] + process.querySize
     )
@@ -410,98 +565,12 @@ def trainALModel(request, iter):
     al.save()
 
     data = {
-        'msg': f'train AL model {iter}', 
+        'msg': f'train AL model {iteration}', 
+        'status': 'successful',
+        'iteration':iteration, 
         'cumuNumData': al.cumulatedNumData[-1],
         'trainAcc': train_acc,
         'testAcc': test_acc,
-    }
-    return Response(data)
-
-
-@api_view(['GET'])
-def getUncertaintyRank(request, iter):
-    # 拿前一次模型去對 test data 預測（回去看一下 pytorch 那邊怎寫的）
-    # 也要配合相對應的 uncertainty query method（conf, margin, ...）
-    # 模型：理想中會存在 backend 的一個資料夾
-    import sys
-    sys.path.append('../pytorch/utils')
-
-    import torch
-    from torch.utils.data import DataLoader
-    from pytorch.utils.utils import connectDevice
-    from pytorch.utils.dataset import IndexedDataset
-    from pytorch.utils.modelStructures import ComplexModel
-    from pytorch.utils.functions import modify_valid_record
-    from pytorch.utils.query import query_the_oracle
-
-    # get data from database
-    process = FullProcess.objects.all().order_by("-id")[0] 
-
-    # params
-    query_size = process.querySize
-    strategy = process.uncertaintyQueryMethod
-    pool_size = process.poolingSize
-    batch_size = process.batchSize
-
-    # datasets
-    df_train = process.dataset.get(name='train-raw').df
-    df_valid = process.dataset.get(name='valid-raw').df
-    dataset_train = IndexedDataset(df_train)
-    dataset_valid = IndexedDataset(df_valid, TestOrValid=True, Valid=True)
-    valid_loader = DataLoader(dataset_valid, batch_size=batch_size, shuffle=True, drop_last=True)
-
-    # cpu or gpu
-    device = connectDevice()
-    iteration = int(iter)
-
-    # model
-    model = ComplexModel().to(device=device)
-    model.load_state_dict(torch.load(f'./trainingModels/model_{iteration}.pt'))
-    
-
-    # query session
-    # 每個iteration的開始加入一些labeled data 到training，用上個迴圈還沒被重置的model
-    uncertain_idx = query_the_oracle(model, device, dataset_train, query_size=query_size, query_strategy=strategy, pool_size=pool_size) #用上一輪的model去拿到新的資料
-    # update_idx, update_records = modify_valid_record(model, device, valid_loader, dataset_valid, uncertain_idx) #用上一輪的model去更新valid上的預測至目前
-
-    # 這些 id 在 torch dataset 有紀錄「已 label」，但要在這邊再寫一次去更動資料庫那邊
-    ds_train_db = Dataset.objects.get(name='train-raw')
-    
-    for index in uncertain_idx:
-        ds_train_db.labelOrNot[index] = 1
-    ds_train_db.save()
-
-    # 回傳一個陣列，是 uncertainty 從最不確定到第 querySize 不確定的資料
-    print("\n ===== uncertain indices =====\n")
-    print(uncertain_idx)
-
-    # # modify validation record
-    # print("\n ===== update_idx =====\n")
-    # update_idx = update_idx.tolist()
-    # print(update_idx)
-    # print("\n ===== update_records =====\n")
-    # print(update_records)
-
-    # ds_valid_db = Dataset.objects.get(name='valid-raw')
-    # print(len(ds_valid_db.labelOrNot))
-    # print(ds_valid_db.labelOrNot)
-    # print(len(ds_valid_db.predictionRecord))
-    # print(ds_valid_db.predictionRecord)
-
-    # for i, pred_id in enumerate(update_idx):
-    #     ds_valid_db.predictionRecord[pred_id].append(update_records[i])
-    # ds_valid_db.save()
-
-    al = ActiveLearning.objects.all().order_by("-id")[0]
-    if len(al.queryIdxByIter) < iteration + 1:
-        al.queryIdxByIter.append(uncertain_idx)
-    else:
-        al.queryIdxByIter[iteration] = uncertain_idx
-    al.save()
-
-    data = {
-        'msg': f"get uncertainty ranking iter {iteration}(an list or a bar chart figure)",
-        'uncertainIdx': uncertain_idx,
     }
     return Response(data)
 
@@ -516,18 +585,6 @@ def saveModel(request):
 
 @api_view(['POST'])
 def trainFinalTeacher(request):
-    import numpy as np
-
-    import sys
-    sys.path.append('../pytorch/utils')
-    import torch
-    from torch.utils.data import DataLoader
-    from torch.utils.data.sampler import SubsetRandomSampler
-    from pytorch.utils.utils import connectDevice
-    from pytorch.utils.dataset import IndexedDataset
-    from pytorch.utils.modelStructures import ComplexModel
-    from pytorch.utils.trainModel import final_train_teacher
-
     process = FullProcess.objects.all().order_by("-id")[0] 
     num_epoch = process.numEpochs
     batch_size = process.batchSize
@@ -544,7 +601,6 @@ def trainFinalTeacher(request):
     train_df = ds_train_db.df
     dataset_train = IndexedDataset(train_df, TestOrValid=False, ReVealY=True, revealIdx=labeled_idx)
     labeled_train_loader = DataLoader(dataset_train, batch_size=batch_size, num_workers=0, sampler=SubsetRandomSampler(labeled_idx))
-
 
     # a new valid dataset and loader
     df_valid = process.dataset.get(name='valid-raw').df
@@ -575,6 +631,8 @@ def trainFinalTeacher(request):
         test_acc = test_acc/(len(dataset_test))
         print(f"test acc: {test_acc}")
 
+    process.finalTeacherAcc = test_acc
+    process.save()
 
     data = {
         'msg':"train final teacher",
@@ -585,18 +643,6 @@ def trainFinalTeacher(request):
 
 @api_view(['POST'])
 def doKD(request): # actually train final student
-    import numpy as np
-
-    import sys
-    sys.path.append('../pytorch/utils')
-    import torch
-    from torch.utils.data import DataLoader
-    from torch.utils.data.sampler import SubsetRandomSampler
-    from pytorch.utils.utils import connectDevice
-    from pytorch.utils.dataset import IndexedDataset
-    from pytorch.utils.modelStructures import ComplexModel, SimpleModel
-    from pytorch.utils.trainModel import final_train_student
-
     process = FullProcess.objects.all().order_by("-id")[0] 
     num_epoch = process.numEpochs
     batch_size = process.batchSize
@@ -613,7 +659,6 @@ def doKD(request): # actually train final student
     train_df = ds_train_db.df
     dataset_train = IndexedDataset(train_df, TestOrValid=False, ReVealY=True, revealIdx=labeled_idx)
     labeled_train_loader = DataLoader(dataset_train, batch_size=batch_size, num_workers=0, sampler=SubsetRandomSampler(labeled_idx))
-
 
     # a new valid dataset and loader
     df_valid = process.dataset.get(name='valid-raw').df
@@ -645,10 +690,203 @@ def doKD(request): # actually train final student
             test_acc += (test_pred.cpu() == labels.cpu()).sum().item() # get the index of the class with the highest probability
         test_acc = test_acc/(len(dataset_test))
         print(f"test acc: {test_acc}")
+    
+    process.finalStudentAcc = test_acc
+    process.save()
 
-
+    # get comparison(with teacher) results
+    summary_teacher = summary(teacher_model, input_size=(batch_size,16))
+    summary_student = summary(student_model, input_size=(batch_size,16))
+    
     data = {
         'msg': 'do KD...',
         'testAcc': test_acc,
+        'comparison': {
+            'teacher':{
+                'acc': process.finalTeacherAcc,
+                'totalParams':summary_teacher.total_params,
+                'paramsSize':summary_teacher.total_param_bytes,
+                'outputSize':summary_teacher.total_output_bytes,
+            },
+            'student':{
+                'acc': test_acc,
+                'totalParams':summary_student.total_params,
+                'paramsSize':summary_student.total_param_bytes,
+                'outputSize':summary_student.total_output_bytes,
+            },
+        },
     }
     return Response(data)
+
+
+@api_view(['GET'])
+def getShapPlotImage(request, img):
+    print("\n ================= getShapPlotImage ================= \n")
+    image_path = f"./shap-images/{img}"
+
+    with open(image_path, 'rb') as img:
+        response = HttpResponse(img.read(), content_type='image/png')
+    return response
+
+
+@api_view(['POST'])
+def processShapClassPlot(request):
+
+    print("\n ================= processShapClassPlot ================= \n")
+    shapClass = json.loads(request.body)
+    print(shapClass)
+    
+    process = FullProcess.objects.all().order_by("-id")[0] 
+    valid_df = process.dataset.get(name='valid-raw').df
+    test_df = process.dataset.get(name='test-raw').df
+    dataset_test = IndexedDataset(test_df, TestOrValid=True)
+    batch_size = process.batchSize
+    test_loader = DataLoader(dataset_test, batch_size=batch_size,shuffle=False, drop_last=True)
+
+    #SHAP
+    device = connectDevice()
+    teacher_model = ComplexModel().to(device)
+    teacher_model.load_state_dict(torch.load('./trainingModels/LargeModel.ckpt', map_location=torch.device('cpu')))
+    for batch in test_loader:
+        datas, labels, _ = batch
+        datas, labels = datas.to(device), labels.to(device)
+        explainer = shap.DeepExplainer(teacher_model, datas)
+        break
+
+    #savefig
+    shap_img_path = './shap-images'
+    if not os.path.isdir(shap_img_path):
+        print("\n === No folder for shap img, make one now === \n")
+        os.mkdir(shap_img_path)
+    
+    shap_values_teacher = explainer.shap_values(datas)
+    shap.summary_plot(shap_values_teacher, datas, valid_df.columns[:-1], show=False)
+    plt.savefig(f'{shap_img_path}/all_class.png')
+    plt.close()
+    
+    shap.summary_plot(shap_values_teacher[int(shapClass)], datas, valid_df.columns[:-1])
+    summaryimage_filename = 'class_summary.png'
+    plt.savefig(f'{shap_img_path}/{summaryimage_filename}')
+    plt.close()
+
+    shap.summary_plot(shap_values_teacher[int(shapClass)], datas, valid_df.columns[:-1], plot_type='bar')
+    gbarimage_filename = 'class_gbar.png'
+    plt.savefig(f'{shap_img_path}/{gbarimage_filename}')
+    plt.close()
+
+    #correlation
+    posX=[]
+    negX=[]
+    Xcol = valid_df.columns[:-1].tolist()
+    for i in range(len(Xcol)):
+        cor=np.corrcoef(datas[:,i:i+1].numpy().T, shap_values_teacher[int(shapClass)][:,i:i+1].T)[0,1]
+        if cor>0: 
+            posX.append(Xcol[i])
+        elif cor<0:
+            negX.append(Xcol[i])
+    
+    #pie chart
+    abs_mean=np.abs(shap_values_teacher[1]).mean(0).tolist()  
+    df = pd.DataFrame([abs_mean], columns =valid_df.columns[:-1])
+    id=df.loc[0].sort_values().index
+    val=df.loc[0].sort_values().values
+    total=sum(val)
+    labels = [f'{l}, {(s/total*100):0.1f}%' for l, s in zip(id, val)]
+    pie = plt.pie(val,autopct='%1.1f%%', startangle=90)
+    plt.axis('equal')
+    plt.legend(bbox_to_anchor=(0.85, 1), loc='upper left', labels=labels)
+    gPieImage_filename="gPie.png"
+    plt.savefig(f'{shap_img_path}/{gPieImage_filename}')
+    plt.close()
+        
+    return Response({'image_path': summaryimage_filename,
+                     'gBarImagePath': gbarimage_filename,
+                     'posX':posX,
+                     'negX':negX,
+                     'gPieImagePath': gPieImage_filename})
+
+
+@api_view(['POST'])
+def processDepClassPlot(request):
+    print("\n ================= processDepClassPlot ================= \n")
+
+    data = json.loads(request.body)
+
+    class1 = data['depClass1']
+    class2 = data['depClass2']
+    depY = data['depY']
+    print(class1)
+    print(class2)
+    print(depY)
+
+    process = FullProcess.objects.all().order_by("-id")[0] 
+    valid_df = process.dataset.get(name='valid-raw').df
+    test_df = process.dataset.get(name='test-raw').df
+    dataset_test = IndexedDataset(test_df, TestOrValid=True)
+    batch_size = process.batchSize
+    test_loader = DataLoader(dataset_test, batch_size=batch_size,shuffle=False, drop_last=True)
+
+    #SHAP
+    device = connectDevice()
+    teacher_model = ComplexModel().to(device)
+    teacher_model.load_state_dict(torch.load('./trainingModels/LargeModel.ckpt', map_location=torch.device('cpu')))
+    for batch in test_loader:
+        datas, labels, _ = batch
+        datas, labels = datas.to(device), labels.to(device)
+        explainer = shap.DeepExplainer(teacher_model, datas)
+        break
+
+    #savefig
+    shap_img_path = './shap-images'
+    if not os.path.isdir(shap_img_path):
+        print("\n === No folder for shap img, make one now === \n")
+        os.mkdir(shap_img_path)
+
+    shap_values_teacher = explainer.shap_values(datas)
+    shap.dependence_plot(class1, shap_values_teacher[int(depY)], datas.numpy(), valid_df.columns[:-1], interaction_index=class2)
+    image_filename_d1 = 'dep1.png'
+    plt.savefig(f'{shap_img_path}/{image_filename_d1}')
+    plt.close()
+
+    shap.dependence_plot(class2, shap_values_teacher[int(depY)], datas.numpy(), valid_df.columns[:-1], interaction_index=class1)
+    image_filename_d2 = 'dep2.png'
+    plt.savefig(f'{shap_img_path}/{image_filename_d2}')
+    plt.close()
+
+    return Response({'image_pathD1': image_filename_d1, 'image_pathD2': image_filename_d2})
+    
+
+@api_view(['POST'])
+def processCF(request):
+    print("\n ================= processCF ================= \n")
+    
+    process = FullProcess.objects.all().order_by("-id")[0] 
+    valid_df = process.dataset.get(name='valid-raw').df
+    Xcol=valid_df.columns[:-1].tolist()
+
+    d = dice_ml.Data(dataframe=valid_df, continuous_features=Xcol, outcome_name='Class')
+    backend ='PYT' 
+    device = connectDevice()
+    teacher_model = ComplexModel().to(device)
+    teacher_model.load_state_dict(torch.load('./trainingModels/LargeModel.ckpt', map_location=torch.device('cpu')))
+    m = dice_ml.Model(model=teacher_model, backend=backend)
+    
+    exp_random = dice_ml.Dice(d, m) # initiate DiCE
+
+    # Get parameters from the JSON request data
+    data = json.loads(request.body)
+
+    desired_y = int(data['desired_y'])
+    inputX = data['inputX']
+
+    floatX = [[float(i) for i in inputX]]
+    query_instances = pd.DataFrame(floatX, columns =Xcol)
+    # query_instances = test_df.iloc[4:5, :]  
+    dice_exp = exp_random.generate_counterfactuals(query_instances, total_CFs=2, desired_class=desired_y, verbose=False)   
+    df_qi=dice_exp.cf_examples_list[0].test_instance_df
+    df_cf=dice_exp.cf_examples_list[0].final_cfs_df
+    df = df_qi.append(df_cf)
+    df_json = df.to_json(orient='records')
+
+    return Response({'data': df_json})
+    

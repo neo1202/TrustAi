@@ -95,6 +95,8 @@ function ResultPage() {
     <br/>
     <br/>
     {/* <button className="bg-white btn" onClick={saveModel}>Save the Selected Model</button> */}
+    <br/>
+    <br/>
     <button className="bg-white btn" onClick={trainFinalTeacherModel}>Train Final Teacher Model</button>
 
   </div>;

@@ -14,7 +14,7 @@ function StepperButton({ handlePageChange }) {
 
   return (
     <>
-      <p>Now step from Context:{currentContextStep}</p>
+      {/* <p>Now step from Context:{currentContextStep}</p> */}
       <button className="bg-white btn" onClick={handleButtonClick}>
         {currentContextStep === steps.length
           ? "Finish"

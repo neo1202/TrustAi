@@ -115,7 +115,7 @@ function HomePage() {
     <>
       <div>It's HomePage</div>
       <input type="file" onChange={handleFileChange} />
-      <button onClick={testUpload}>TEST UPLOAD FOR API ACCESS</button>
+      {/* <button onClick={testUpload}>TEST UPLOAD FOR API ACCESS</button> */}
       <button onClick={uploadFile}>Upload File</button>
       <button onClick={handleTrainingButtonClick}>Go to Training</button>
     </>

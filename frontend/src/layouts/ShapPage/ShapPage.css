@@ -1,0 +1,74 @@
+.heading1{
+    text-align: center;
+    font-family: "Koulen"; /* Change "Your Desired Font" to the actual font you want to use */
+    font-size: 36px; /* Change the font size as needed */
+    font-weight: bold; /* You can adjust the font weight if necessary */
+    /* Add any other styles you want */
+  }
+  .cenheading2{
+    text-align: center;
+    font-family: "Koulen"; /* Change "Your Desired Font" to the actual font you want to use */
+    font-size: 24px; /* Change the font size as needed */
+    font-weight: bold; /* You can adjust the font weight if necessary */
+    /* Add any other styles you want */
+  }
+  .heading2{
+    font-family: "Koulen"; /* Change "Your Desired Font" to the actual font you want to use */
+    font-size: 24px; /* Change the font size as needed */
+    font-weight: bold; /* You can adjust the font weight if necessary */
+    /* Add any other styles you want */
+  }
+  
+  .heading3{
+    font-family: "Koulen"; /* Change "Your Desired Font" to the actual font you want to use */
+    font-weight: bold;
+  }
+  
+  .whitebox{
+    border: 2px solid rgb(215, 215, 215);
+    background-color: white;
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-bottom:5px;
+  }
+  .graybut {
+    background-color: rgb(80, 80, 80);
+    border-radius: 12px;
+  }
+  /* .graybut:hover {
+    background-color: #9a9a9a;
+    color: rgb(142, 140, 140);
+    border-radius: 12px;
+  } */
+  
+  
+  table{
+    border-collapse: separate;
+    width: 100%;
+    border-spacing: 0;
+    
+  }
+  
+  th{
+    background-color: #6c6b6b;
+    color:#ffffff;
+    /* width:25vw;
+    height:75px; */
+    border: 2px solid #c0c0c0;
+    border-radius: px;
+  }
+  td{
+    border: 2px solid #c0c0c0;
+  }
+  
+  .image-container {
+    display: flex; /* Use flexbox to arrange the images horizontally */
+    gap: 20px; /* Adjust the gap (spacing) between the images */
+    align-items: center; /* Align images vertically in the center (optional) */
+  }
+  
+  /* Optionally, you can add additional styling to the images themselves */
+  .image-container img {
+    max-width: 100%; /* Ensure images don't exceed their container's width */
+    height: auto; /* Maintain the aspect ratio of the images */
+  }

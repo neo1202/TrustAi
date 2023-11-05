@@ -17,11 +17,11 @@ function MethodSelectPage() {
   const [inputNumEpochValue, setInputNumEpochValue] = useState('');
   const [inputBatchSizeValue, setInputBatchSizeValue] = useState('');
 
-  const [displayIterText, setDisplayIterText] = useState('');
-  const [displayLRText, setDisplayLRText] = useState('');
-  const [displayPoolSizeText, setDisplayPoolSizeText] = useState('');
-  const [displayNumEpochText, setDisplayNumEpochText] = useState('');
-  const [displayBatchSizeText, setDisplayBatchSizeText] = useState('');
+  const [displayIter, setDisplayIter] = useState('');
+  const [displayLR, setDisplayLR] = useState('');
+  const [displayPoolSize, setDisplayPoolSize] = useState('');
+  const [displayNumEpoch, setDisplayNumEpoch] = useState('');
+  const [displayBatchSize, setDisplayBatchSize] = useState('');
 
   useEffect(() => {
     setCount((prev) => prev + 1);
@@ -120,7 +120,7 @@ function MethodSelectPage() {
     const data = await response.json()
     console.log("Settings...", data)
 
-    setDisplayIterText(inputIterValue);
+    setDisplayIter(inputIterValue);
     setInputIterValue('');
   }
 
@@ -142,7 +142,7 @@ function MethodSelectPage() {
     const data = await response.json()
     console.log("Settings...", data)
 
-    setDisplayLRText(inputLRValue);
+    setDisplayLR(inputLRValue);
     setInputLRValue('');
   }
 
@@ -164,7 +164,7 @@ function MethodSelectPage() {
     const data = await response.json()
     console.log("Settings...", data)
 
-    setDisplayPoolSizeText(inputPoolSizeValue);
+    setDisplayPoolSize(inputPoolSizeValue);
     setInputPoolSizeValue('');
   }
 
@@ -186,7 +186,7 @@ function MethodSelectPage() {
     const data = await response.json()
     console.log("Settings...", data)
 
-    setDisplayNumEpochText(inputNumEpochValue);
+    setDisplayNumEpoch(inputNumEpochValue);
     setInputNumEpochValue('');
   }
 
@@ -208,7 +208,7 @@ function MethodSelectPage() {
     const data = await response.json()
     console.log("Settings...", data)
 
-    setDisplayBatchSizeText(inputBatchSizeValue);
+    setDisplayBatchSize(inputBatchSizeValue);
     setInputBatchSizeValue('');
   }
 
@@ -259,7 +259,7 @@ function MethodSelectPage() {
       <br/>
       
 
-      <p>How many do you want to add in one iteration?  __{displayIterText? displayIterText:"__"}__</p>
+      <p>How many do you want to add in one iteration?  __{displayIter? displayIter:"__"}__</p>
       <textarea
         value={inputIterValue}
         onChange={handleInputIterChange}
@@ -281,7 +281,7 @@ function MethodSelectPage() {
       <br/>
       
       <h2>Params/hyperparams adjustments </h2>
-      <p>Learning rate __{displayLRText? displayLRText:"__"}__</p>
+      <p>Learning rate __{displayLR? displayLR:"__"}__</p>
       <textarea
         value={inputLRValue}
         onChange={handleInputLRChange}
@@ -290,7 +290,7 @@ function MethodSelectPage() {
       />
       <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handleLREnter}>Enter</button>
 
-      <p>Pooling Size __{displayPoolSizeText? displayPoolSizeText:"__"}__</p>
+      <p>Pooling Size __{displayPoolSize? displayPoolSize:"__"}__</p>
       <textarea
         value={inputPoolSizeValue}
         onChange={handleInputPoolSizeChange}
@@ -299,7 +299,7 @@ function MethodSelectPage() {
       />
       <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handlePoolSizeEnter}>Enter</button>
 
-      <p>Number of Epoch __{displayNumEpochText? displayNumEpochText:"__"}__</p>
+      <p>Number of Epoch __{displayNumEpoch? displayNumEpoch:"__"}__</p>
       <textarea
         value={inputNumEpochValue}
         onChange={handleInputNumEpochChange}
@@ -308,7 +308,7 @@ function MethodSelectPage() {
       />
       <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handleNumEpochEnter}>Enter</button>
 
-      <p>Batch Size __{displayBatchSizeText? displayBatchSizeText:"__"}__</p>
+      <p>Batch Size __{displayBatchSize? displayBatchSize:"__"}__</p>
       <textarea
         value={inputBatchSizeValue}
         onChange={handleInputBatchSizeChange}
