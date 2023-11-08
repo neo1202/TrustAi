@@ -3,11 +3,9 @@ import axios from 'axios';
 import API_URL from "../api";
 import Dropdown from "../components/Dropdown";
 import Navbar from "../components/Navbar";
-import Header from "../layouts/Header/Header";
 import "../layouts/ShapPage/ShapPage.css"; // Import the CSS file for styling
 
 function ShapPage() {
-  //
   const [shapClass, setShapClass] = useState('');
   const [desired_y, setDesired_y] = useState('');
   const [imagePath, setImagePath] = useState('');
@@ -129,8 +127,6 @@ function ShapPage() {
   
   return (
     <div style={pageStyle}>
-      <Header />
-      <br/>
       <Navbar />
       <div id="home" className="section">
         {/* Content for the Home section */}

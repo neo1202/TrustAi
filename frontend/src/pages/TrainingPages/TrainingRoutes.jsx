@@ -1,25 +1,22 @@
 import React, { useState, useContext } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import Stepper from "./layouts/Stepper/Stepper";
-import StepperButton from "./layouts/StepperButton/StepperButton";
-import PageInfoContext, { StepProvider } from "./context/pageInfo";
-import Header from "./layouts/Header/Header";
+import Stepper from "../../layouts/Stepper/Stepper";
+import StepperButton from "../../layouts/StepperButton/StepperButton";
+import PageInfoContext, { PageProvider } from "../../context/pageInfo";
 
-import SetUpPage from "./pages/TrainingPages/SetUpPage";
-import TrainingProcessPage from "./pages/TrainingPages/TrainingProcessPage";
-import ResultPage from "./pages/TrainingPages/ResultPage";
-import MethodSelectPage from "./pages/TrainingPages/MethodSelectPage";
-import UserTypeLabelPage from "./pages/TrainingPages/UserTypeLabelPage";
-import KDPage from "./pages/TrainingPages/KDPage";
-import ShapExpPage from "./pages/TrainingPages/ShapExpPage";
+import SetUpPage from "./SetUpPage";
+import ResultPage from "./ResultPage";
+import MethodSelectPage from "./MethodSelectPage";
+import UserTypeLabelPage from "./UserTypeLabelPage";
+import KDPage from "./KDPage";
+import ShapExpPage from "./ShapExpPage";
 
 function TrainingRoutes() {
   const trainingPages = [
     "SetUpPage",
     "MethodSelect",
     "UserTypeLabel",
-    // "TrainingProcess",
     "Result",
     "KD",
     "ShapExp",
@@ -33,14 +30,12 @@ function TrainingRoutes() {
 
   return (
     <>
-      <Header />
       <Stepper />
       <Routes>
         <Route index element={<SetUpPage />} />
         {/* index代表默認頁 */}
         <Route path="MethodSelect" element={<MethodSelectPage />} />
         <Route path="UserTypeLabel" element={<UserTypeLabelPage />} />
-        <Route path="TrainingProcess" element={<TrainingProcessPage />} />
         <Route path="Result" element={<ResultPage />} />
         <Route path="KD" element={<KDPage />} />
         <Route path="ShapExp" element={<ShapExpPage />} />

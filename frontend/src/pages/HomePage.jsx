@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
+import { usePage } from "../hooks/usePage";
 import API_URL from "../api";
 
 function HomePage() {
       
   const [selectedFile, setSelectedFile] = useState(null);
+  const { currentPage, setCurrentPage } = usePage();
 
   const navigate = useNavigate();
 
@@ -51,6 +53,7 @@ function HomePage() {
     const data3 = await response3.json()
     console.log(data3)
 
+    setCurrentPage("training");
 
     navigate("/training");
   };

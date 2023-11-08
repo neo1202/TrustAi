@@ -3,7 +3,26 @@ import { Link, Outlet } from "react-router-dom";
 import Logo from "../../assets/logo.jpeg";
 import { IoPersonCircle } from "react-icons/io5";
 
-function Header() {
+import { useNavigate } from "react-router-dom";
+import { usePage } from "../../hooks/usePage";
+
+const pageRoutes = ['', 'dataquality', 'training', 'shap']
+const headerLabels = { // 'routes':'header label shown'
+    '':'Home', 
+    'dataquality':'Data Quality',
+    'training':'Active Learning',
+    'shap':'Shap Explanation',
+}
+
+const Header = () => {
+  const navigate = useNavigate()
+  const { currentPage, setCurrentPage } = usePage();
+  
+  const handleClickLink = (route) => {
+    setCurrentPage(route)
+    navigate(`/${route}`)
+  }
+  
   return (
     <>
       <nav
@@ -16,18 +35,17 @@ function Header() {
         >
           <img alt="" className="rounded-full" src={Logo} />
         </a>
-        <Link to="/" className="flex items-center justify-center w-32">
-          Home
-        </Link>
-        <Link
-          to="/training"
-          className="flex items-center justify-center w-32 text-indigo-800"
-        >
-          Active Learning
-        </Link>
-        <Link to="/shap" className="flex items-center justify-center w-32">
-          Shap Explanation
-        </Link>
+        {pageRoutes.map((route, i) => {
+          return (
+          <Link to={`/${route}`} 
+                className={`flex items-center justify-center w-32 hover:cursor-pointer ${route === currentPage? "text-indigo-800":""}`}
+                onClick={() => {
+                    handleClickLink(route)
+                }}
+                key={i} >
+            {headerLabels[route]}
+          </Link> )
+        })}
         <a
           className="flex items-center justify-center w-16 h-16 mr-24 rounded-full"
           href="/profile"
