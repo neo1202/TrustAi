@@ -1,0 +1,38 @@
+version: "3"
+services:
+  django_backend:
+    build:
+      context: . #代表從當前目錄下去找
+    command: ["sh", "./start.sh"]
+    volumes:
+      - ./api:/app/api
+      - ./core:/app/core
+      - ./django-venv:/app/venv
+      - ./pytorch:/app/pytorch
+      # - ./env:/app/env
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=postgres_db
+      - DB_NAME=ntuimprojectdatabase
+      - DB_USER=ntuimproject
+      - DB_PASS=ntuim
+    depends_on:
+      - postgres_db
+
+  postgres_db:
+    image: postgres:14.9
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    # env_file:
+    #   - ./env/postgres.env
+    environment:
+      # - POSTGRES_DB=${POSTGRES_NAME}
+      # - POSTGRES_USER=${POSTGRES_USER}
+      # - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=ntuimprojectdatabase
+      - POSTGRES_USER=ntuimproject
+      - POSTGRES_PASSWORD=ntuim
+# volumes:
+#   postgres_data:
+#https://medium.com/@raykipkorir/setup-django-and-postgres-using-docker-deb68be89a47
