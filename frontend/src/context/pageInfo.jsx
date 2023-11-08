@@ -1,17 +1,18 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 const PageInfoContext = createContext();
 
-function StepProvider({ children }) {
+const PageProvider = ({ children }) => {
+  const [currentPage, setCurrentPage] = useState('') // the route of the page `/${route}`, so '' represents home page
   const [currentContextStep, setCurrentContextStep] = useState(1);
   const [allComplete, setAllComplete] = useState(false);
+
   const valueToShare = {
-    currentContextStep: currentContextStep,
-    incrementCurrentContextStep: () => {
-      setCurrentContextStep((prev) => prev + 1);
-    },
-    allComplete: allComplete,
+    currentPage, setCurrentPage, 
+    currentContextStep, setCurrentContextStep, 
+    allComplete, setAllComplete,
   };
+
   return (
     <PageInfoContext.Provider value={valueToShare}>
       {children}
@@ -19,7 +20,5 @@ function StepProvider({ children }) {
   );
 }
 
-export { StepProvider };
+export { PageProvider };
 export default PageInfoContext;
-
-// import PageInfoContext, {StepProvider} from pageInfo.jsx

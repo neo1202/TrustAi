@@ -475,6 +475,9 @@ def trainInitModel(request):
 
 @api_view(['POST'])
 def trainALModel(request, iter):
+    data = json.loads(request.body)
+    print(data)
+
     process = FullProcess.objects.all().order_by("-id")[0] 
     al = ActiveLearning.objects.all().order_by("-id")[0]
     iteration = int(iter)
@@ -488,11 +491,8 @@ def trainALModel(request, iter):
                 })
         else:
             iteration = int(al.nthIter[-1]) + 1
-    print(type(iter))
-    print(al.nthIter)
+    
     print(f"\n\n =============== {iteration} ===============\n\n") 
-    # elif iter != al.nthIter[-1] and iter in al.nthIter:
-    #     iter = al.nthIter[-1] + 1
     
     # training session
     batch_size = process.batchSize

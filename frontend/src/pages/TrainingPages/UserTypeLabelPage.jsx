@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from "react";
 // import { useData } from "../../hooks/useData";
-import axios from "axios";
-//import Table from "../../components/Table";
-import SortableTable from "../../components/SortableTable";
 import API_URL from "../../api";
 import QueryTheOracle from "../../components/QueryTheOracle";
-import UncertaintyQueryTable from "../../components/UncertaintyQueryTable";
 import DataTable from "../../components/DataTable";
 
 function UserTypeLabelPage() {
 
   const [iterCount, setIterCount] = useState(1);  
-  const [uncertaintyRank, setUncertaintyRank] = useState([])
+  const [uncertaintyId, setUncertaintyId] = useState([]) 
   const [cumulatedNumData, setCumulatedNumData] = useState(0)
   const [currTrainAcc, setCurrTrainAcc] = useState(0.1)
   const [currTestAcc, setCurrTestAcc] = useState(0.1)
   const [finishTraining, setFinishTraining] = useState(false)
-//   const [queryResults, setQueryResults] = useState([])
+  const [queryResults, setQueryResults] = useState([]) // after asking the oracle, set the answers as result, [{str(id): answer}]
   const [uncertainData, setUncertainData] = useState([])
   const [keys, setKeys] = useState([])
 
@@ -47,7 +43,7 @@ function UserTypeLabelPage() {
     })
     const data = await response.json()
     console.log("Getting uncertainty rank...", data.msg)
-    setUncertaintyRank(data.uncertainIdx)
+    setUncertaintyId(data.uncertainIdx)
     setUncertainData(data.uncertainData)
     setKeys(data.keys)
 
@@ -77,6 +73,7 @@ function UserTypeLabelPage() {
   }
 
   const train = async () => {
+    const result = { uncertaintyId: uncertaintyId, queryResults: queryResults}
     const response = await fetch(
         `${API_URL}/trainALModel/${iterCount}/`, 
         {
@@ -84,7 +81,7 @@ function UserTypeLabelPage() {
         headers: {
             'Content-Type': 'application/json'
         },
-        // body: JSON.stringify(uncertaintyRank)
+        body: JSON.stringify(result)
     })
     const data = await response.json()
     console.log("Training AL model...", data.msg)
@@ -127,53 +124,6 @@ function UserTypeLabelPage() {
     
   }
 
-  /* ********************************************************************* */
-
-//   const tableData = [
-//     { id: 3, width: 300, color: "bg-red-500", score: 4, label: "橘子" },
-//     { id: 4, width: 2500, color: "bg-green-500", score: 0.2, label: "檸檬" },
-//   ];
-
-//   const tConfig = keys.map((k, i) => { // 感覺要把特徵一個個手 key
-//     return { 
-//         columnName: k, 
-//         render: (oneInstanceData) => oneInstanceData.key
-//     }
-//   })
-//   console.log("tConfig", tConfig)
-
-//   const tableConfig = [
-//     {
-//       columnName: "instance_id",
-//       render: (oneInstanceData) => oneInstanceData.id,
-//     },
-//     {
-//       columnName: "width",
-//       render: (oneInstanceData) => oneInstanceData.width,
-//     },
-//     {
-//       columnName: "color",
-//       render: (oneInstanceData) => (
-//         <div className={`p-3 m-2 ${oneInstanceData.color}`} />
-//       ),
-//     },
-//     {
-//       columnName: "score",
-//       render: (oneInstanceData) => oneInstanceData.score,
-//       sortValue: (oneInstanceData) => oneInstanceData.score,
-//     },
-//     {
-//       columnName: "label",
-//       render: (oneInstanceData) => oneInstanceData.label,
-//     },
-//   ];
-
-//   const keyFn = (oneInstanceData) => {
-//     return oneInstanceData.id;
-//   };
-
-  /* ********************************************************************* */
-
   return (
     <div className="relative">
       <h1>UserTypeLabelPage</h1>
@@ -182,16 +132,10 @@ function UserTypeLabelPage() {
       <button className="bg-white btn" onClick={modifyNumDataPerIter}>Modify the Number Data Per Iteration(should directly modify `querySize` in DB)</button>
       <br/>
       <br/>
-      {/* <p>Uncertainty Ranking</p>
-      <p>{`Uncertainty rank, iter ${iterCount}: ${uncertaintyRank}`}</p> */}
 
       <p>Query the Oracle</p>
-      {/* {uncertaintyRank.map((data, i) => {
-        const key = `${iterCount}-${i}`
-        return <QueryTheOracle key={key}
-                               data={data}
-                               setQueryResults={setQueryResults}/>
-      })} */}
+      <QueryTheOracle queryIds={uncertaintyId} setQueryResults={setQueryResults}/>
+      <br />
       <DataTable data={uncertainData}
                  keys={keys} />
 
@@ -216,16 +160,11 @@ function UserTypeLabelPage() {
         <img src={`${API_URL}/plotCumulation/${cumuTestAccPlot}`} alt="cumuTestAccPlot" />{/* /${iterCount} */}
       </div> : <></>}
       
-
       <br/>
       <br/>
       <button className="bg-white btn" onClick={trainNextIter}>Go on to Next AL Training</button>
       <button className="bg-white btn" style={{marginLeft:'30px'}}>Stop Here(Go on to KD)</button>
 
-
-      {/* <SortableTable data={uncertainData} config={tConfig} keyFn={keyFn} /> */}
-      {/* <UncertaintyQueryTable uncertainData={uncertainData}
-                             keys={keys} /> */}
     </div>
   );
 }
