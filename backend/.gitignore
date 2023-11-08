@@ -4,4 +4,3 @@ shap-images/
 dashboard/
 __pycache__/
 *.pyc
-db/
