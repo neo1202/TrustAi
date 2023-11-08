@@ -2,3 +2,5 @@ trainingModels/
 figures/
 shap-images/
 dashboard/
+__pycache__/
+*.pyc
