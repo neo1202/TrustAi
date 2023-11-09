@@ -1,17 +1,23 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
+import { Button, Input, Select, Typography } from "antd";
 import API_URL from "../../api";
 import { initialDatasetSelectMethod, models } from "../../config/config";
 import SelectBlock from "../../components/SelectBlock";
 import DataTable from "../../components/DataTable";
 
+const { TextArea } = Input;
+const { Option } = Select;
+const { Title, Paragraph } = Typography;
+
 function SetUpPage() {
 
   const [rawData, setRawData] = useState([]);
+  const [shownData, setShownData] = useState([]);
   const [keys, setKeys] = useState([]);
   const [numRows, setNumRows] = useState(54321);
   const [numCols, setNumCols] = useState(20);
 
-  const [numShownData, setNumShownData] = useState('3');
+  const [numShownData, setNumShownData] = useState('');
   const [displayNumShownData, setDisplayNumShownData] = useState('');
   const [initNumData, setInitNumData] = useState('');
   const [displayInitNumData, setDisplayInitNumData] = useState('');
@@ -24,23 +30,7 @@ function SetUpPage() {
     getData()
   }, [])
 
-  const deleteDataset = async () => {
-    const response = await fetch(
-        `${API_URL}/deleteTest/`, 
-        {
-            method: "DELETE",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            // body: JSON.stringify(note)
-        })
-    
-    const data = await response.json()
-    console.log(data)
-  }
-
   const getData = async () => { 
-    const number = { 'num': numShownData }
     const response = await fetch(
         `${API_URL}/getData/train-raw`, 
         {
@@ -78,8 +68,9 @@ function SetUpPage() {
     }
   };
   
-  const handleNumShownDataEnter = async () => {
+  const handleNumShownDataEnter = () => {
     setDisplayNumShownData(numShownData);
+    setShownData(rawData.slice(0, numShownData));
     setNumShownData('');
   }
 
@@ -102,7 +93,7 @@ function SetUpPage() {
     console.log("Settings...", data)
 
     setDisplayInitNumData(initNumData);
-    setInitNumData('')
+    setInitNumData('');
   }
 
   const handleSelectInitData = async (blockName) => {
@@ -158,8 +149,6 @@ function SetUpPage() {
   };
 
   const trainInitModel = async () => {
-    // pop a modal or something to show training progress
-
     const model = {'model': selectedModel}
 
     const response = await fetch(
@@ -178,56 +167,78 @@ function SetUpPage() {
   }
 
 
-  return <div>
-    <h1>SetUpPage</h1>
-    {/* <button className="bg-white btn" onClick={deleteDataset} >delete all in Dataset model(test btn)</button> */}
-    <br/>
-    <p>There are __{numRows? numRows:"__"}__ rows in total.</p>
-    <p>There are __{numCols? numCols:"__"}__ features in total.</p>
-    <DataTable data={rawData.slice(0,numShownData)}
-               keys={keys} />
-    {/* <p>How many data is desired to be shown?  __{displayNumShownData? displayNumShownData:"__"}__</p>
-    <textarea
+  return (
+    <div>
+      <Title level={2}>SetUpPage</Title>
+      <Paragraph>
+        There are __{numRows ? numRows : "__"}__ rows in total.
+      </Paragraph>
+      <Paragraph>
+        There are __{numCols ? numCols : "__"}__ features in total.
+      </Paragraph>
+      <DataTable data={shownData} keys={keys} />
+      <Paragraph>
+        How many data is desired to be shown? __{numShownData ? numShownData : "__"}__
+      </Paragraph>
+      <TextArea
+        style={{ width: "150px" }}
         value={numShownData}
-        onChange={handleNumShownDataChange}
-        onKeyDown={handleNumShownDataKeyPress}
+        onChange={(e) => setNumShownData(e.target.value)}
+        onPressEnter={handleNumShownDataEnter}
         placeholder="Type a number and press Enter"
-    />
-    <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handleNumShownDataEnter}>Enter</button> */}
-    <br/>
-    <p>How many training data do you want to set in the beginning?  __{displayInitNumData? displayInitNumData:"__"}__</p>
-    <textarea
+        autoSize={{ minRows: 2, maxRows: 6 }} // Adjust minRows and maxRows as needed
+      />
+      <Button style={{ marginLeft: "20px", width: "80px" }} type="primary" onClick={handleNumShownDataEnter}>
+        Enter
+      </Button>
+      <br />
+      <Paragraph>
+        How many training data do you want to set in the beginning? __{initNumData ? initNumData : "__"}__
+      </Paragraph>
+      <TextArea
+        style={{ width: "150px" }}
         value={initNumData}
-        onChange={handleInitNumDataChange}
-        onKeyDown={handleInitNumDataKeyPress}
+        onChange={(e) => setInitNumData(e.target.value)}
+        onPressEnter={handleInitNumDataEnter}
         placeholder="Type a number and press Enter"
-    />
-    <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handleInitNumDataEnter}>Enter</button>
-    <br/>
-    {/* <br/>
-    <div style={{display: 'flex'}}>
-        {initialDatasetSelectMethod.map((method, i) => {
-            return <SelectBlock key={i}
-                                blockName={method}
-                                selected={selectedInitData === method}
-                                onClick={handleSelectInitData} />
-        })}
-    </div> */}
-    
-    <br/>
-    {/* <p>Choose Model(but currently not providing multiple model right?)</p>
-    {models.map((model, i) => {
-        return <SelectBlock key={i}
-                            blockName={model}
-                            selected={selectedModel === model}
-                            onClick={handleSelectModel} />
-    })} */}
-    <br/>
-    <button className="bg-white btn" onClick={trainInitModel}>Go to train initial model</button>
-    {initAcc === 100? <></>:<p>{`Accuracy of initial model: ${initAcc}`}</p>}
+        autoSize={{ minRows: 2, maxRows: 6 }} // Adjust minRows and maxRows as needed
+      />
+      <Button style={{ marginLeft: "20px", width: "80px" }} type="primary" onClick={handleInitNumDataEnter}>
+        Enter
+      </Button>
+      <br />
+      <br />
+      {/* <div style={{ display: "flex" }}>
+        {initialDatasetSelectMethod.map((method, i) => (
+          <SelectBlock key={i} blockName={method} selected={selectedInitData === method} onClick={handleSelectInitData} />
+        ))}
+      </div>
 
-    
-  </div>
+      <br />
+      <Paragraph>Choose Model (but currently not providing multiple models, right?)</Paragraph>
+      <Select
+        style={{ width: 200 }}
+        placeholder="Select a model"
+        onChange={handleSelectModel}
+        value={selectedModel}
+      >
+        {models.map((model, i) => (
+          <Option key={i} value={model}>
+            {model}
+          </Option>
+        ))}
+      </Select> */}
+      <br />
+      <Button style={{ marginTop: "10px" }} type="primary" onClick={trainInitModel}>
+        Go to train initial model
+      </Button>
+      {initAcc === 100 ? (
+        <></>
+      ) : (
+        <Paragraph>{`Accuracy of the initial model: ${initAcc}`}</Paragraph>
+      )}
+    </div>
+  );
 }
 
 export default SetUpPage;

@@ -155,9 +155,9 @@ function UserTypeLabelPage() {
             <li>{`Test accuracy: ${currTestAcc}`}</li>
         </ul>
         <button className="bg-white btn" onClick={saveModel}>Save the Model of This Iteration</button>
-        <img src={`${API_URL}/plotCumulation/${cumuNumDataPlot}`} alt="cumuNumDataPlot" />{/* /${iterCount} */}
-        <img src={`${API_URL}/plotCumulation/${cumuTrainAccPlot}`} alt="cumuTrainAccPlot" />{/* /${iterCount} */}
-        <img src={`${API_URL}/plotCumulation/${cumuTestAccPlot}`} alt="cumuTestAccPlot" />{/* /${iterCount} */}
+        <img src={`${API_URL}/getPlotImages/dashboard/${cumuNumDataPlot}`} alt="cumuNumDataPlot" />{/* /${iterCount} */}
+        <img src={`${API_URL}/getPlotImages/dashboard/${cumuTrainAccPlot}`} alt="cumuTrainAccPlot" />{/* /${iterCount} */}
+        <img src={`${API_URL}/getPlotImages/dashboard/${cumuTestAccPlot}`} alt="cumuTestAccPlot" />{/* /${iterCount} */}
       </div> : <></>}
       
       <br/>

@@ -1,34 +1,31 @@
 import React, { useEffect, useState } from "react";
+import { Modal, Input, Button, Select } from "antd";
 import API_URL from "../../api";
-import Modal from "../../components/Modal";
-import SelectBlock from "../../components/SelectBlock";
-import { uncertaintyQueryMethod } from "../../config/config"
+import { uncertaintyQueryMethod } from "../../config/config";
+
+const { Option } = Select;
 
 function MethodSelectPage() {
-
   const [count, setCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
 
-  const [selectedUncertaintyMethod, setSelectedUncertaintyMethod] = useState('');
+  const [selectedUncertaintyMethod, setSelectedUncertaintyMethod] = useState("");
 
-  const [inputIterValue, setInputIterValue] = useState('');
-  const [inputLRValue, setInputLRValue] = useState('');
-  const [inputPoolSizeValue, setInputPoolSizeValue] = useState('');
-  const [inputNumEpochValue, setInputNumEpochValue] = useState('');
-  const [inputBatchSizeValue, setInputBatchSizeValue] = useState('');
+  const [inputIterValue, setInputIterValue] = useState("");
+  const [inputLRValue, setInputLRValue] = useState("");
+  const [inputPoolSizeValue, setInputPoolSizeValue] = useState("");
+  const [inputNumEpochValue, setInputNumEpochValue] = useState("");
+  const [inputBatchSizeValue, setInputBatchSizeValue] = useState("");
 
-  const [displayIter, setDisplayIter] = useState('');
-  const [displayLR, setDisplayLR] = useState('');
-  const [displayPoolSize, setDisplayPoolSize] = useState('');
-  const [displayNumEpoch, setDisplayNumEpoch] = useState('');
-  const [displayBatchSize, setDisplayBatchSize] = useState('');
+  const [displayIter, setDisplayIter] = useState("");
+  const [displayLR, setDisplayLR] = useState("");
+  const [displayPoolSize, setDisplayPoolSize] = useState("");
+  const [displayNumEpoch, setDisplayNumEpoch] = useState("");
+  const [displayBatchSize, setDisplayBatchSize] = useState("");
 
   useEffect(() => {
     setCount((prev) => prev + 1);
   }, []);
-//   console.log(count);
-//   console.log("進入MethodSelectPage!!wc");
-//   console.log("對就是MethodSelect");
 
   const handleClick = () => {
     setShowModal(true);
@@ -38,285 +35,148 @@ function MethodSelectPage() {
     setShowModal(false);
   };
 
-  const actionBar = (
-    <div>
-      <button onClick={handleCloseModal}>I got it</button>
-    </div>
-  );
-
-  const modal = (
-    <Modal onClose={handleCloseModal} actionBar={actionBar}>
-      <p>這個Model是CNN架構, 可以處理中等複雜的數據</p>
-    </Modal>
-  );
-
-  // ================================= //
-
   const handleSelectUncertaintyMethod = async (blockName) => {
     const setting = {
-        'type': 'SelectUncertaintyMethod',
-        'value': blockName,
-    }
+      type: "SelectUncertaintyMethod",
+      value: blockName,
+    };
 
     if (selectedUncertaintyMethod === blockName) {
-        setSelectedUncertaintyMethod(''); // remove border
-        setting.value = ''
+      setSelectedUncertaintyMethod("");
+      setting.value = "";
     } else {
-        setSelectedUncertaintyMethod(blockName);
+      setSelectedUncertaintyMethod(blockName);
     }
 
-    const response = await fetch(
-        `${API_URL}/settings/`, 
-        {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(setting)
-    })
-    const data = await response.json()
-    console.log("Settings...", data)
-  }
-
-  // ================================= //
-
-  const handleInputIterChange = (e) => {
-    setInputIterValue(e.target.value);
+    const response = await fetch(`${API_URL}/settings/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(setting),
+    });
+    const data = await response.json();
+    console.log("Settings...", data);
   };
 
-  const handleInputLRChange = (e) => {
-    setInputLRValue(e.target.value);
+  const handleInputChange = (stateUpdater, e) => {
+    stateUpdater(e.target.value);
   };
 
-  const handleInputPoolSizeChange = (e) => {
-    setInputPoolSizeValue(e.target.value);
-  };
-
-  const handleInputNumEpochChange = (e) => {
-    setInputNumEpochValue(e.target.value);
-  };
-
-  const handleInputBatchSizeChange = (e) => {
-    setInputBatchSizeValue(e.target.value);
-  };
-
-  // ================================= //
-
-  const handleIterEnter = async () => {
+  const handleEnter = async (type, value, stateUpdater, displayUpdater) => {
     const setting = {
-        'type': 'SetNumDataPerIter',
-        'value': inputIterValue,
-    }
+      type,
+      value,
+    };
 
-    const response = await fetch(
-        `${API_URL}/settings/`, 
-        {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(setting)
-    })
-    const data = await response.json()
-    console.log("Settings...", data)
+    const response = await fetch(`${API_URL}/settings/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(setting),
+    });
 
-    setDisplayIter(inputIterValue);
-    setInputIterValue('');
-  }
+    const data = await response.json();
+    console.log("Settings...", data);
 
-  const handleLREnter = async () => {
-    const setting = {
-        'type': 'SetLearningRate',
-        'value': inputLRValue,
-    }
-
-    const response = await fetch(
-        `${API_URL}/settings/`, 
-        {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(setting)
-    })
-    const data = await response.json()
-    console.log("Settings...", data)
-
-    setDisplayLR(inputLRValue);
-    setInputLRValue('');
-  }
-
-  const handlePoolSizeEnter = async () => {
-    const setting = {
-        'type': 'SetPoolingSize',
-        'value': inputPoolSizeValue,
-    }
-
-    const response = await fetch(
-        `${API_URL}/settings/`, 
-        {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(setting)
-    })
-    const data = await response.json()
-    console.log("Settings...", data)
-
-    setDisplayPoolSize(inputPoolSizeValue);
-    setInputPoolSizeValue('');
-  }
-
-  const handleNumEpochEnter = async () => {
-    const setting = {
-        'type': 'SetNumEpoch',
-        'value': inputNumEpochValue,
-    }
-
-    const response = await fetch(
-        `${API_URL}/settings/`, 
-        {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(setting)
-    })
-    const data = await response.json()
-    console.log("Settings...", data)
-
-    setDisplayNumEpoch(inputNumEpochValue);
-    setInputNumEpochValue('');
-  }
-
-  const handleBatchSizeEnter = async () => {
-    const setting = {
-        'type': 'SetBatchingSize',
-        'value': inputBatchSizeValue,
-    }
-
-    const response = await fetch(
-        `${API_URL}/settings/`, 
-        {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(setting)
-    })
-    const data = await response.json()
-    console.log("Settings...", data)
-
-    setDisplayBatchSize(inputBatchSizeValue);
-    setInputBatchSizeValue('');
-  }
-
-  // ================================= //
-
-  const handleIterKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleIterEnter()
-    }
+    displayUpdater(value);
+    stateUpdater("");
   };
 
-  const handleLRKeyPress = (e) => {
-    if (e.key === 'Enter') {
-        handleLREnter()
-    }
+  const renderSelectOptions = () => {
+    return uncertaintyQueryMethod.map((method, i) => (
+      <Option key={i} value={method}>
+        {method}
+      </Option>
+    ));
   };
-
-  const handlePoolSizeKeyPress = (e) => {
-    if (e.key === 'Enter') {
-        handlePoolSizeEnter()
-    }
-  };
-
-  const handleNumEpochKeyPress = (e) => {
-    if (e.key === 'Enter') {
-        handleNumEpochEnter()
-    }
-  };
-
-  const handleBatchSizeKeyPress = (e) => {
-    if (e.key === 'Enter') {
-        handleBatchSizeEnter()
-    }
-  };
-
-  // ================================= //
 
   return (
     <div className="relative">
       <h1>ChooseModelPage</h1>
-      <h2>If the initial model is not good enough(quite normal), then do settings on this AL page</h2>
-      <h2>this page should include: 1. num per AL iter 2. query method 3. params, hyperparams, ...</h2>
-      <br/>
-      
+      <h2>If the initial model is not good enough (quite normal), then do settings on this AL page</h2>
+      <h2>This page should include: 1. num per AL iter 2. query method 3. params, hyperparams, ...</h2>
+      <br />
 
-      <button onClick={handleClick}>openModal</button>
-      {showModal && modal}
-      <br/>
-      
+      <Button onClick={handleClick}>Open Modal</Button>
+      <Modal visible={showModal} onCancel={handleCloseModal} footer={null}>
+        <p>這個Model是CNN架構, 可以處理中等複雜的數據</p>
+      </Modal>
+      <br />
 
-      <p>How many do you want to add in one iteration?  __{displayIter? displayIter:"__"}__</p>
-      <textarea
+      <p>How many do you want to add in one iteration? __{displayIter ? displayIter : "__"}__</p>
+      <Input
+        style={{ width: 250 }}
         value={inputIterValue}
-        onChange={handleInputIterChange}
-        onKeyDown={handleIterKeyPress}
+        onChange={(e) => handleInputChange(setInputIterValue, e)}
+        onPressEnter={() => handleEnter("SetNumDataPerIter", inputIterValue, setInputIterValue, setDisplayIter)}
         placeholder="Type a number and press Enter"
       />
-      <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handleIterEnter}>Enter</button>
 
-      <br/>
-      
-      
+      <br />
+
       <p>Uncertainty query method</p>
-      {uncertaintyQueryMethod.map((method, i) => {
-        return <SelectBlock key={i}
-                            blockName={method}
-                            selected={selectedUncertaintyMethod === method}
-                            onClick={handleSelectUncertaintyMethod} />
-      })}
-      <br/>
-      
+      <Select
+        style={{ width: 250 }}
+        value={selectedUncertaintyMethod}
+        onChange={handleSelectUncertaintyMethod}
+        placeholder="Select a method"
+      >
+        {renderSelectOptions()}
+      </Select>
+      <br />
+
       <h2>Params/hyperparams adjustments </h2>
-      <p>Learning rate __{displayLR? displayLR:"__"}__</p>
-      <textarea
-        value={inputLRValue}
-        onChange={handleInputLRChange}
-        onKeyDown={handleLRKeyPress}
-        placeholder="Type a number and press Enter"
-      />
-      <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handleLREnter}>Enter</button>
+    <p>Learning rate __{displayLR ? displayLR : "__"}__</p>
+    <Input
+      style={{ width: 250 }}
+      value={inputLRValue}
+      onChange={(e) => handleInputChange(setInputLRValue, e)}
+      onPressEnter={() => handleEnter("SetLearningRate", inputLRValue, setInputLRValue, setDisplayLR)}
+      placeholder="Type a number and press Enter"
+    />
+    <Button type="primary" onClick={() => handleEnter("SetLearningRate", inputLRValue, setInputLRValue, setDisplayLR)}>
+      Enter
+    </Button>
 
-      <p>Pooling Size __{displayPoolSize? displayPoolSize:"__"}__</p>
-      <textarea
-        value={inputPoolSizeValue}
-        onChange={handleInputPoolSizeChange}
-        onKeyDown={handlePoolSizeKeyPress}
-        placeholder="Type a number and press Enter"
-      />
-      <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handlePoolSizeEnter}>Enter</button>
+    <p>Pooling Size __{displayPoolSize ? displayPoolSize : "__"}__</p>
+    <Input
+      style={{ width: 250 }}
+      value={inputPoolSizeValue}
+      onChange={(e) => handleInputChange(setInputPoolSizeValue, e)}
+      onPressEnter={() => handleEnter("SetPoolingSize", inputPoolSizeValue, setInputPoolSizeValue, setDisplayPoolSize)}
+      placeholder="Type a number and press Enter"
+    />
+    <Button type="primary" onClick={() => handleEnter("SetPoolingSize", inputPoolSizeValue, setInputPoolSizeValue, setDisplayPoolSize)}>
+      Enter
+    </Button>
 
-      <p>Number of Epoch __{displayNumEpoch? displayNumEpoch:"__"}__</p>
-      <textarea
-        value={inputNumEpochValue}
-        onChange={handleInputNumEpochChange}
-        onKeyDown={handleNumEpochKeyPress}
-        placeholder="Type a number and press Enter"
-      />
-      <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handleNumEpochEnter}>Enter</button>
+    <p>Number of Epoch __{displayNumEpoch ? displayNumEpoch : "__"}__</p>
+    <Input
+      style={{ width: 250 }}
+      value={inputNumEpochValue}
+      onChange={(e) => handleInputChange(setInputNumEpochValue, e)}
+      onPressEnter={() => handleEnter("SetNumEpoch", inputNumEpochValue, setInputNumEpochValue, setDisplayNumEpoch)}
+      placeholder="Type a number and press Enter"
+    />
+    <Button type="primary" onClick={() => handleEnter("SetNumEpoch", inputNumEpochValue, setInputNumEpochValue, setDisplayNumEpoch)}>
+      Enter
+    </Button>
 
-      <p>Batch Size __{displayBatchSize? displayBatchSize:"__"}__</p>
-      <textarea
-        value={inputBatchSizeValue}
-        onChange={handleInputBatchSizeChange}
-        onKeyDown={handleBatchSizeKeyPress}
-        placeholder="Type a number and press Enter"
-      />
-      <button style={{marginLeft: '20px'}} className="bg-white btn" onClick={handleBatchSizeEnter}>Enter</button>
-      
+    <p>Batch Size __{displayBatchSize ? displayBatchSize : "__"}__</p>
+    <Input
+      style={{ width: 250 }}
+      value={inputBatchSizeValue}
+      onChange={(e) => handleInputChange(setInputBatchSizeValue, e)}
+      onPressEnter={() => handleEnter("SetBatchingSize", inputBatchSizeValue, setInputBatchSizeValue, setDisplayBatchSize)}
+      placeholder="Type a number and press Enter"
+    />
+    <Button type="primary" onClick={() => handleEnter("SetBatchingSize", inputBatchSizeValue, setInputBatchSizeValue, setDisplayBatchSize)}>
+      Enter
+    </Button>
+
+      {/* Additional Input components for other parameters */}
 
     </div>
   );

@@ -139,7 +139,7 @@ function ShapPage() {
           onSelect={handleDropdownSelection}
         />
         <h1 id="global_shap" className="heading1">Global SHAP</h1>
-        <img src={`${API_URL}/getShapPlotImage/all_class.png`} alt="Generated Plot" />
+        <img src={`${API_URL}/getPlotImages/shap-images/all_class.png`} alt="Generated Plot" />
         
         <h2 id="ft_imp_class" className="heading2">Feature Influence on A Class </h2>
         <p2>
@@ -162,8 +162,8 @@ positive value means positive effect and negative value means neagative effect O
           <div>
             <h2>Generated Plot:</h2>
             <div className="image-container">
-              <img src={`${API_URL}/getShapPlotImage/${imagePath}`} alt="Generated Plot" />
-              <img src={`${API_URL}/getShapPlotImage/${gBarImagePath}`} alt="Generated Plot" />
+              <img src={`${API_URL}/getPlotImages/shap-images/${imagePath}`} alt="Generated Plot" />
+              <img src={`${API_URL}/getPlotImages/shap-images/${gBarImagePath}`} alt="Generated Plot" />
 
             </div>
             <div className="image-container">
@@ -180,7 +180,7 @@ positive value means positive effect and negative value means neagative effect O
                 <li key={index}>{value}</li>
               ))}
               </ul>
-              <img src={`${API_URL}/getShapPlotImage/${gPieImagePath}`} alt="Generated Plot" />
+              <img src={`${API_URL}/getPlotImages/shap-images/${gPieImagePath}`} alt="Generated Plot" />
               </div>
           </div>
         )}
@@ -221,8 +221,8 @@ positive value means positive effect and negative value means neagative effect O
           <div>
             <h3 className='heading3'>Generated Plot:</h3>
             <div className="image-container">
-              <img src={`${API_URL}/getShapPlotImage/${imagePathD1}`} alt="Generated Plot" />
-              <img src={`${API_URL}/getShapPlotImage/${imagePathD2}`} alt="Generated Plot" />
+              <img src={`${API_URL}/getPlotImages/shap-images/${imagePathD1}`} alt="Generated Plot" />
+              <img src={`${API_URL}/getPlotImages/shap-images/${imagePathD2}`} alt="Generated Plot" />
             </div>
           </div>
         )}

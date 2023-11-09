@@ -185,7 +185,7 @@ def getData(request, pk):
         print(f"dataset {pk} does not exist!")
 
     df = dataset.df
-    rawData = df.to_dict(orient='records')
+    rawData = df.round(4).to_dict(orient='records')
     numRows = df.shape[0]
     numCols = df.shape[1] - 1 # 前端叫的是訓練集，所以欄位數量要扣掉標籤欄
 
@@ -193,20 +193,6 @@ def getData(request, pk):
         'rawData': rawData, 'keys': list(rawData[0].keys()),
         'numRows': numRows, 'numCols': numCols}
     return Response(data)
-
-######################################################
-
-@api_view(['DELETE'])
-def deleteTest(request):
-    print(f"\n\n======== DELETE ========\n\n")
-
-
-    Dataset.objects.all().delete()
-    FullProcess.objects.all().delete()
-    return Response({'msg':"all dataset deleted"})
-
-######################################################
-
 
 
 @api_view(['POST']) # not yet in urls
@@ -223,9 +209,11 @@ def setMethodsAndConfigs(request):
     setting_type = data['type']
     setting_value = data['value']
 
-    process = FullProcess.objects.all().order_by("-id")[0] 
+    process = FullProcess.objects.all().order_by("-id")[0]
 
-    if setting_type == 'SetInitNumData':
+    if setting_type == 'SelectImputer':
+        process.imputerMethod = setting_value 
+    elif setting_type == 'SetInitNumData':
         process.initTrainingDataNum = setting_value
     elif setting_type == 'SelectInitData':
         process.initTrainingDataSelectMethod = setting_value
@@ -247,6 +235,14 @@ def setMethodsAndConfigs(request):
     process.save()
 
     print(f"\n\nsetting type = {data['type']}, value = {data['value']}\n\n")
+    return Response(data)
+
+@api_view(['GET'])
+def startImpute(request):
+    process = FullProcess.objects.all().order_by("-id")[0]
+    imputeMethod = process.imputerMethod
+
+    data = {'imputeMethod': imputeMethod}
     return Response(data)
 
 
@@ -720,9 +716,9 @@ def doKD(request): # actually train final student
 
 
 @api_view(['GET'])
-def getShapPlotImage(request, img):
-    print("\n ================= getShapPlotImage ================= \n")
-    image_path = f"./shap-images/{img}"
+def getPlotImages(request, folder, img):
+    print("\n ================= getPlotImages ================= \n")
+    image_path = f"./{folder}/{img}"
 
     with open(image_path, 'rb') as img:
         response = HttpResponse(img.read(), content_type='image/png')

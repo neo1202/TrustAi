@@ -16,10 +16,11 @@ const headerLabels = { // 'routes':'header label shown'
 
 const Header = () => {
   const navigate = useNavigate()
-  const { currentPage, setCurrentPage } = usePage();
+  const { currentPage, setCurrentPage, setCurrentContextStep } = usePage();
   
   const handleClickLink = (route) => {
-    setCurrentPage(route)
+    setCurrentPage(route);
+    setCurrentContextStep(1);
     navigate(`/${route}`)
   }
   

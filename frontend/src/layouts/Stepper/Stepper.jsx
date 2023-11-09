@@ -18,8 +18,6 @@ function Stepper() {
         break;
   }
 
-  console.log("STEPPER")
-
   return (
     <>
       <div className="flex justify-between mx-auto w-6/6">
