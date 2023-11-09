@@ -1,11 +1,21 @@
 import React from "react";
-// import { usePage } from "../../context/pageInfo";
 import { usePage } from "../../hooks/usePage";
-import { stepsConfig } from "../../config/config";
+import { trainingStepsConfig, DQStepsConfig } from "../../config/config";
+
 
 function StepperButton({ handlePageChange }) {
-  const { currentContextStep, setCurrentContextStep } = usePage();
-  const steps = stepsConfig;
+  const { currentPage, currentContextStep, setCurrentContextStep } = usePage();
+  var steps = []; // the label under the stepper circles
+  switch (currentPage) {
+    case "training":
+        steps = trainingStepsConfig
+        break;
+    case "dataquality":
+        steps = DQStepsConfig
+        break;
+    default:
+        break;
+  }
   const handleButtonClick = () => {
     handlePageChange();
     setCurrentContextStep(prev => prev + 1);

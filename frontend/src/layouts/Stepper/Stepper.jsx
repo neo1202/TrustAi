@@ -1,13 +1,25 @@
 import React, { useState } from "react";
 import "./stepper.css";
 import { TiTick } from "react-icons/ti";
-import { stepsConfig } from "../../config/config";
-import { useContext } from "react";
-import PageInfoContext from "../../context/pageInfo";
+import { trainingStepsConfig, DQStepsConfig } from "../../config/config";
+import { usePage } from "../../hooks/usePage";
 
 function Stepper() {
-  const steps = stepsConfig;
-  const { currentContextStep, allComplete } = useContext(PageInfoContext);
+  const { currentPage, currentContextStep, allComplete } = usePage();
+  var steps = []; // the label under the stepper circles
+  switch (currentPage) {
+    case "training":
+        steps = trainingStepsConfig
+        break;
+    case "dataquality":
+        steps = DQStepsConfig
+        break;
+    default:
+        break;
+  }
+
+  console.log("STEPPER")
+
   return (
     <>
       <div className="flex justify-between mx-auto w-6/6">

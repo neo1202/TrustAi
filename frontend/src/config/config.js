@@ -1,13 +1,18 @@
-const stepsConfig = [
+// steps config: the shown label on the stepper button 
+const trainingStepsConfig = [
   "Initial Setup",
   "Method Select",
   "UserTypeLabelPage",
-//   "Training Process",
   "Result",
   "Knowledge Distill",
-//   "KD Result",
   "Shap Explanation",
 ];
+
+const DQStepsConfig = [
+  "EDA(edash return)",
+  "Imputer Select",
+  "DQ Result",
+]
 
 const initialDatasetSelectMethod = [
     'Randomly Generate',
@@ -27,7 +32,8 @@ const uncertaintyQueryMethod = [
 ]
 
 export {
-    stepsConfig, 
+    trainingStepsConfig, 
+    DQStepsConfig, 
     initialDatasetSelectMethod,
     models,
     uncertaintyQueryMethod,

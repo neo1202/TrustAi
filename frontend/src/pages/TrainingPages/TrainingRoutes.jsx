@@ -1,9 +1,8 @@
 import React, { useState, useContext } from "react";
-import { Routes, Route } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import { usePage } from "../../hooks/usePage";
 import Stepper from "../../layouts/Stepper/Stepper";
 import StepperButton from "../../layouts/StepperButton/StepperButton";
-import PageInfoContext, { PageProvider } from "../../context/pageInfo";
 
 import SetUpPage from "./SetUpPage";
 import ResultPage from "./ResultPage";
@@ -14,18 +13,18 @@ import ShapExpPage from "./ShapExpPage";
 
 function TrainingRoutes() {
   const trainingPages = [
-    "SetUpPage",
+    "SetUp",
     "MethodSelect",
     "UserTypeLabel",
     "Result",
     "KD",
     "ShapExp",
   ];
-  const { currentContextStep } = useContext(PageInfoContext);
+  const { currentContextStep } = usePage();
   const navigate = useNavigate();
 
   const handleButtonClick = () => {
-    navigate(`/training/${trainingPages[currentContextStep]}`); // 导航到currentStep頁
+    navigate(`/training/${trainingPages[currentContextStep]}`);
   };
 
   return (
@@ -33,7 +32,6 @@ function TrainingRoutes() {
       <Stepper />
       <Routes>
         <Route index element={<SetUpPage />} />
-        {/* index代表默認頁 */}
         <Route path="MethodSelect" element={<MethodSelectPage />} />
         <Route path="UserTypeLabel" element={<UserTypeLabelPage />} />
         <Route path="Result" element={<ResultPage />} />
