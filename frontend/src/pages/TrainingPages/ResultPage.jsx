@@ -80,7 +80,6 @@ function ResultPage() {
 
   return <div>
     <h1>ResultPage</h1>
-    <h2>This page will train a final teacher model using the labeled training data accumulated from AL, and the student model will be shown on the next(KD) page</h2>
     
     <br/>
     {/* <p>Saved Model</p>
@@ -93,9 +92,7 @@ function ResultPage() {
 
     <p>{`Final Teacher Test Accuracy: ${finalTeacherTestAcc? finalTeacherTestAcc:'Not yet trained.'}`}</p>
     <br/>
-    <br/>
     {/* <button className="bg-white btn" onClick={saveModel}>Save the Selected Model</button> */}
-    <br/>
     <br/>
     <button className="bg-white btn" onClick={trainFinalTeacherModel}>Train Final Teacher Model</button>
 

@@ -127,9 +127,6 @@ function UserTypeLabelPage() {
   return (
     <div className="relative">
       <h1>UserTypeLabelPage</h1>
-      <h2>Iteratively do AL on this page until the model is good</h2>
-      <h2>This page should include, uncertainty ranking, query actions, set new training set, training session, for each iteration</h2>
-      <button className="bg-white btn" onClick={modifyNumDataPerIter}>Modify the Number Data Per Iteration(should directly modify `querySize` in DB)</button>
       <br/>
       <br/>
 
@@ -140,7 +137,6 @@ function UserTypeLabelPage() {
                  keys={keys} />
 
       
-      <button className="bg-white btn" onClick={train}>Manually Add Data</button>
       <button className="bg-white btn" style={{marginLeft:'30px'}} onClick={train}>Train</button>
 
       <br/>
@@ -148,13 +144,10 @@ function UserTypeLabelPage() {
         <p>Iteration Result</p>
         <ul>
             <li>{`Iteration ${iterCount}`}</li>
-            {/* <li>{`Teacher model selected: 17`}</li> */}
             <li>{`Cumulated training data: ${cumulatedNumData}`}</li>
             <li>{`Train accuracy: ${currTrainAcc}`}</li>
-            {/* <li>{`Train loss: 0.0129`}</li> */}
             <li>{`Test accuracy: ${currTestAcc}`}</li>
         </ul>
-        <button className="bg-white btn" onClick={saveModel}>Save the Model of This Iteration</button>
         <img src={`${API_URL}/getPlotImages/dashboard/${cumuNumDataPlot}`} alt="cumuNumDataPlot" />{/* /${iterCount} */}
         <img src={`${API_URL}/getPlotImages/dashboard/${cumuTrainAccPlot}`} alt="cumuTrainAccPlot" />{/* /${iterCount} */}
         <img src={`${API_URL}/getPlotImages/dashboard/${cumuTestAccPlot}`} alt="cumuTestAccPlot" />{/* /${iterCount} */}
@@ -163,7 +156,6 @@ function UserTypeLabelPage() {
       <br/>
       <br/>
       <button className="bg-white btn" onClick={trainNextIter}>Go on to Next AL Training</button>
-      <button className="bg-white btn" style={{marginLeft:'30px'}}>Stop Here(Go on to KD)</button>
 
     </div>
   );

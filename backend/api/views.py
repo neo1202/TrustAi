@@ -66,6 +66,7 @@ def getRoutes(request):
 def uploadFile(request):
     # print("\nUploading file...\n")
     # print(request)
+    print("\n\n ====== upload ====== \n\n")
     data = json.loads(request.body)
     return Response(data)
 

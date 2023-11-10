@@ -6,7 +6,6 @@ import { uncertaintyQueryMethod } from "../../config/config";
 const { Option } = Select;
 
 function MethodSelectPage() {
-  const [count, setCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
 
   const [selectedUncertaintyMethod, setSelectedUncertaintyMethod] = useState("");
@@ -22,10 +21,6 @@ function MethodSelectPage() {
   const [displayPoolSize, setDisplayPoolSize] = useState("");
   const [displayNumEpoch, setDisplayNumEpoch] = useState("");
   const [displayBatchSize, setDisplayBatchSize] = useState("");
-
-  useEffect(() => {
-    setCount((prev) => prev + 1);
-  }, []);
 
   const handleClick = () => {
     setShowModal(true);
@@ -95,8 +90,6 @@ function MethodSelectPage() {
   return (
     <div className="relative">
       <h1>ChooseModelPage</h1>
-      <h2>If the initial model is not good enough (quite normal), then do settings on this AL page</h2>
-      <h2>This page should include: 1. num per AL iter 2. query method 3. params, hyperparams, ...</h2>
       <br />
 
       <Button onClick={handleClick}>Open Modal</Button>
