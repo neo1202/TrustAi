@@ -139,12 +139,12 @@ function ShapPage() {
           onSelect={handleDropdownSelection}
         />
         <h1 id="global_shap" className="heading1">Global SHAP</h1>
-        <img src={`${API_URL}/getPlotImages/shap-images/all_class.png`} alt="Generated Plot" />
+        <img src={`${API_URL}/getPlotImages/shap-images/all_class.png`} alt="Generated Plot" style={{ width: '600px', height: '600px' }} />
         
         <h2 id="ft_imp_class" className="heading2">Feature Influence on A Class </h2>
         <p2>
         shap value means the contribution to a class, the larger the absoulute value the larger the contribution.
-positive value means positive effect and negative value means neagative effect ON a class.
+positive value means positive effect and negative value means neagative effect on a class.
           
         </p2>
         <form onSubmit={handleShapSubmit}>
@@ -161,27 +161,43 @@ positive value means positive effect and negative value means neagative effect O
         {imagePath && (
           <div>
             <h2>Generated Plot:</h2>
-            <div className="image-container">
-              <img src={`${API_URL}/getPlotImages/shap-images/${imagePath}`} alt="Generated Plot" />
-              <img src={`${API_URL}/getPlotImages/shap-images/${gBarImagePath}`} alt="Generated Plot" />
-
-            </div>
-            <div className="image-container">
-              <h3 className='heading3'>Positive Effect:</h3>
-              <ul>
-              {posX.map((value, index) => (
-                <li key={index}>{value}</li>
-              ))}
-              </ul>
-            
-              <h3 className='heading3'>Negative Effect:</h3>
-              <ul>
-              {negX.map((value, index) => (
-                <li key={index}>{value}</li>
-              ))}
-              </ul>
-              <img src={`${API_URL}/getPlotImages/shap-images/${gPieImagePath}`} alt="Generated Plot" />
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              
+              <div className="image-container">
+                <div style={{ border: '1px solid black', display: 'inline-block' }}>
+                  <img src={`${API_URL}/getPlotImages/shap-images/${imagePath}`} alt="Generated Plot" style={{ width: '500px', height: '500px' }}/>
+                </div>
+                <div style={{ border: '1px solid black', display: 'inline-block' , marginRight: '20px'}}>
+                  <img src={`${API_URL}/getPlotImages/shap-images/${gBarImagePath}`} alt="Generated Plot" style={{ width: '500px', height: '500px' }}/>
+                </div>
               </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}> 
+                <div style={{ display: 'flex', flexDirection: 'row' }} >
+                  <div style={{ border: '1px solid black', display: 'inline-block',  width: '200px', height: '180px', overflow: 'auto', marginRight: '20px'}}>
+                    <h3 className='heading3'>Positive Effect:</h3>
+                    
+                    <ul>
+                      {posX.map((value, index) => (
+                        <li key={index}>{value}</li>
+                      ))}
+                    </ul>
+                    
+                  </div>
+                  <div style={{ border: '1px solid black', display: 'inline-block' ,  width: '200px', height: '180px', overflow: 'auto' }}>
+                    <h3 className='heading3'>Negative Effect:</h3>
+                    <ul>
+                    {negX.map((value, index) => (
+                      <li key={index}>{value}</li>
+                    ))}
+                    </ul>
+                  </div>
+                </div>
+                  <div style={{ border: '1px solid black', display: 'inline-block' , marginTop: '20px'}}>
+                    <img src={`${API_URL}/getPlotImages/shap-images/${gPieImagePath}`} alt="Generated Plot" style={{ width: '400px', height: '300px' }}/>
+                  </div>
+                {/* </div> */}
+              </div>
+            </div>
           </div>
         )}
 

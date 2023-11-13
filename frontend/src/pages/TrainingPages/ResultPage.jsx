@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import API_URL from "../../api";
 import SelectBlock from "../../components/SelectBlock";
+import { Button} from "antd";
 
 function ResultPage() {
 
@@ -94,7 +95,7 @@ function ResultPage() {
     <br/>
     {/* <button className="bg-white btn" onClick={saveModel}>Save the Selected Model</button> */}
     <br/>
-    <button className="bg-white btn" onClick={trainFinalTeacherModel}>Train Final Teacher Model</button>
+    <Button  onClick={trainFinalTeacherModel}>Train Final Teacher Model</Button>
 
   </div>;
 }

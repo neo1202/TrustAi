@@ -10,7 +10,7 @@ import DataQualityRoutes from "./pages/DataQualityPages/DataQualityRoutes";
 function App() {
 
   return (
-    <div className="flex flex-col justify-start h-screen gap-4 bg-gray-400 item-center">
+    <div className="flex flex-col justify-start h-screen gap-4 bg-white-400 item-center">
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />

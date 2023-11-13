@@ -782,6 +782,7 @@ def processShapClassPlot(request):
         elif cor<0:
             negX.append(Xcol[i])
     
+    fig, ax = plt.subplots(figsize=(4, 5))
     #pie chart
     abs_mean=np.abs(shap_values_teacher[1]).mean(0).tolist()  
     df = pd.DataFrame([abs_mean], columns =valid_df.columns[:-1])
@@ -790,10 +791,10 @@ def processShapClassPlot(request):
     total=sum(val)
     labels = [f'{l}, {(s/total*100):0.1f}%' for l, s in zip(id, val)]
     pie = plt.pie(val,autopct='%1.1f%%', startangle=90)
-    plt.axis('equal')
-    plt.legend(bbox_to_anchor=(0.85, 1), loc='upper left', labels=labels)
+    ax.axis('equal')
+    ax.legend(bbox_to_anchor=(1, 1), loc='upper left', labels=labels)
     gPieImage_filename="gPie.png"
-    plt.savefig(f'{shap_img_path}/{gPieImage_filename}')
+    plt.savefig(f'{shap_img_path}/{gPieImage_filename}', bbox_inches='tight')
     plt.close()
         
     return Response({'image_path': summaryimage_filename,

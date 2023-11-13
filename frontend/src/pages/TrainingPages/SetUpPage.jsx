@@ -188,7 +188,7 @@ function SetUpPage() {
         placeholder="Type a number and press Enter"
         autoSize={{ minRows: 2, maxRows: 6 }} // Adjust minRows and maxRows as needed
       />
-      <Button style={{ marginLeft: "20px", width: "80px" }} type="primary" onClick={handleNumShownDataEnter}>
+      <Button style={{ marginLeft: "20px", width: "80px" }}  onClick={handleNumShownDataEnter}>
         Enter
       </Button>
       <br />
@@ -203,7 +203,7 @@ function SetUpPage() {
         placeholder="Type a number and press Enter"
         autoSize={{ minRows: 2, maxRows: 6 }} // Adjust minRows and maxRows as needed
       />
-      <Button style={{ marginLeft: "20px", width: "80px" }} type="primary" onClick={handleInitNumDataEnter}>
+      <Button style={{ marginLeft: "20px", width: "80px" }}  onClick={handleInitNumDataEnter}>
         Enter
       </Button>
       <br />
@@ -229,7 +229,7 @@ function SetUpPage() {
         ))}
       </Select> */}
       <br />
-      <Button style={{ marginTop: "10px" }} type="primary" onClick={trainInitModel}>
+      <Button style={{ marginTop: "10px" }}  onClick={trainInitModel}>
         Go to train initial model
       </Button>
       {initAcc === 100 ? (
