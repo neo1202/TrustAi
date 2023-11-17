@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
 import API_URL from "../api";
 import Dropdown from "../components/Dropdown";
 import Navbar from "../components/Navbar";
@@ -13,16 +12,31 @@ function ShapPage() {
   const [posX, setPosX] = useState([]);
   const [negX, setNegX] = useState([]);
   const [gPieImagePath, setGPieImagePath] = useState('');
-  
+  const [XLabels, setXLabels] = useState([]);
+  const [yLabel, setYLabel] = useState('');
+  const [inputX, setInputX] = useState(Array(XLabels.length).fill('0.5')); // Initialize with an empty value
 
-  const XLabels = ['Area', 'Perimeter', 'MajorAxisLength', 'MinorAxisLength',
-  'AspectRation', 'Eccentricity', 'ConvexArea', 'EquivDiameter',
-  'Extent', 'Solidity', 'roundness', 'Compactness', 
-  'ShapeFactor1','ShapeFactor2', 'ShapeFactor3', 'ShapeFactor4'];
+  useEffect(() => {
+    getXLabels()
+  }, [])
+  
+  const getXLabels = async () => {
+    const response = await fetch(
+      `${API_URL}/getFeaturesAndLabel/`, 
+      {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    const data = await response.json()
+    setXLabels(data.featureNames)
+    setYLabel(data.labelName)
+    setInputX(Array(data.featureNames.length).fill('0.5'))
+  }
+
   const [data, setData] = useState([]);
   const [isDataAvailable, setIsDataAvailable] = useState(false); //track cf data gerated or not
-  
-  const [inputX, setInputX] = useState(Array(XLabels.length).fill('0.5')); // Initialize with an empty value
   
   const [depClass1, setDepClass1] = useState('Area');
   const [depClass2, setDepClass2] = useState('MajorAxisLength');
@@ -41,7 +55,6 @@ function ShapPage() {
     setDropdownSelection(optionSelected);
   };
 
-  //
   const handleInputXChange = (index, value) => {
     // Create a copy of the inputValues array and update the value at the specified index
     const updatedValues = [...inputX];
@@ -262,7 +275,7 @@ positive value means positive effect and negative value means neagative effect O
           ))}
           <div>
             <label>
-              Choose A Desired Class:
+              Choose A Desired Class of {yLabel}:
               <input type="text"  className='whitebox' value={desired_y} onChange={(e) => setDesired_y(e.target.value)} />
             </label>
           </div>
@@ -275,44 +288,14 @@ positive value means positive effect and negative value means neagative effect O
             <table >
               <thead>
                 <tr>
-                  <th>Area</th>
-                  <th>Perimeter</th>
-                  <th>MajorAxisLength</th>
-                  <th>MinorAxisLength</th>
-                  <th>AspectRation</th>   {/* 5*/}
-                  <th>Eccentricity</th>
-                  <th>ConvexArea</th>
-                  <th>EquivDiameter</th>
-                  <th>Extent</th>
-                  <th>Solidity</th> {/* 10*/}
-                  <th>roundness</th>
-                  <th>Compactness</th>
-                  <th>ShapeFactor1</th>
-                  <th>ShapeFactor2</th>
-                  <th>ShapeFactor3</th> {/* 15*/}
-                  <th>ShapeFactor4</th>
-                  <th>Class</th>
+                  {XLabels.map((label, i) => <th key={i}>{label}</th>)}
+                  <th>{yLabel}</th>
                 </tr>
               </thead>
               <tbody>
-                {data.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.Area}</td>
-                    <td>{item.Perimeter}</td>
-                    <td>{item.MajorAxisLength}</td>
-                    <td>{item.MinorAxisLength}</td>
-                    <td>{item.AspectRation}</td>
-                    <td>{item.Eccentricity}</td>
-                    <td>{item.ConvexArea}</td>
-                    <td>{item.EquivDiameter}</td>
-                    <td>{item.Extent}</td>
-                    <td>{item.Solidity}</td>
-                    <td>{item.roundness}</td>
-                    <td>{item.Compactness}</td>
-                    <td>{item.ShapeFactor1}</td>
-                    <td>{item.ShapeFactor2}</td>
-                    <td>{item.ShapeFactor3}</td>
-                    <td>{item.ShapeFactor4}</td>
+                {data.map((item, i) => (
+                  <tr key={i}>
+                    {XLabels.map((label, j) => ( <td key={`${i}-${j}`}>{item[label]}</td> ))}
                     <td>{item.Class}</td>
                   </tr>
                 ))}

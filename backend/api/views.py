@@ -8,11 +8,13 @@ import json
 import os
 import sys
 sys.path.append('../pytorch/utils')
+sys.path.append('../dataquality')
 
 # Django
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import FullProcess
@@ -27,6 +29,7 @@ from torchinfo import summary
 
 # functions from pytorch folder
 from pytorch.config import config
+from pytorch.config import datasetConfig
 from pytorch.utils.utils import connectDevice
 from pytorch.utils.dataset import IndexedDataset
 from pytorch.utils.functions import choose_teacher
@@ -46,6 +49,9 @@ from sklearn.model_selection import train_test_split
 import shap
 import dice_ml
 
+# data quality
+from dataquality.missForest import MissForest
+
 @api_view(['GET'])
 def getRoutes(request):
     # when going to 8000/api/, the page shows how we get access to each backend server
@@ -64,10 +70,20 @@ def getRoutes(request):
 
 @api_view(['POST'])
 def uploadFile(request):
-    # print("\nUploading file...\n")
-    # print(request)
+
     print("\n\n ====== upload ====== \n\n")
-    data = json.loads(request.body)
+    # data = json.loads(request.body)
+    if request.method == 'POST' and request.FILES['file']:
+        uploaded_file = request.FILES['file']
+        destination = open(os.path.join('dataset', uploaded_file.name), 'wb+')
+
+        for chunk in uploaded_file.chunks():
+            destination.write(chunk)
+        destination.close()
+
+        return JsonResponse({'msg': 'File uploaded successfully'})
+
+    return JsonResponse({'msg': 'Invalid request'}, status=400)
     return Response(data)
 
 
@@ -90,17 +106,23 @@ def clearProcess(request):
 
 @api_view(['POST'])
 def initProcess(request):
+    query_size = config['query_size']
+    pool_size = config['pool_size']
+    learning_rate = config['learning_rate']
+    n_epochs = config['n_epochs']
+    batch_size = config['batch_size']
+
     process = FullProcess.objects.create(
         processID = 1, # just use as a foreign key
         initTrainingDataNum = 0,
         initTrainingDataSelectMethod = 'Randomly Generate',
         trainingModel = '3 Layer Neural Network Model',
         uncertaintyQueryMethod = 'Margin',
-        querySize = 20,
-        poolingSize = 300,
-        learningRate = 1e-3,
-        numEpochs = 100,
-        batchSize = 16,
+        querySize = query_size,
+        poolingSize = pool_size,
+        learningRate = learning_rate,
+        numEpochs = n_epochs,
+        batchSize = batch_size,
         finalTeacherAcc = 0,
         finalStudentAcc = 0,
     )
@@ -127,11 +149,13 @@ def initProcess(request):
 
 @api_view(['POST'])
 def readData(request):
-    df = pd.read_csv(r'./pytorch/data/preprocessed_beans_train.csv')
+    df = pd.read_csv(datasetConfig['train_data_path'])
     df_train, df_valid = train_test_split(df, test_size=0.2, random_state=42) # valid_ratio = 0.2
     df_train = df_train.reset_index(drop=True)
 
-    df_test = pd.read_csv(r'./pytorch/data/preprocessed_beans_test.csv')
+    df_test = pd.read_csv(datasetConfig['test_data_path'])
+
+    label_name = datasetConfig['label_name']
 
     msg = ''
     if not Dataset.objects.filter(name = 'train-raw').exists():
@@ -145,7 +169,7 @@ def readData(request):
         num_train = df_train.shape[0]
         process.dataset.create(
             name = 'train-raw', df = df_train,
-            data = df_train.drop('Class', axis=1), labels = df_train['Class'],
+            data = df_train.drop(label_name, axis=1), labels = df_train[label_name],
             labelOrNot = [0 for _ in range(num_train)],
             predictionRecord = [[] for _ in range(num_train)],
         )
@@ -155,7 +179,7 @@ def readData(request):
         num_valid = df_valid.shape[0]
         process.dataset.create(
             name = 'valid-raw', df = df_valid,
-            data = df_valid.drop('Class', axis=1), labels = df_valid['Class'],
+            data = df_valid.drop(label_name, axis=1), labels = df_valid[label_name],
             labelOrNot = [1 for _ in range(num_valid)],
             predictionRecord = [[] for _ in range(num_valid)],
         )
@@ -165,7 +189,7 @@ def readData(request):
         num_test = df_test.shape[0]
         process.dataset.create(
             name = 'test-raw', df = df_test,
-            data = df_test.drop('Class', axis=1), labels = df_test['Class'],
+            data = df_test.drop(label_name, axis=1), labels = df_test[label_name],
             labelOrNot = [1 for _ in range(num_test)],
             predictionRecord = [[] for _ in range(num_test)],
         )
@@ -194,6 +218,21 @@ def getData(request, pk):
         'rawData': rawData, 'keys': list(rawData[0].keys()),
         'numRows': numRows, 'numCols': numCols}
     return Response(data)
+
+
+@api_view(['GET'])
+def getFeaturesAndLabel(request):
+    print("\n\n ====== getFeaturesAndLabel ====== \n\n")
+
+    df = pd.read_csv(datasetConfig['test_data_path'])
+    label_name = datasetConfig['label_name']
+    features = list(df.columns)
+    features.remove(label_name)
+
+    return Response({
+        'featureNames':features,
+        'labelName':label_name,
+    })
 
 
 @api_view(['POST']) # not yet in urls
@@ -242,6 +281,34 @@ def setMethodsAndConfigs(request):
 def startImpute(request):
     process = FullProcess.objects.all().order_by("-id")[0]
     imputeMethod = process.imputerMethod
+    print(f"\n\n ====== {imputeMethod} ====== \n\n")
+
+    folder_path = f'./imputedData'
+    if not os.path.isdir(folder_path):
+        print("\n === No folder for imputed data, make one now === \n")
+        os.mkdir(folder_path)
+
+    if imputeMethod == 'Auto':
+        pass
+
+    elif imputeMethod == 'Genetic-enhanced fuzzy c-means':
+        pass
+
+    elif imputeMethod == 'VAE':
+        pass
+
+    elif imputeMethod == 'EM':
+        pass
+
+    elif imputeMethod == 'Miss-forest':
+        df = pd.read_csv(datasetConfig['train_data_path'])
+        print(df)
+        imputer = MissForest()
+        df_imputed = imputer.fit_transform(df)
+
+    df_imputed.to_csv(f"{folder_path}/Imputed.csv", index=False)
+    print("\n#######################################\n")
+    print(df_imputed)
 
     data = {'imputeMethod': imputeMethod}
     return Response(data)
@@ -858,11 +925,12 @@ def processDepClassPlot(request):
 def processCF(request):
     print("\n ================= processCF ================= \n")
     
+    label_name = datasetConfig['label_name']
     process = FullProcess.objects.all().order_by("-id")[0] 
     valid_df = process.dataset.get(name='valid-raw').df
     Xcol=valid_df.columns[:-1].tolist()
 
-    d = dice_ml.Data(dataframe=valid_df, continuous_features=Xcol, outcome_name='Class')
+    d = dice_ml.Data(dataframe=valid_df, continuous_features=Xcol, outcome_name=label_name)
     backend ='PYT' 
     device = connectDevice()
     teacher_model = ComplexModel().to(device)

@@ -8,6 +8,7 @@ urlpatterns = [
     path('initProcess/', views.initProcess, name='initProcess'),
     path('readData/', views.readData, name='readData'),
     path('getData/<str:pk>', views.getData, name='getData'),
+    path('getFeaturesAndLabel/', views.getFeaturesAndLabel, name='getFeaturesAndLabel'),
     path('settings/', views.setMethodsAndConfigs, name='settings'),
     path('startImpute/', views.startImpute, name='startImpute'),
     path('uncertaintyRank/<str:iter>/', views.getUncertaintyRank, name='uncertaintyRank'),

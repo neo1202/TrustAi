@@ -11,3 +11,10 @@ config = {
     'query_size': 20,
     'pool_size': 300
 }
+
+datasetConfig = {
+    # 'train_data_path':r'./pytorch/data/data_train.csv',
+    'train_data_path':r'./pytorch/data/preprocessed_beans_train.csv',
+    'test_data_path':r'./pytorch/data/preprocessed_beans_test.csv',
+    'label_name':'Class',
+}

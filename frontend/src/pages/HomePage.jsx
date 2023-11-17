@@ -72,14 +72,14 @@ function HomePage() {
         `${API_URL}/upload/`, 
         {
             method: "POST",
-            headers: {
-                'Content-Type': "multipart/form-data",
-            },
+            // headers: {
+            //     'Content-Type': 'multipart/form-data',
+            // },
             body: formData
         })
 
     const data = await response.json()
-    console.log(data)
+    console.log(data.msg)
   };
 
   return (

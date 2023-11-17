@@ -1,17 +1,19 @@
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+from ..config import datasetConfig
 
+label_name = datasetConfig['label_name']
 
 class IndexedDataset(Dataset):
     # data loading
     def __init__(self, df, TestOrValid=False, Valid=False, ReVealY=False, revealIdx=None): # if ReVealY=False, revealIdx must be none. They are passed together
         #df = pd.read_csv(file_name)
-        self.x = torch.from_numpy(df.drop(columns=['Class']).to_numpy())
+        self.x = torch.from_numpy(df.drop(columns=[label_name]).to_numpy())
         self.x = self.x.to(torch.float32)
 
         '''真實的y, 但會顯示出的是label, 這邊的y幫助之後自動update unlabeled'''
-        self.hidden_y = torch.from_numpy(df['Class'].to_numpy())
+        self.hidden_y = torch.from_numpy(df[label_name].to_numpy())
         self.n_samples = self.x.shape[0] #總共多少筆資料，不管有沒有label過
         #print(self.x.shape[0]) 多少個資料
 
