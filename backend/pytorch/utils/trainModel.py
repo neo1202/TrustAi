@@ -17,12 +17,13 @@ from .modelStructures import ComplexModel
 from .query import query_the_oracle
 from .plotting import plot_pred_record
 from .functions import modify_valid_record, choose_teacher, loss_kd
+from ..config import datasetConfig
 
 device = connectDevice()
 
 
 def test(model, device, data_loader): #可能是test也可能是valid，只看準確度
-    test_df = pd.read_csv('./pytorch/data/preprocessed_beans_test.csv')
+    test_df = pd.read_csv(datasetConfig['test_data_path'])
     dataset_test = IndexedDataset(test_df, TestOrValid=True)
 
     test_correct = 0

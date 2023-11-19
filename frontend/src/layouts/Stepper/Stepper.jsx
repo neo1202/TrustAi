@@ -30,28 +30,15 @@ function Stepper() {
           >
             <div className="step">
               {i + 1 < currentContextStep || allComplete ? (
-                <TiTick size={24} />
+                <TiTick size={24} /> // the checks in the number circles
               ) : (
                 i + 1
               )}
             </div>
-            <p className="text-gray-500">{step}</p>
+            <p className="text-gray-400">{step}</p>
           </div>
         ))}
       </div>
-
-      {/* {!allComplete && (
-        <button
-          className="bg-white btn"
-          onClick={() => {
-            currentContextStep === steps.length
-              ? setAllComplete(true)
-              : setCurrentStep((prev) => prev + 1);
-          }}
-        >
-          {currentStep === steps.length ? "Finish" : `To ${steps[currentStep]}`}
-        </button>
-      )} */}
     </>
   );
 }

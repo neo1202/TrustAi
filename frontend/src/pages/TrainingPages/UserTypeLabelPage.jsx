@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-// import { useData } from "../../hooks/useData";
 import API_URL from "../../api";
 import QueryTheOracle from "../../components/QueryTheOracle";
 import DataTable from "../../components/DataTable";
+import Dashboard from "../../components/Dashboard";
+import { Button } from "antd";
 
 function UserTypeLabelPage() {
 
@@ -16,10 +17,21 @@ function UserTypeLabelPage() {
   const [uncertainData, setUncertainData] = useState([])
   const [keys, setKeys] = useState([])
 
+  const [labeledToAllRatioPlot, setLabeledToAllRatioPlot] = useState('')
+  const [labeledClassRatioPlot, setLabeledClassRatioPlot] = useState('')
   const [cumuNumDataPlot, setCumuNumDataPlot] = useState('') // plot path
   const [cumuTrainAccPlot, setCumuTrainAccPlot] = useState('')
   const [cumuTestAccPlot, setCumuTestAccPlot] = useState('')
 
+  const [isDashboardVisible, setDashboardVisible] = useState(false);
+
+  const showDashboard = () => {
+    setDashboardVisible(true);
+  };
+
+  const hideDashboard = () => {
+    setDashboardVisible(false);
+  };
 
   useEffect(() => {
     getUncertaintyRank()
@@ -27,11 +39,10 @@ function UserTypeLabelPage() {
 
   useEffect(() => {
     plotCumulation()
+    showDashboard()
   }, [finishTraining])
 
   const getUncertaintyRank = async () => {
-    // 要拿「前一個」模型預測出的計算結果
-    // 一進頁面時會去拿初始模型（第 0 個模型）的預測結果
     const response = await fetch(
         `${API_URL}/uncertaintyRank/${iterCount-1}/`, 
         {
@@ -39,15 +50,12 @@ function UserTypeLabelPage() {
         headers: {
             'Content-Type': 'application/json'
         },
-        // body: JSON.stringify(setting)
     })
     const data = await response.json()
     console.log("Getting uncertainty rank...", data.msg)
     setUncertaintyId(data.uncertainIdx)
     setUncertainData(data.uncertainData)
     setKeys(data.keys)
-
-    console.log(data.uncertainData)
   }
 
   const modifyNumDataPerIter = () => {
@@ -56,17 +64,18 @@ function UserTypeLabelPage() {
 
   const plotCumulation  = async () => {
     const response = await fetch(
-        `${API_URL}/plotCumulation/`, // ${iterCount}/
+        `${API_URL}/plotCumulation/`, 
         {
         method: "GET",
         headers: {
             'Content-Type': 'application/json'
         },
-        // body: JSON.stringify(uncertaintyRank)
     })
     const data = await response.json()
     console.log("Plotting cumulated information...", data.msg)
 
+    setLabeledToAllRatioPlot(`${data.labeledToAllRatioPlot}?timestamp=${Date.now()}`)
+    setLabeledClassRatioPlot(`${data.labeledClassRatioPlot}?timestamp=${Date.now()}`)
     setCumuNumDataPlot(`${data.cumuNumDataPlot}?timestamp=${Date.now()}`)
     setCumuTrainAccPlot(`${data.cumuTrainAccPlot}?timestamp=${Date.now()}`)
     setCumuTestAccPlot(`${data.cumuTestAccPlot}?timestamp=${Date.now()}`)
@@ -95,8 +104,6 @@ function UserTypeLabelPage() {
   }
 
   const trainNextIter = () => {
-    // to be done
-    // 用上次的 model 去 predict unlabeled 的資料（後端的事），前端拿到排名
     if (finishTraining) {
         setIterCount(iter => iter + 1);
         setFinishTraining(false)
@@ -125,40 +132,49 @@ function UserTypeLabelPage() {
   }
 
   return (
-    <div className="relative">
-      <h1>UserTypeLabelPage</h1>
-      <br/>
-      <br/>
-
-      <p>Query the Oracle</p>
-      <QueryTheOracle queryIds={uncertaintyId} setQueryResults={setQueryResults}/>
+    <div className="flex flex-col place-items-center justify-center h-screen bg-white-400">
       <br />
-      <DataTable data={uncertainData}
-                 keys={keys} />
+      <br />
 
+      <QueryTheOracle queryIds={uncertaintyId} setQueryResults={setQueryResults} />
+
+      <br />
+      <DataTable data={uncertainData} keys={keys} />
       
-      <button className="bg-white btn" style={{marginLeft:'30px'}} onClick={train}>Train</button>
+      <br />
+      {finishTraining ? (
+        <div>
+          <Dashboard
+            visible={isDashboardVisible}
+            onCancel={() => {
+              hideDashboard();
+              trainNextIter();
+            }}
+            imageUrls={[
+              `${API_URL}/getPlotImages/dashboard/${labeledToAllRatioPlot}`,
+              `${API_URL}/getPlotImages/dashboard/${labeledClassRatioPlot}`,
+              `${API_URL}/getPlotImages/dashboard/${cumuNumDataPlot}`,
+              `${API_URL}/getPlotImages/dashboard/${cumuTrainAccPlot}`,
+            //   `${API_URL}/getPlotImages/dashboard/${cumuTestAccPlot}`,
+            ]}
+            iterCount={iterCount}
+            cumulatedNumData={cumulatedNumData}
+            currTrainAcc={currTrainAcc}
+            currTestAcc={currTestAcc}
+          />
+        </div>
+      ) : (
+        <></>
+      )}
 
-      <br/>
-      {finishTraining? <div>
-        <p>Iteration Result</p>
-        <ul>
-            <li>{`Iteration ${iterCount}`}</li>
-            <li>{`Cumulated training data: ${cumulatedNumData}`}</li>
-            <li>{`Train accuracy: ${currTrainAcc}`}</li>
-            <li>{`Test accuracy: ${currTestAcc}`}</li>
-        </ul>
-        <img src={`${API_URL}/getPlotImages/dashboard/${cumuNumDataPlot}`} alt="cumuNumDataPlot" />{/* /${iterCount} */}
-        <img src={`${API_URL}/getPlotImages/dashboard/${cumuTrainAccPlot}`} alt="cumuTrainAccPlot" />{/* /${iterCount} */}
-        <img src={`${API_URL}/getPlotImages/dashboard/${cumuTestAccPlot}`} alt="cumuTestAccPlot" />{/* /${iterCount} */}
-      </div> : <></>}
-      
-      <br/>
-      <br/>
-      <button className="bg-white btn" onClick={trainNextIter}>Go on to Next AL Training</button>
-
+      <br />
+      <br />
+      <Button className="bg-white btn" style={{ marginLeft: '30px' }} onClick={train}>
+        Train
+      </Button>
     </div>
   );
+  
 }
 
 export default UserTypeLabelPage;

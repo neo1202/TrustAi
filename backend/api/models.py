@@ -12,6 +12,7 @@ class FullProcess(models.Model):
     """
     processID = models.PositiveIntegerField() 
 
+    yLabel = models.CharField(max_length=200, default="ylabel")
     imputerMethod = models.CharField(max_length=200, default="EM")
 
     initTrainingDataNum = models.PositiveIntegerField()

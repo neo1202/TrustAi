@@ -11,7 +11,7 @@ const headerLabels = { // 'routes':'header label shown'
     '':'Home', 
     'dataquality':'Data Quality',
     'training':'Active Learning',
-    'shap':'Shap Explanation',
+    'shap':'SHAP Explanation',
 }
 
 const Header = () => {
@@ -39,7 +39,7 @@ const Header = () => {
         {pageRoutes.map((route, i) => {
           return (
           <Link to={`/${route}`} 
-                className={`flex items-center justify-center w-32 hover:cursor-pointer ${route === currentPage? "text-indigo-800":""}`}
+                className={`flex items-center justify-center w-40 hover:cursor-pointer ${route === currentPage? "text-indigo-800":""}`}
                 onClick={() => {
                     handleClickLink(route)
                 }}

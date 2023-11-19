@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use('agg') 
 import matplotlib.pyplot as plt
+from collections import Counter
 import json
 import os
 import sys
@@ -149,13 +150,19 @@ def initProcess(request):
 
 @api_view(['POST'])
 def readData(request):
+    label_name = datasetConfig['label_name']
+
     df = pd.read_csv(datasetConfig['train_data_path'])
+    df[label_name] = df[label_name].apply(lambda x: x - 1)
+    
     df_train, df_valid = train_test_split(df, test_size=0.2, random_state=42) # valid_ratio = 0.2
     df_train = df_train.reset_index(drop=True)
 
     df_test = pd.read_csv(datasetConfig['test_data_path'])
+    df_test[label_name] = df_test[label_name].apply(lambda x: x - 1)
 
-    label_name = datasetConfig['label_name']
+    print(df_train[label_name])
+    print(df_test[label_name])
 
     msg = ''
     if not Dataset.objects.filter(name = 'train-raw').exists():
@@ -251,7 +258,9 @@ def setMethodsAndConfigs(request):
 
     process = FullProcess.objects.all().order_by("-id")[0]
 
-    if setting_type == 'SelectImputer':
+    if setting_type == 'SetYLabel':
+        process.yLabel = setting_value
+    elif setting_type == 'SelectImputer':
         process.imputerMethod = setting_value 
     elif setting_type == 'SetInitNumData':
         process.initTrainingDataNum = setting_value
@@ -420,6 +429,40 @@ def plotCumulation(request): # , iter
         print("\n === No folder for plots of dashboard, make one now === \n")
         os.mkdir(dashboard_plots_path)
 
+    ds_train_db = Dataset.objects.get(name='train-raw')
+    labeled_idx = ds_train_db.labelOrNot
+    labeled_idx = np.array([i for i, x in enumerate(labeled_idx) if x == 1])
+
+    labels = ds_train_db.labels
+    true_labels_by_idx = np.array(labels)
+    true_labels_by_idx = true_labels_by_idx[labeled_idx]
+
+    """ labeled-to-all ration pie chart """
+    ratio = len(true_labels_by_idx ) / ds_train_db.df.shape[0]
+    labels = ['Labeled', 'Unlabeled']
+    sizes = [ratio, 1 - ratio]
+    colors = ['lightcoral', 'lightskyblue']
+    labeled_to_all_plot_name = 'label-to-all-ratio.png'
+    labeled_to_all_plot_path = f'{dashboard_plots_path}/{labeled_to_all_plot_name}'
+    plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    plt.title('Labeled-to-All Data Ratio')
+    plt.savefig(f'{labeled_to_all_plot_path}')
+    plt.close()
+
+    """ labeled class counts pie chart """
+    number_counts = Counter(list(true_labels_by_idx))
+    labels = [str(number) for number in number_counts.keys()]
+    colors = ['gold', 'lightskyblue', 'lightcoral', 'lightgreen', 'lightpink', 'lightgray']
+    labeled_class_plot_name = 'labelClass-ratio.png'
+    labeled_class_plot_path = f'{dashboard_plots_path}/{labeled_class_plot_name}'
+    plt.pie(number_counts.values(), labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    plt.title('Labeled Class Ratio')
+    plt.savefig(f'{labeled_class_plot_path}')
+    plt.close()
+
+    """ Cumulated Number of Training Data """
     num_data_plot_name = 'iter-numData.png'
     num_data_plot_path = f'{dashboard_plots_path}/{num_data_plot_name}'
     plt.plot(iters, num_datas)
@@ -429,26 +472,32 @@ def plotCumulation(request): # , iter
     plt.savefig(f'{num_data_plot_path}')
     plt.close()
 
+    """ Training Accuracy by Iteration """
     train_acc_plot_name = 'iter-trainAcc.png'
     train_acc_plot_path = f'{dashboard_plots_path}/{train_acc_plot_name}'
     plt.plot(iters, train_accs)
     plt.xlabel('Iteration')
     plt.ylabel('Accuracy')
+    plt.yticks(np.arange(0, 1.1, 0.1))
     plt.title('Training Accuracy by Iteration')
     plt.savefig(f'{train_acc_plot_path}')
     plt.close()
 
+    """ Test Accuracy by Iteration """
     test_acc_plot_name = 'iter-testAcc.png'
     test_acc_plot_path = f'{dashboard_plots_path}/{test_acc_plot_name}'
     plt.plot(iters, test_accs)
     plt.xlabel('Iteration')
     plt.ylabel('Accuracy')
+    plt.yticks(np.arange(0, 1.1, 0.1))
     plt.title('Test Accuracy by Iteration')
     plt.savefig(f'{test_acc_plot_path}')
     plt.close()
 
     return Response({
         'msg': 'plotting cumulated info...',
+        'labeledToAllRatioPlot': labeled_to_all_plot_name,
+        'labeledClassRatioPlot': labeled_class_plot_name, 
         'cumuNumDataPlot': num_data_plot_name, 
         'cumuTrainAccPlot': train_acc_plot_name,
         'cumuTestAccPlot': test_acc_plot_name,
@@ -633,8 +682,8 @@ def trainALModel(request, iter):
         'status': 'successful',
         'iteration':iteration, 
         'cumuNumData': al.cumulatedNumData[-1],
-        'trainAcc': train_acc,
-        'testAcc': test_acc,
+        'trainAcc': round(train_acc, 4),
+        'testAcc': round(test_acc, 4),
     }
     return Response(data)
 
@@ -649,6 +698,7 @@ def saveModel(request):
 
 @api_view(['POST'])
 def trainFinalTeacher(request):
+    # print(f"\n\n&&&&&&&&&&&&&&& {datasetConfig['large_model_path'] == './trainingModels/LargeModel.ckpt'} &&&&&&&&&&&&&&&\n\n") 
     process = FullProcess.objects.all().order_by("-id")[0] 
     num_epoch = process.numEpochs
     batch_size = process.batchSize
@@ -759,8 +809,8 @@ def doKD(request): # actually train final student
     process.save()
 
     # get comparison(with teacher) results
-    summary_teacher = summary(teacher_model, input_size=(batch_size,16))
-    summary_student = summary(student_model, input_size=(batch_size,16))
+    summary_teacher = summary(teacher_model, input_size=(batch_size, datasetConfig['num_feature']))
+    summary_student = summary(student_model, input_size=(batch_size, datasetConfig['num_feature']))
     
     data = {
         'msg': 'do KD...',

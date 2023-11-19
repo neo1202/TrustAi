@@ -2,14 +2,14 @@
 const trainingStepsConfig = [
   "Initial Setup",
   "Method Select",
-  "UserTypeLabelPage",
-  "Result",
-  "Knowledge Distill",
-  "Shap Explanation",
+  "User Query",
+  "Final Training",
+  "Knowledge Distillation",
+  "SHAP Explanation",
 ];
 
 const DQStepsConfig = [
-  "EDA(edash return)",
+  "Edash Return",
   "Imputer Select",
   "DQ Result",
 ]
