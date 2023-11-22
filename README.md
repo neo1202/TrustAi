@@ -1,4 +1,34 @@
-# TrustAi
+# TrustAi website
+
+> frontend: React, Tailwind
+
+> backend: Django Postgres
+
+Integrated backend with Docker for containerization.
+
+## To start the website
+
+### Frontend:
+
+<i>the website runs on</i> http://localhost:5173/
+
+```
+cd frontend
+npm install
+npm run dev
+```
+
+### Backend&DB:
+
+- open your docker desktop (download from https://www.docker.com/products/docker-desktop/)
+- need to add the tag --build to build an image for the first time
+
+```
+cd backend
+docker compose up --build
+```
+
+<!-- # TrustAi
 
 TrustAi website
 
@@ -27,7 +57,7 @@ Check activated Python
 which python3
 ```
 
-Upgrade `pip` 
+Upgrade `pip`
 
 ```
 pip install --upgrade pip
@@ -137,7 +167,7 @@ check database and its user by `\l`
 #### Download PgAdmin4
 link: https://www.pgadmin.org/download/
 
-and refer to this page for creating a database 
+and refer to this page for creating a database
 https://www.codementor.io/@engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb
 
 
@@ -149,4 +179,4 @@ python3 manage.py runserver
 
 and the server would run on port http://127.0.0.1:8000
 
-<i>The CORS policy is dealt by using vite proxy</i>
+<i>The CORS policy is dealt by using vite proxy</i> -->
