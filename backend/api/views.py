@@ -843,6 +843,37 @@ def getPlotImages(request, folder, img):
     return response
 
 
+@api_view(['GET'])
+def processShapAllClassPlot(request):
+    print("\n ================= processShapAllClassPlot ================= \n")
+    process = FullProcess.objects.all().order_by("-id")[0] 
+    valid_df = process.dataset.get(name='valid-raw').df
+    test_df = process.dataset.get(name='test-raw').df
+    dataset_test = IndexedDataset(test_df, TestOrValid=True)
+    batch_size = process.batchSize
+    test_loader = DataLoader(dataset_test, batch_size=150,shuffle=False, drop_last=True)
+    print("\n ================= running SHAP ================= \n")
+    #SHAP
+    device = connectDevice()
+    teacher_model = ComplexModel().to(device)
+    teacher_model.load_state_dict(torch.load('./trainingModels/LargeModel.ckpt', map_location=torch.device('cpu')))
+    for batch in test_loader:
+        datas, labels, _ = batch
+        datas, labels = datas.to(device), labels.to(device)
+        explainer = shap.DeepExplainer(teacher_model, datas)
+        break
+    #savefig
+    
+    shap_img_path = './shap-images'
+    if not os.path.isdir(shap_img_path):
+        print("\n === No folder for shap img, make one now === \n")
+        os.mkdir(shap_img_path)
+    print("\n ================= calculating SHAP ================= \n")
+    shap_values_teacher = explainer.shap_values(datas)
+    shap.summary_plot(shap_values_teacher, datas, valid_df.columns[:-1], show=False,  max_display=16)
+    plt.savefig(f'{shap_img_path}/all_class.png')
+    plt.close()
+    return HttpResponse("Data processed successfully")
 @api_view(['POST'])
 def processShapClassPlot(request):
 
@@ -855,8 +886,10 @@ def processShapClassPlot(request):
     test_df = process.dataset.get(name='test-raw').df
     dataset_test = IndexedDataset(test_df, TestOrValid=True)
     batch_size = process.batchSize
-    test_loader = DataLoader(dataset_test, batch_size=batch_size,shuffle=False, drop_last=True)
-
+    test_loader = DataLoader(dataset_test, batch_size=200,shuffle=False, drop_last=True)
+    
+    
+    
     #SHAP
     device = connectDevice()
     teacher_model = ComplexModel().to(device)
@@ -874,16 +907,16 @@ def processShapClassPlot(request):
         os.mkdir(shap_img_path)
     
     shap_values_teacher = explainer.shap_values(datas)
-    shap.summary_plot(shap_values_teacher, datas, valid_df.columns[:-1], show=False)
-    plt.savefig(f'{shap_img_path}/all_class.png')
-    plt.close()
+    # shap.summary_plot(shap_values_teacher, datas, valid_df.columns[:-1], show=False)
+    # plt.savefig(f'{shap_img_path}/all_class.png')
+    # plt.close()
     
-    shap.summary_plot(shap_values_teacher[int(shapClass)], datas, valid_df.columns[:-1])
+    shap.summary_plot(shap_values_teacher[int(shapClass)], datas, valid_df.columns[:-1],  max_display=16)
     summaryimage_filename = 'class_summary.png'
     plt.savefig(f'{shap_img_path}/{summaryimage_filename}')
     plt.close()
 
-    shap.summary_plot(shap_values_teacher[int(shapClass)], datas, valid_df.columns[:-1], plot_type='bar')
+    shap.summary_plot(shap_values_teacher[int(shapClass)], datas, valid_df.columns[:-1], plot_type='bar', max_display=16)
     gbarimage_filename = 'class_gbar.png'
     plt.savefig(f'{shap_img_path}/{gbarimage_filename}')
     plt.close()
@@ -903,8 +936,10 @@ def processShapClassPlot(request):
     #pie chart
     abs_mean=np.abs(shap_values_teacher[1]).mean(0).tolist()  
     df = pd.DataFrame([abs_mean], columns =valid_df.columns[:-1])
-    id=df.loc[0].sort_values().index
-    val=df.loc[0].sort_values().values
+    # display the top 16 features
+    k=16
+    id=df.loc[0].sort_values().index[:k]
+    val=df.loc[0].sort_values().values[:k]
     total=sum(val)
     labels = [f'{l}, {(s/total*100):0.1f}%' for l, s in zip(id, val)]
     pie = plt.pie(val,autopct='%1.1f%%', startangle=90)
@@ -939,7 +974,8 @@ def processDepClassPlot(request):
     test_df = process.dataset.get(name='test-raw').df
     dataset_test = IndexedDataset(test_df, TestOrValid=True)
     batch_size = process.batchSize
-    test_loader = DataLoader(dataset_test, batch_size=batch_size,shuffle=False, drop_last=True)
+    test_loader = DataLoader(dataset_test, batch_size=200,shuffle=False, drop_last=True)
+    
 
     #SHAP
     device = connectDevice()
@@ -974,17 +1010,20 @@ def processDepClassPlot(request):
 @api_view(['POST'])
 def processCF(request):
     print("\n ================= processCF ================= \n")
-    
+    print("new")
     label_name = datasetConfig['label_name']
     process = FullProcess.objects.all().order_by("-id")[0] 
-    valid_df = process.dataset.get(name='valid-raw').df
-    Xcol=valid_df.columns[:-1].tolist()
-
-    d = dice_ml.Data(dataframe=valid_df, continuous_features=Xcol, outcome_name=label_name)
+    test_df = process.dataset.get(name='test-raw').df
+    
+    Xcol=test_df.columns[:-1].tolist()
+    test_df_4 = test_df.round(3)
+    print(test_df_4.head())
+    d = dice_ml.Data(dataframe=test_df_4, continuous_features=Xcol, outcome_name=label_name)
     backend ='PYT' 
     device = connectDevice()
     teacher_model = ComplexModel().to(device)
     teacher_model.load_state_dict(torch.load('./trainingModels/LargeModel.ckpt', map_location=torch.device('cpu')))
+    teacher_model.eval()
     m = dice_ml.Model(model=teacher_model, backend=backend)
     
     exp_random = dice_ml.Dice(d, m) # initiate DiCE
@@ -997,11 +1036,15 @@ def processCF(request):
 
     floatX = [[float(i) for i in inputX]]
     query_instances = pd.DataFrame(floatX, columns =Xcol)
-    # query_instances = test_df.iloc[4:5, :]  
+    # query_instances = test_df.iloc[4:5, :-1]  #######
+    # query_instances = query_instances.round(3)
+    print(query_instances)
+    print("==============ready to generate counterfactuals==============")
     dice_exp = exp_random.generate_counterfactuals(query_instances, total_CFs=2, desired_class=desired_y, verbose=False)   
     df_qi=dice_exp.cf_examples_list[0].test_instance_df
     df_cf=dice_exp.cf_examples_list[0].final_cfs_df
     df = df_qi.append(df_cf)
+    print(df)
     df_json = df.to_json(orient='records')
 
     return Response({'data': df_json})

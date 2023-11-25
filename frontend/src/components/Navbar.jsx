@@ -33,9 +33,9 @@ function Navbar() {
     return (
       <nav className="sticky-navbar">
         <ul>
-          <li>
+          {/* <li>
             <button className="nav-link" onClick={scrollToHome}>Home</button>
-          </li>
+          </li> */}
           {/* <li>
             <button className="nav-link" onClick={scrollToSamples}>Samples</button>
           </li> */}

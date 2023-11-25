@@ -18,6 +18,7 @@ urlpatterns = [
     path('saveModel/', views.saveModel, name='saveModel'),
     path('trainFinalTeacher/', views.trainFinalTeacher, name='trainFinalTeacher'),
     path('KD/', views.doKD, name='KD'),
+    path('processShapAllClassPlot/', views.processShapAllClassPlot, name='processShapAllClassPlot'),
     path('processShapClassPlot/', views.processShapClassPlot, name='processShapClassPlot'),
     path('processDepClassPlot/', views.processDepClassPlot, name='processDepClassPlot'),
     path('getPlotImages/<str:folder>/<str:img>/', views.getPlotImages, name='getPlotImages'),

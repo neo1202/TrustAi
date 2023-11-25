@@ -14,7 +14,8 @@ function ShapPage() {
   const [gPieImagePath, setGPieImagePath] = useState('');
   const [XLabels, setXLabels] = useState([]);
   const [yLabel, setYLabel] = useState('');
-  const [inputX, setInputX] = useState(Array(XLabels.length).fill('0.5')); // Initialize with an empty value
+  const [inputX, setInputX] = useState(Array(XLabels.length).fill('20')); // Initialize with an empty value
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getXLabels()
@@ -32,14 +33,21 @@ function ShapPage() {
     const data = await response.json()
     setXLabels(data.featureNames)
     setYLabel(data.labelName)
-    setInputX(Array(data.featureNames.length).fill('0.5'))
+    setInputX(Array(data.featureNames.length).fill('20'))
   }
-
+  useEffect(() => {
+    const fetchData = async () => {
+            const response = await fetch(`${API_URL}/processShapAllClassPlot/`);
+            setIsLoading(false);
+    };
+    fetchData();
+  }, []);
+  
   const [data, setData] = useState([]);
   const [isDataAvailable, setIsDataAvailable] = useState(false); //track cf data gerated or not
   
-  const [depClass1, setDepClass1] = useState('Area');
-  const [depClass2, setDepClass2] = useState('MajorAxisLength');
+  const [depClass1, setDepClass1] = useState('feat_65');
+  const [depClass2, setDepClass2] = useState('feat_9');
   const [depY, setDepY] = useState('');
   const [imagePathD1, setImagePathD1] = useState('');
   const [imagePathD2, setImagePathD2] = useState('');
@@ -136,7 +144,10 @@ function ShapPage() {
   const pageStyle = {
     backgroundColor: "#ffffff", // Set your desired background color here
   };
-
+  
+  if (isLoading) {
+    return <p>Loading All Class SHAP...</p>; // replace with your loading image
+} 
   
   return (
     <div style={pageStyle}>
@@ -152,6 +163,7 @@ function ShapPage() {
           onSelect={handleDropdownSelection}
         />
         <h1 id="global_shap" className="heading1">Global SHAP</h1>
+        <h2 id="ft_imp_class" className="heading2">Feature Influence on All Class </h2>
         <img src={`${API_URL}/getPlotImages/shap-images/all_class.png`} alt="Generated Plot" style={{ width: '600px', height: '600px' }} />
         
         <h2 id="ft_imp_class" className="heading2">Feature Influence on A Class </h2>
@@ -296,7 +308,7 @@ positive value means positive effect and negative value means neagative effect O
                 {data.map((item, i) => (
                   <tr key={i}>
                     {XLabels.map((label, j) => ( <td key={`${i}-${j}`}>{item[label]}</td> ))}
-                    <td>{item.Class}</td>
+                    <td>{item[yLabel]}</td>
                   </tr>
                 ))}
               </tbody>

@@ -5,7 +5,8 @@ const trainingStepsConfig = [
   "User Query",
   "Final Training",
   "Knowledge Distillation",
-  "SHAP Explanation",
+  "Summary",
+  "SHAP"
 ];
 
 const DQStepsConfig = [
