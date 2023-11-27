@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import PageInfoContext from "../context/pageInfo";
+import PageInfoContext from "../context/pageInfoContext";
 
 const usePage = () => useContext(PageInfoContext);
 

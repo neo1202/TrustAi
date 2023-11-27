@@ -6,7 +6,7 @@ import StepperButton from "../../layouts/StepperButton/StepperButton";
 
 import EdashPage from "./EdashPage";
 import ImputerSelectPage from "./ImputerSelectPage";
-import DQResultPage from "./Results/DQResultPage";
+import DQResultRoutes from "./Results/DQResultRoutes";
 
 const DataQualityRoutes = () => {
   const DQPages = [
@@ -27,7 +27,7 @@ const DataQualityRoutes = () => {
     <Routes>
       <Route index element={<EdashPage />} />
       <Route path="ImputerSelect" element={<ImputerSelectPage />} />
-      <Route path="DQResult/*" element={<DQResultPage />} />
+      <Route path="DQResult/*" element={<DQResultRoutes />} />
     </Routes>
     <StepperButton handlePageChange={handleButtonClick} />
   </>)

@@ -1,19 +1,45 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import Typography from "@mui/material/Typography";
 import DataTable from "../../../components/DataTable"
+import { useDQ } from "../../../hooks/useDQ";
+import API_URL from "../../../api";
 
-const data = [
-    { "C1":"V11", "C2":"V12", "C3":"V13", },
-    { "C1":"V21", "C2":"V22", "C3":"V23", },
-    { "C1":"V31", "C2":"V32", "C3":"V33", },
-]
-
-const keys = ["C1", "C2", "C3"]
 
 const DataframePage = () => {
+  const [keys, setKeys] = useState([]);
+  const { imputedTrainData, imputedTestData } = useDQ();
+
+  const getKeys = async () => {
+    const response = await fetch(`${API_URL}/getFeaturesAndLabel/complete`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      console.log("Get columns...", data);
+      setKeys(data.allColumns);
+  }
+
+  useEffect(() => {
+    getKeys();
+  }, [])
+
   return (
-    <div>
-      <h1>Dataframe Page</h1>
-      <DataTable data={data} keys={keys}/>
+    <div className="flex flex-col place-items-center justify-center h-screen bg-white-400">
+
+
+      <Typography variant="h4" gutterBottom>
+        Imputed Training Data
+      </Typography>
+      <DataTable data={imputedTrainData} keys={keys}/>
+
+      <br />
+
+      <Typography variant="h4" gutterBottom>
+        Imputed Testing Data
+      </Typography>
+      <DataTable data={imputedTestData} keys={keys}/>
     </div>
   )
 }

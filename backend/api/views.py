@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use('agg') 
 import matplotlib.pyplot as plt
+import seaborn as sns
 from collections import Counter
 import json
 import os
@@ -52,6 +53,7 @@ import dice_ml
 
 # data quality
 from dataquality.missForest import MissForest
+from dataquality.em import impute_em
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -149,7 +151,47 @@ def initProcess(request):
 
 
 @api_view(['POST'])
-def readData(request):
+def readMissData(request):
+    label_name = datasetConfig['label_name']
+    
+    df_train_miss = pd.read_csv(datasetConfig['train_data_miss_path'])
+    df_test_miss = pd.read_csv(datasetConfig['test_data_miss_path'])
+    
+    if not Dataset.objects.filter(name = 'train-miss').exists():
+        msg = 'dataset does not exist, now store one in'
+        print(f"\n\n{msg}\n\n")
+
+        process = FullProcess.objects.all().order_by("-id")[0] # the greatest id
+
+        # store training dataset
+        num_train = df_train_miss.shape[0]
+        process.dataset.create(
+            name = 'train-miss', df = df_train_miss,
+            data = df_train_miss.drop(label_name, axis=1), labels = df_train_miss[label_name],
+            labelOrNot = [0 for _ in range(num_train)],
+            predictionRecord = [[] for _ in range(num_train)],
+        )
+        process.save()
+
+        # store training dataset
+        num_test = df_test_miss.shape[0]
+        process.dataset.create(
+            name = 'test-miss', df = df_test_miss,
+            data = df_test_miss.drop(label_name, axis=1), labels = df_test_miss[label_name],
+            labelOrNot = [0 for _ in range(num_test)],
+            predictionRecord = [[] for _ in range(num_test)],
+        )
+        process.save()
+    else:
+        # no object satisfying query exists
+        msg = 'dataset already exists, no need to store again'
+    print(f"\n\n{msg}\n\n")
+
+    return Response({'msg':f'{msg}'})
+
+
+@api_view(['POST'])
+def readALData(request):
     label_name = datasetConfig['label_name']
 
     df = pd.read_csv(datasetConfig['train_data_path'])
@@ -161,14 +203,10 @@ def readData(request):
     df_test = pd.read_csv(datasetConfig['test_data_path'])
     df_test[label_name] = df_test[label_name].apply(lambda x: x - 1)
 
-    print(df_train[label_name])
-    print(df_test[label_name])
-
     msg = ''
     if not Dataset.objects.filter(name = 'train-raw').exists():
         # at least one object satisfying query exists
         msg = 'dataset does not exist, now store one in'
-        print(f"\n\n{msg}\n\n")
 
         process = FullProcess.objects.all().order_by("-id")[0] # the greatest id
 
@@ -204,17 +242,17 @@ def readData(request):
     else:
         # no object satisfying query exists
         msg = 'dataset already exists, no need to store again'
-        print(f"\n\n{msg}\n\n")
+    print(f"\n\n{msg}\n\n")
 
     return Response({'msg':f'{msg}'})
 
 
 @api_view(['GET'])
-def getData(request, pk):
-    # 實際上，應該是丟進一個資料集，回傳長度。可能是初始資料、某一次迭代的訓練集等
-    dataset = Dataset.objects.get(name=pk)
+def getData(request, pk):    
     if not Dataset.objects.filter(name=pk).exists():
         print(f"dataset {pk} does not exist!")
+
+    dataset = Dataset.objects.get(name=pk)
 
     df = dataset.df
     rawData = df.round(4).to_dict(orient='records')
@@ -228,26 +266,25 @@ def getData(request, pk):
 
 
 @api_view(['GET'])
-def getFeaturesAndLabel(request):
+def getFeaturesAndLabel(request, type):
     print("\n\n ====== getFeaturesAndLabel ====== \n\n")
-
-    df = pd.read_csv(datasetConfig['test_data_path'])
     label_name = datasetConfig['label_name']
+
+    if type == 'miss':
+        df = pd.read_csv(datasetConfig['test_data_miss_path'])
+        all_columns = ['Statistical Numbers'] + list(df.columns)
+    elif type == 'complete':
+        df = pd.read_csv(datasetConfig['test_data_path'])
+        all_columns = df.columns
+
     features = list(df.columns)
     features.remove(label_name)
 
     return Response({
-        'featureNames':features,
-        'labelName':label_name,
+        'allColumns': all_columns,
+        'featureNames': features,
+        'labelName': label_name,
     })
-
-
-@api_view(['POST']) # not yet in urls
-def setDataset(request):
-    # 實際上，應該是組合出一個資料集。包括初始資料集（隨機跟指定 index 的方法都要做出來）、某一次迭代的訓練集等
-    # 初始資料集可以是 dataset0，往後 AL 就從 dataset1 開始
-
-    return 
 
 
 @api_view(['POST', 'PUT']) # 'DELETE'? 
@@ -286,6 +323,71 @@ def setMethodsAndConfigs(request):
     print(f"\n\nsetting type = {data['type']}, value = {data['value']}\n\n")
     return Response(data)
 
+
+@api_view(['POST'])
+def doEDA(request):
+    print(f"\n\n ====== doEDA ====== \n\n")
+    label_name = datasetConfig['label_name']
+
+    def EDA(df, type):
+        folder_path = f'./edash'
+        if not os.path.isdir(folder_path):
+            print("\n === No folder for edash, make one now === \n")
+            os.mkdir(folder_path)
+
+        """ data description: df.describe() """
+        df_des = df.describe().reset_index().rename(columns={'index': 'Statistical Numbers'})
+
+        """ missing value """
+        missing_values = df.isnull().sum().sort_values(ascending=False)
+
+        sns.set(style="whitegrid") # Set a nicer style using seaborn
+
+        missing_value_plot_name = f'missing_values_plot-{type}.png'
+        plt.figure(figsize=(30, 9))  
+        sns.barplot(x=missing_values.index, y=missing_values.values, palette="Blues")  # Use a blue-like color palette
+        plt.title('Missing Values in Each Column', fontsize=16)
+        plt.xlabel('Columns', fontsize=14)
+        plt.ylabel('Number of Missing Values', fontsize=14)
+        plt.xticks(rotation=90, ha='right', fontsize=12)
+        plt.yticks(fontsize=12)
+        plt.tight_layout()  # Adjust layout for better appearance
+        plt.savefig(f'{folder_path}/{missing_value_plot_name}')
+        plt.close()
+
+        """ label class ratio """
+        label_counts = df[label_name].value_counts()
+
+        label_class_pie_plot = f'label_class_ratio-{type}.png'
+        plt.figure(figsize=(8, 8))  
+        plt.pie(label_counts, labels=label_counts.index, autopct='%1.1f%%', startangle=140)
+        plt.title('Distribution of Label Classes')
+        plt.savefig(f'{folder_path}/{label_class_pie_plot}')
+        plt.close()
+
+        return df_des, missing_value_plot_name, label_class_pie_plot
+
+    df_train_miss = Dataset.objects.get(name='train-miss').df
+    df_test_miss = Dataset.objects.get(name='test-miss').df
+
+    df_train_des, miss_plot_train, label_class_ratio_train = EDA(df_train_miss, type='train')
+    df_test_des, miss_plot_test, label_class_ratio_test = EDA(df_test_miss, type='test')
+
+    return Response({
+        'msg': "finish EDA of missing data",
+        'train': {
+            'description': df_train_des.round(4).to_dict(orient='records'), 
+            'missingValuePlot': miss_plot_train, 
+            'labelClassRatioPlot': label_class_ratio_train, 
+        },
+        'test': {
+            'description': df_test_des.round(4).to_dict(orient='records'), 
+            'missingValuePlot': miss_plot_test, 
+            'labelClassRatioPlot': label_class_ratio_test, 
+        },
+    })
+
+
 @api_view(['GET'])
 def startImpute(request):
     process = FullProcess.objects.all().order_by("-id")[0]
@@ -297,38 +399,49 @@ def startImpute(request):
         print("\n === No folder for imputed data, make one now === \n")
         os.mkdir(folder_path)
 
-    if imputeMethod == 'Auto':
-        pass
+    label_name = datasetConfig['label_name']
+    df_train = pd.read_csv(datasetConfig['train_data_miss_path'])
+    df_train_X = df_train.drop(label_name, axis=1)
+    df_train_y = df_train[label_name]
 
-    elif imputeMethod == 'Genetic-enhanced fuzzy c-means':
-        pass
+    df_test = pd.read_csv(datasetConfig['test_data_miss_path'])
+    df_test_X = df_test.drop(label_name, axis=1)
+    df_test_y = df_test[label_name]
 
-    elif imputeMethod == 'VAE':
+    if imputeMethod == 'Genetic-enhanced fuzzy c-means':
         pass
 
     elif imputeMethod == 'EM':
-        pass
+        result_train = impute_em(df_train_X, max_iter=25)
+        result_test = impute_em(df_test_X, max_iter=25)
+        df_train_imputed = result_train['X_imputed']
+        df_test_imputed = result_test['X_imputed']
 
     elif imputeMethod == 'Miss-forest':
-        df = pd.read_csv(datasetConfig['train_data_path'])
-        print(df)
         imputer = MissForest()
-        df_imputed = imputer.fit_transform(df)
+        df_train_imputed = imputer.fit_transform(df_train_X)
+        df_test_imputed = imputer.fit_transform(df_test_X) 
 
-    df_imputed.to_csv(f"{folder_path}/Imputed.csv", index=False)
-    print("\n#######################################\n")
-    print(df_imputed)
+    data_train = pd.concat([df_train_imputed, df_train_y], axis=1)
+    data_test = pd.concat([df_test_imputed, df_test_y], axis=1)
 
-    data = {'imputeMethod': imputeMethod}
+    print("\n === CONCATED === \n")
+
+    data_train.to_csv(f"{datasetConfig['train_data_path']}", index=False)
+    data_test.to_csv(f"{datasetConfig['test_data_path']}", index=False)
+
+    print("\n === TO_CSV === \n")
+
+    data = { 
+        'imputeMethod': imputeMethod, 
+        'imputedTrainData': data_train.round(4).to_dict(orient='records'),
+        'imputedTestData': data_test.round(4).to_dict(orient='records'),
+    }
     return Response(data)
 
 
 @api_view(['GET'])
 def getUncertaintyRank(request, iter):
-    # 拿前一次模型去對 test data 預測（回去看一下 pytorch 那邊怎寫的）
-    # 也要配合相對應的 uncertainty query method（conf, margin, ...）
-    # 模型：理想中會存在 backend 的一個資料夾
-
     # get data from database
     process = FullProcess.objects.all().order_by("-id")[0] 
 

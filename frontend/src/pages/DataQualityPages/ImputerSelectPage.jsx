@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
 
 import API_URL from "../../api";
+import { useDQ } from "../../hooks/useDQ"
 
 const ImputerSelectPage = () => {
   const imputers = [
@@ -34,6 +35,8 @@ const ImputerSelectPage = () => {
     },
   ];
 
+  const { setImputedTrainData, setImputedTestData } = useDQ();
+
   const handleImputerClick = async (imputerName) => {
     const setting = {
       type: "SelectImputer",
@@ -58,7 +61,9 @@ const ImputerSelectPage = () => {
       },
     });
     const data = await response.json();
-    console.log("start impute...", data);
+    console.log("finish imputing...", data);
+    setImputedTrainData(data.imputedTrainData)
+    setImputedTestData(data.imputedTestData)
   };
 
   return (

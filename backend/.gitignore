@@ -2,6 +2,7 @@ trainingModels/
 figures/
 shap-images/
 dashboard/
+edash/
 __pycache__/
 *.pyc
 .venv

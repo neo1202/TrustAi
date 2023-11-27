@@ -23,7 +23,7 @@ function ShapPage() {
   
   const getXLabels = async () => {
     const response = await fetch(
-      `${API_URL}/getFeaturesAndLabel/`, 
+      `${API_URL}/getFeaturesAndLabel/complete`, 
       {
       method: "GET",
       headers: {

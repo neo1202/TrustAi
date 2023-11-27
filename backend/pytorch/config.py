@@ -13,6 +13,8 @@ config = {
 }
 
 datasetConfig = {
+    'train_data_miss_path':r'./dataquality/data/data_train_miss.csv',
+    'test_data_miss_path':r'./dataquality/data/data_test_miss.csv',
     'train_data_path':r'./pytorch/data/data_train.csv',
     'test_data_path':r'./pytorch/data/data_test.csv',
     'label_name':'Gas Class',
