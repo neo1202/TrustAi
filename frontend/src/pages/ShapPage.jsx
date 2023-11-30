@@ -157,12 +157,7 @@ function ShapPage() {
         {/* Content for the Home section */}
       </div>
       <div id="shap-page" className="section">
-        <>a component to be used in future i.e.現在沒用</>
-        <Dropdown
-          options={dropdownOptions}
-          selection={dropdownSelection}
-          onSelect={handleDropdownSelection}
-        />
+        
         <h1 id="global_shap" className="heading1">Global SHAP</h1>
         <p style={{ textAlign: 'center'}}>
         SHAP value means the contribution to a class, the larger the absoulute value the larger the contribution.  

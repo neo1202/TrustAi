@@ -27,20 +27,33 @@ const KDPage = () => {
     }
 
     return <div>
-        <h1>KD Page</h1>
+        
 
         <br/>
         <br/>
-        <p>{`Final Student Test Accuracy: ${finalStudentTestAcc? finalStudentTestAcc:'Not yet trained.'}`}</p>
+        <h2 style={{ fontSize: '30px', fontFamily: 'Koulen', textAlign: 'center' }}>Final Student Test Accuracy: </h2>
+        <p style={{ fontSize: '25px', fontFamily: 'Koulen', textAlign: 'center' }}>{`${finalStudentTestAcc? finalStudentTestAcc:'Not yet trained.'}`}</p>
 
         <br/>
-        <p>Compress your model?</p>
-        <button style={{marginRight:'20px'}} onClick={handleKD}>YES</button> <button>NO</button>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="p-5 rounded-lg mb-4" style={{ backgroundColor: '#eeeeee', width: '20%', padding: '20px', margin: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' , boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)'}}>
+            <p>Compress your model?</p>
+            <div className="mt-4">
+                <button 
+                className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-3 py-1 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+                style={{marginRight:'20px'}} onClick={handleKD}>YES</button> 
+                <button 
+                className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-3 py-1 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+                >NO</button>
+            </div>
+        </div>
+        </div>
         <br/>
         <br/>
         
         {finishKD? <div>
-            <p>KD Result</p>
+            
+            <h2 style={{ fontSize: '30px', fontFamily: 'Koulen', textAlign: 'center' }}>KD Result</h2>
             <ComparisonTable comparison={comparison} />
         </div> : <></>}
     </div>

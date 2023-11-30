@@ -1,6 +1,7 @@
 import React from 'react';
 
-const blockStyle = "border border-gray-300 p-2"
+
+const blockStyle = "p-2"
 
 const ComparisonTable = ({ comparison }) => {
 
@@ -8,17 +9,17 @@ const ComparisonTable = ({ comparison }) => {
   const student = comparison.student
 
   return (
-    <div className="max-w-screen-xl mx-auto p-4">
-      <table className="table-auto w-full border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className={blockStyle}></th> {/* the left-top block */}
-            <th className={blockStyle}>Teacher</th>
-            <th className={blockStyle}>Student</th>
+    <div className="max-w-screen-xl mx-auto p-4"  >
+      <table >
+        <thead >
+          <tr >
+            <th style={{ backgroundColor: '#eeeeee'}}></th> {/* the left-top block */}
+            <th className={blockStyle} style={{ backgroundColor: '#eeeeee' , color: 'black', fontWeight: 'normal' }}>Teacher</th>
+            <th className={blockStyle} style={{ backgroundColor: '#eeeeee' , color: 'black', fontWeight: 'normal' }}>Student</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr >
             <td className={blockStyle}>Test Accuracy</td>
             <td className={blockStyle}>{teacher.acc}</td>
             <td className={blockStyle}>{student.acc}</td>

@@ -80,7 +80,7 @@ function ResultPage() {
   }
 
   return <div>
-    <h1>ResultPage</h1>
+    
     
     <br/>
     {/* <p>Saved Model</p>
@@ -90,12 +90,14 @@ function ResultPage() {
                           selected={selectedModel === model}
                           onClick={handleSelectModel} />
     })} */}
-
-    <p>{`Final Teacher Test Accuracy: ${finalTeacherTestAcc? finalTeacherTestAcc:'Not yet trained.'}`}</p>
+    <h2 style={{ fontSize: '30px', fontFamily: 'Koulen', textAlign: 'center' }}>Final Teacher Test Accuracy: </h2>
+    <p style={{ fontSize: '25px', fontFamily: 'Koulen', textAlign: 'center' }}>{`${finalTeacherTestAcc? finalTeacherTestAcc:'Not yet trained.'}`}</p>
     <br/>
     {/* <button className="bg-white btn" onClick={saveModel}>Save the Selected Model</button> */}
     <br/>
-    <Button  onClick={trainFinalTeacherModel}>Train Final Teacher Model</Button>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <Button onClick={trainFinalTeacherModel}>Train Final Teacher Model</Button>
+  </div>
 
   </div>;
 }
