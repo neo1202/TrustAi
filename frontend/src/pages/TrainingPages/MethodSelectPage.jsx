@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Input, Button, Select } from "antd";
+import React, { useState } from "react";
+import { Input, Button, Select, Tooltip, Typography } from "antd";
 import API_URL from "../../api";
 import { uncertaintyQueryMethod } from "../../config/config";
 
 const { Option } = Select;
+const { Title } = Typography;
 
-function MethodSelectPage() {
-  const [showModal, setShowModal] = useState(false);
-
+const MethodSelectPage = () => {
   const [selectedUncertaintyMethod, setSelectedUncertaintyMethod] = useState("");
 
   const [inputIterValue, setInputIterValue] = useState("");
@@ -16,19 +15,11 @@ function MethodSelectPage() {
   const [inputNumEpochValue, setInputNumEpochValue] = useState("");
   const [inputBatchSizeValue, setInputBatchSizeValue] = useState("");
 
-  const [displayIter, setDisplayIter] = useState("");
-  const [displayLR, setDisplayLR] = useState("");
-  const [displayPoolSize, setDisplayPoolSize] = useState("");
-  const [displayNumEpoch, setDisplayNumEpoch] = useState("");
-  const [displayBatchSize, setDisplayBatchSize] = useState("");
-
-  const handleClick = () => {
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
+  const [displayIter, setDisplayIter] = useState("20");
+  const [displayLR, setDisplayLR] = useState("0.001");
+  const [displayPoolSize, setDisplayPoolSize] = useState("300");
+  const [displayNumEpoch, setDisplayNumEpoch] = useState("100");
+  const [displayBatchSize, setDisplayBatchSize] = useState("16");
 
   const handleSelectUncertaintyMethod = async (blockName) => {
     const setting = {
@@ -88,89 +79,128 @@ function MethodSelectPage() {
   };
 
   return (
-    <div className="relative">
-      <h1>ChooseModelPage</h1>
-      <br />
+    <div className="flex flex-col justify-center items-center h-screen gap-4 bg-white-400">
 
-      <Button onClick={handleClick}>Open Modal</Button>
-      <Modal visible={showModal} onCancel={handleCloseModal} footer={null}>
-        <p>這個Model是CNN架構, 可以處理中等複雜的數據</p>
-      </Modal>
-      <br />
+      <div className="flex flex-row justify-between items-start gap-32 relative">
 
-      <p>How many do you want to add in one iteration? __{displayIter ? displayIter : "__"}__</p>
-      <Input
-        style={{ width: 250 }}
-        value={inputIterValue}
-        onChange={(e) => handleInputChange(setInputIterValue, e)}
-        onPressEnter={() => handleEnter("SetNumDataPerIter", inputIterValue, setInputIterValue, setDisplayIter)}
-        placeholder="Type a number and press Enter"
-      />
+        {/* Left Part */}
+        <div className="flex flex-col items-start">
+          <Title level={2}>Basic Settings</Title>
 
-      <br />
+          <div className="flex flex-col items-start">
+            <Tooltip title="Number of data added per loop">
+              <p>Number of data added per loop: __{displayIter ? displayIter : "__"}__</p>
+            </Tooltip>
+            <div className="flex flex-row items-center" style={{ marginBottom: '16px' }}>
+              <Input
+                style={{ width: 250 }}
+                value={inputIterValue}
+                onChange={(e) => handleInputChange(setInputIterValue, e)}
+                onPressEnter={() => handleEnter("SetNumDataPerIter", inputIterValue, setInputIterValue, setDisplayIter)}
+                placeholder="Type a number"
+              />
+              <Button type="primary" onClick={() => handleEnter("SetNumDataPerIter", inputIterValue, setInputIterValue, setDisplayIter)}>
+                Enter
+              </Button>
+            </div>
+          </div>
 
-      <p>Uncertainty query method</p>
-      <Select
-        style={{ width: 250 }}
-        value={selectedUncertaintyMethod}
-        onChange={handleSelectUncertaintyMethod}
-        placeholder="Select a method"
-      >
-        {renderSelectOptions()}
-      </Select>
-      <br />
+          <div className="flex flex-col items-start">
+            <Tooltip title="Uncertainty query method">
+              <p>Uncertainty query method</p>
+            </Tooltip>
+            <Select
+              style={{ width: 250 }}
+              value={selectedUncertaintyMethod}
+              onChange={handleSelectUncertaintyMethod}
+              placeholder="Select a method"
+            >
+              {renderSelectOptions()}
+            </Select>
+          </div>
+        </div>
 
-      <h2>Params/hyperparams adjustments </h2>
-    <p>Learning rate __{displayLR ? displayLR : "__"}__</p>
-    <Input
-      style={{ width: 250 }}
-      value={inputLRValue}
-      onChange={(e) => handleInputChange(setInputLRValue, e)}
-      onPressEnter={() => handleEnter("SetLearningRate", inputLRValue, setInputLRValue, setDisplayLR)}
-      placeholder="Type a number and press Enter"
-    />
-    <Button type="primary" onClick={() => handleEnter("SetLearningRate", inputLRValue, setInputLRValue, setDisplayLR)}>
-      Enter
-    </Button>
+        {/* Right Part */}
+        <div className="flex flex-col items-start">
+          <Title level={2}>Parameter Adjustments</Title>
 
-    <p>Pooling Size __{displayPoolSize ? displayPoolSize : "__"}__</p>
-    <Input
-      style={{ width: 250 }}
-      value={inputPoolSizeValue}
-      onChange={(e) => handleInputChange(setInputPoolSizeValue, e)}
-      onPressEnter={() => handleEnter("SetPoolingSize", inputPoolSizeValue, setInputPoolSizeValue, setDisplayPoolSize)}
-      placeholder="Type a number and press Enter"
-    />
-    <Button type="primary" onClick={() => handleEnter("SetPoolingSize", inputPoolSizeValue, setInputPoolSizeValue, setDisplayPoolSize)}>
-      Enter
-    </Button>
+          {/* Learning Rate */}
+          <div className="flex flex-col items-start">
+            <Tooltip title="Learning rate">
+              <p>Learning rate __{displayLR ? displayLR : "__"}__</p>
+            </Tooltip>
+            <div className="flex flex-row items-center" style={{ marginBottom: '16px' }}>
+              <Input
+                style={{ width: 250 }}
+                value={inputLRValue}
+                onChange={(e) => handleInputChange(setInputLRValue, e)}
+                onPressEnter={() => handleEnter("SetLearningRate", inputLRValue, setInputLRValue, setDisplayLR)}
+                placeholder="Type a number"
+              />
+              <Button type="primary" onClick={() => handleEnter("SetLearningRate", inputLRValue, setInputLRValue, setDisplayLR)}>
+                Enter
+              </Button>
+            </div>
+          </div>
 
-    <p>Number of Epoch __{displayNumEpoch ? displayNumEpoch : "__"}__</p>
-    <Input
-      style={{ width: 250 }}
-      value={inputNumEpochValue}
-      onChange={(e) => handleInputChange(setInputNumEpochValue, e)}
-      onPressEnter={() => handleEnter("SetNumEpoch", inputNumEpochValue, setInputNumEpochValue, setDisplayNumEpoch)}
-      placeholder="Type a number and press Enter"
-    />
-    <Button type="primary" onClick={() => handleEnter("SetNumEpoch", inputNumEpochValue, setInputNumEpochValue, setDisplayNumEpoch)}>
-      Enter
-    </Button>
+          {/* Pooling Size */}
+          <div className="flex flex-col items-start">
+            <Tooltip title="Pooling Size">
+              <p>Pooling Size __{displayPoolSize ? displayPoolSize : "__"}__</p>
+            </Tooltip>
+            <div className="flex flex-row items-center" style={{ marginBottom: '16px' }}>
+              <Input
+                style={{ width: 250 }}
+                value={inputPoolSizeValue}
+                onChange={(e) => handleInputChange(setInputPoolSizeValue, e)}
+                onPressEnter={() => handleEnter("SetPoolingSize", inputPoolSizeValue, setInputPoolSizeValue, setDisplayPoolSize)}
+                placeholder="Type a number"
+              />
+              <Button type="primary" onClick={() => handleEnter("SetPoolingSize", inputPoolSizeValue, setInputPoolSizeValue, setDisplayPoolSize)}>
+                Enter
+              </Button>
+            </div>
+          </div>
 
-    <p>Batch Size __{displayBatchSize ? displayBatchSize : "__"}__</p>
-    <Input
-      style={{ width: 250 }}
-      value={inputBatchSizeValue}
-      onChange={(e) => handleInputChange(setInputBatchSizeValue, e)}
-      onPressEnter={() => handleEnter("SetBatchingSize", inputBatchSizeValue, setInputBatchSizeValue, setDisplayBatchSize)}
-      placeholder="Type a number and press Enter"
-    />
-    <Button type="primary" onClick={() => handleEnter("SetBatchingSize", inputBatchSizeValue, setInputBatchSizeValue, setDisplayBatchSize)}>
-      Enter
-    </Button>
+          {/* Number of Epoch */}
+          <div className="flex flex-col items-start">
+            <Tooltip title="Number of Epoch">
+              <p>Number of Epoch __{displayNumEpoch ? displayNumEpoch : "__"}__</p>
+            </Tooltip>
+            <div className="flex flex-row items-center" style={{ marginBottom: '16px' }}>
+              <Input
+                style={{ width: 250 }}
+                value={inputNumEpochValue}
+                onChange={(e) => handleInputChange(setInputNumEpochValue, e)}
+                onPressEnter={() => handleEnter("SetNumEpoch", inputNumEpochValue, setInputNumEpochValue, setDisplayNumEpoch)}
+                placeholder="Type a number"
+              />
+              <Button type="primary" onClick={() => handleEnter("SetNumEpoch", inputNumEpochValue, setInputNumEpochValue, setDisplayNumEpoch)}>
+                Enter
+              </Button>
+            </div>
+          </div>
 
-      {/* Additional Input components for other parameters */}
-
+          {/* Batch Size */}
+          <div className="flex flex-col items-start">
+            <Tooltip title="Batch Size">
+              <p>Batch Size __{displayBatchSize ? displayBatchSize : "__"}__</p>
+            </Tooltip>
+            <div className="flex flex-row items-center" style={{ marginBottom: '16px' }}>
+              <Input
+                style={{ width: 250 }}
+                value={inputBatchSizeValue}
+                onChange={(e) => handleInputChange(setInputBatchSizeValue, e)}
+                onPressEnter={() => handleEnter("SetBatchingSize", inputBatchSizeValue, setInputBatchSizeValue, setDisplayBatchSize)}
+                placeholder="Type a number"
+              />
+              <Button type="primary" onClick={() => handleEnter("SetBatchingSize", inputBatchSizeValue, setInputBatchSizeValue, setDisplayBatchSize)}>
+                Enter
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

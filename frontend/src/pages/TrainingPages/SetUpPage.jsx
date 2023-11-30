@@ -21,7 +21,6 @@ function SetUpPage() {
   const [displayNumShownData, setDisplayNumShownData] = useState('');
   const [initNumData, setInitNumData] = useState('');
   const [displayInitNumData, setDisplayInitNumData] = useState('');
-  const [selectedInitData, setSelectedInitData] = useState('');
   const [selectedModel, setSelectedModel] = useState('');
 
   const [initAcc, setInitAcc] = useState(100);
@@ -38,7 +37,6 @@ function SetUpPage() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            // body: JSON.stringify(number)
         })
     
     const data = await response.json()
@@ -47,26 +45,6 @@ function SetUpPage() {
     setNumRows(data.numRows)
     setNumCols(data.numCols)
   }
-
-  const handleNumShownDataChange = (e) => {
-    setNumShownData(e.target.value);
-  }
-
-  const handleInitNumDataChange = (e) => {
-    setInitNumData(e.target.value);
-  };
-  
-  const handleNumShownDataKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleNumShownDataEnter();
-    }
-  };
-
-  const handleInitNumDataKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleInitNumDataEnter();
-    }
-  };
   
   const handleNumShownDataEnter = () => {
     setDisplayNumShownData(numShownData);
@@ -96,58 +74,6 @@ function SetUpPage() {
     setInitNumData('');
   }
 
-  const handleSelectInitData = async (blockName) => {
-    const setting = {
-        'type': 'SelectInitData',
-        'value': blockName,
-    }
-
-    if (selectedInitData === blockName) {
-        setSelectedInitData(''); // remove border
-        setting.value = ''
-    } else {
-        setSelectedInitData(blockName);
-    }
-
-    const response = await fetch(
-        `${API_URL}/settings/`, 
-        {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(setting)
-        })
-    const data = await response.json()
-    console.log("Settings...", data)
-  };
-
-  const handleSelectModel = async (blockName) => {
-    const setting = {
-        'type': 'SelectModel',
-        'value': blockName,
-    }
-
-    if (selectedModel === blockName) {
-        setSelectedModel(''); // remove border
-        setting.value = ''
-    } else {
-        setSelectedModel(blockName);
-    }
-
-    const response = await fetch(
-        `${API_URL}/settings/`, 
-        {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(setting)
-        })
-    const data = await response.json()
-    console.log("Settings...", data)
-  };
-
   const trainInitModel = async () => {
     const model = {'model': selectedModel}
 
@@ -169,14 +95,15 @@ function SetUpPage() {
 
   return (
     <div>
-      <Title level={2}>SetUpPage</Title>
+      <Title level={2}>Shape of Training Dataset</Title>
       <Paragraph>
         There are __{numRows ? numRows : "__"}__ rows in total.
       </Paragraph>
       <Paragraph>
         There are __{numCols ? numCols : "__"}__ features in total.
       </Paragraph>
-      <DataTable data={shownData} keys={keys} />
+
+      <Title level={2}>Initial Setup</Title>
       <Paragraph>
         How many data is desired to be shown? __{numShownData ? numShownData : "__"}__
       </Paragraph>
@@ -208,27 +135,6 @@ function SetUpPage() {
       </Button>
       <br />
       <br />
-      {/* <div style={{ display: "flex" }}>
-        {initialDatasetSelectMethod.map((method, i) => (
-          <SelectBlock key={i} blockName={method} selected={selectedInitData === method} onClick={handleSelectInitData} />
-        ))}
-      </div>
-
-      <br />
-      <Paragraph>Choose Model (but currently not providing multiple models, right?)</Paragraph>
-      <Select
-        style={{ width: 200 }}
-        placeholder="Select a model"
-        onChange={handleSelectModel}
-        value={selectedModel}
-      >
-        {models.map((model, i) => (
-          <Option key={i} value={model}>
-            {model}
-          </Option>
-        ))}
-      </Select> */}
-      <br />
       <Button style={{ marginTop: "10px" }}  onClick={trainInitModel}>
         Go to train initial model
       </Button>
@@ -237,6 +143,11 @@ function SetUpPage() {
       ) : (
         <Paragraph>{`Accuracy of the initial model: ${initAcc}`}</Paragraph>
       )}
+      <br />
+
+      <Title level={2}>Data</Title>
+      <DataTable data={shownData} keys={keys} />
+
     </div>
   );
 }
