@@ -7,7 +7,7 @@ import DataTable from "../components/DataTable";
 
 function ShapPage() {
   const [shapClass, setShapClass] = useState('');
-  const [desired_y, setDesired_y] = useState('');
+  const [desired_y, setDesired_y] = useState(1);
   const [imagePath, setImagePath] = useState('');
   const [gBarImagePath, setGBarImagePath] = useState('');
   const [posX, setPosX] = useState([]);
@@ -359,8 +359,10 @@ positive value means positive effect and negative value means neagative effect O
             </form>
             
           </div>
-          <button type="submit" className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-3 py-1 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
-              >Submit</button>
+          <button type="submit" 
+          className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-3 py-1 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+          onClick={handleInputXSubmit}    
+          >Submit</button>
         </div>
         {isDataAvailable && (
           <div className='wrap'  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>

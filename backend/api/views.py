@@ -964,7 +964,7 @@ def processShapAllClassPlot(request):
     test_df = process.dataset.get(name='test-raw').df
     dataset_test = IndexedDataset(test_df, TestOrValid=True)
     batch_size = process.batchSize
-    test_loader = DataLoader(dataset_test, batch_size=200,shuffle=False, drop_last=True)
+    test_loader = DataLoader(dataset_test, batch_size=10,shuffle=False, drop_last=True)
     print("\n ================= running SHAP ================= \n")
     #SHAP
     device = connectDevice()
