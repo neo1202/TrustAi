@@ -40,7 +40,7 @@ const DataTable = ({ data, keys }) => {
   
     return (
       <div style={{ maxWidth: '90%' }}>
-        <div>
+        <div style={{ marginBottom: '5px' }}>
           <Dropdown overlay={menu} placement="bottomLeft">
             <Button>Column Selection</Button>
           </Dropdown>

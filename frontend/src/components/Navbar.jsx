@@ -40,7 +40,7 @@ function Navbar() {
             <button className="nav-link" onClick={scrollToSamples}>Samples</button>
           </li> */}
           <li>
-            <button className="nav-link" onClick={scrollToGlobalShap}>Global Shap</button>
+            <button className="nav-link" onClick={scrollToGlobalShap}>SHAP</button>
           </li>
           {/* <li>
             <button className="nav-link" onClick={scrollToLocalShap}>Local Shap</button>
