@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Select, Typography } from "antd";
+import { Button, Input, Select, Tooltip, Typography } from "antd";
 import API_URL from "../../api";
 import { initialDatasetSelectMethod, models } from "../../config/config";
 import SelectBlock from "../../components/SelectBlock";
@@ -49,7 +49,7 @@ function SetUpPage() {
   const handleNumShownDataEnter = () => {
     setDisplayNumShownData(numShownData);
     setShownData(rawData.slice(0, numShownData));
-    setNumShownData('');
+    setNumShownData('')
   }
 
   const handleInitNumDataEnter = async () => {
@@ -94,45 +94,50 @@ function SetUpPage() {
 
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       <Title level={2}>Shape of Training Dataset</Title>
       <Paragraph>
-        There are __{numRows ? numRows : "__"}__ rows in total.
+        There are __{numRows ? numRows : "__"}__ rows in total. There are __{numCols ? numCols : "__"}__ features in total.
       </Paragraph>
-      <Paragraph>
-        There are __{numCols ? numCols : "__"}__ features in total.
-      </Paragraph>
-
+      
+    
       <Title level={2}>Initial Setup</Title>
-      <Paragraph>
-        How many data is desired to be shown? __{numShownData ? numShownData : "__"}__
-      </Paragraph>
-      <TextArea
-        style={{ width: "150px" }}
+      <Tooltip title="How many data shown">
+        <p>
+          How many data is desired to be shown? __{displayNumShownData ? displayNumShownData : "__"}__
+        </p>
+      </Tooltip>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <Input
+        style={{ width: "150px", marginBottom: "20px", marginTop: "10px"}}
         value={numShownData}
         onChange={(e) => setNumShownData(e.target.value)}
         onPressEnter={handleNumShownDataEnter}
         placeholder="Type a number and press Enter"
-        autoSize={{ minRows: 2, maxRows: 6 }} // Adjust minRows and maxRows as needed
+        
       />
+      
       <Button style={{ marginLeft: "20px", width: "80px" }}  onClick={handleNumShownDataEnter}>
         Enter
       </Button>
+      </div>
       <br />
-      <Paragraph>
-        How many training data do you want to set in the beginning? __{initNumData ? initNumData : "__"}__
-      </Paragraph>
-      <TextArea
+      <p>
+        How many training data do you want to set in the beginning? __{displayInitNumData ? displayInitNumData : "__"}__
+      </p>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <Input
         style={{ width: "150px" }}
         value={initNumData}
         onChange={(e) => setInitNumData(e.target.value)}
         onPressEnter={handleInitNumDataEnter}
         placeholder="Type a number and press Enter"
-        autoSize={{ minRows: 2, maxRows: 6 }} // Adjust minRows and maxRows as needed
+        
       />
       <Button style={{ marginLeft: "20px", width: "80px" }}  onClick={handleInitNumDataEnter}>
         Enter
       </Button>
+      </div>
       <br />
       <br />
       <Button style={{ marginTop: "10px" }}  onClick={trainInitModel}>
