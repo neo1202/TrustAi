@@ -54,6 +54,9 @@ import dice_ml
 # data quality
 from dataquality.missForest import MissForest
 from dataquality.em import impute_em
+from dataquality.fcm import FCMImputer
+from dataquality.continuous import continuous
+from dataquality.metric_model import generate_stack_prediction
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -390,6 +393,16 @@ def doEDA(request):
 
 @api_view(['GET'])
 def startImpute(request):
+    def random_data(seed = 42, upperbound = 0.5, num = 100, features = 2):   
+        '''
+        Generate random data
+        '''
+        np.random.seed(seed)
+        data = np.random.rand(num, features)
+        # data[data < upperbound] = np.nan
+        return data
+    
+
     process = FullProcess.objects.all().order_by("-id")[0]
     imputeMethod = process.imputerMethod
     print(f"\n\n ====== {imputeMethod} ====== \n\n")
@@ -409,7 +422,12 @@ def startImpute(request):
     df_test_y = df_test[label_name]
 
     if imputeMethod == 'Genetic-enhanced fuzzy c-means':
-        pass
+        data = random_data(42, 0.1, 100, 8)
+        data[0:80, [1, 3, 6]] = np.nan
+        print(data)
+
+        fcmImputer = FCMImputer(data = data, num_clusters = 3)
+        after = fcmImputer.impute()
 
     elif imputeMethod == 'EM':
         result_train = impute_em(df_train_X, max_iter=25)
@@ -438,6 +456,51 @@ def startImpute(request):
         'imputedTestData': data_test.round(4).to_dict(orient='records'),
     }
     return Response(data)
+
+
+@api_view(['GET'])
+def getImputedDetails(request):
+    print(f"\n\n ====== getImputedDetails ====== \n\n")
+
+    df_train_miss = pd.read_csv(datasetConfig['train_data_miss_path'])
+    df_test_miss = pd.read_csv(datasetConfig['test_data_miss_path'])
+
+    df_train_complete = pd.read_csv(datasetConfig['train_data_path'])    
+    df_test_complete = pd.read_csv(datasetConfig['test_data_path'])
+
+    df_miss = pd.concat([df_train_miss, df_test_miss], axis=0).reset_index(drop=True)
+    df_complete = pd.concat([df_train_complete, df_test_complete], axis=0).reset_index(drop=True)
+
+    df = pd.DataFrame(np.random.randn(1000, 7), columns=['var1', 'var2', 'var3', 'var4', 'var5', 'var6', 'var7'])
+    tmp = pd.DataFrame(np.random.randn(100, 7), columns=['var1', 'var2', 'var3', 'var4', 'var5', 'var6', 'var7'])
+
+    cont = continuous()
+
+    # comparison = cont.comparison(df, tmp)
+    comparison = cont.comparison(df_miss, df_complete)
+    print(comparison)
+
+    return Response(comparison)
+
+
+@api_view(['GET'])
+def getMetricEvalValue(request):
+    print(f"\n\n ====== getMetricEvalValue ====== \n\n")
+
+    df_train = pd.read_csv(datasetConfig['train_data_path'])
+    df_test = pd.read_csv(datasetConfig['test_data_path'])
+
+    # split x, y, respectively
+    label_name = datasetConfig['label_name']
+    X_train = df_train.drop(label_name, axis=1) 
+    y_train = df_train[label_name]
+
+    X_test = df_test.drop(label_name, axis=1)
+    y_test = df_test[label_name]
+
+    result = generate_stack_prediction(X_train, y_train, X_test, y_test)
+
+    return Response(result)
 
 
 @api_view(['GET'])

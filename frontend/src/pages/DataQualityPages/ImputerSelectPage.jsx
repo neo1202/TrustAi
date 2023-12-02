@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
@@ -9,22 +9,12 @@ import { useDQ } from "../../hooks/useDQ"
 const ImputerSelectPage = () => {
   const imputers = [
     {
-      label: "Auto",
-      description: "Select the model with the best performance, may take longer time",
-      onClick: () => handleImputerClick("Auto"),
-    },
-    {
       label: "Genetic-enhanced fuzzy c-means",
       description: "Genetic-enhanced fuzzy c-means imputer description goes here.",
       onClick: () => handleImputerClick("Genetic-enhanced fuzzy c-means"),
     },
     {
-      label: "VAE",
-      description: "Variational Autoencoder (VAE) imputer description goes here.",
-      onClick: () => handleImputerClick("VAE"),
-    },
-    {
-      label: "EM",
+      label: "Expectation-Maximization",
       description: "Expectation-Maximization (EM) imputer description goes here.",
       onClick: () => handleImputerClick("EM"),
     },
@@ -35,7 +25,10 @@ const ImputerSelectPage = () => {
     },
   ];
 
-  const { setImputedTrainData, setImputedTestData } = useDQ();
+  const {
+    setImputedTrainData, setImputedTestData,
+    getImputedDetails, getMetricValues, 
+  } = useDQ();
 
   const handleImputerClick = async (imputerName) => {
     const setting = {
@@ -68,9 +61,6 @@ const ImputerSelectPage = () => {
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
-      <Typography variant="h4" gutterBottom>
-        Imputer Select Page
-      </Typography>
       <div style={{ display: "flex", justifyContent: "center" }}>
         {imputers.map((imputer, index) => (
           <Tooltip key={index} title={imputer.description}>
@@ -88,7 +78,11 @@ const ImputerSelectPage = () => {
         variant="contained"
         color="primary"
         style={{ backgroundColor: "#4CAF50", margin: "10px" }}
-        onClick={handleImpute}
+        onClick={async () => {
+          await handleImpute();
+          await getImputedDetails();
+          await getMetricValues();
+        }}
       >
         IMPUTE
       </Button>

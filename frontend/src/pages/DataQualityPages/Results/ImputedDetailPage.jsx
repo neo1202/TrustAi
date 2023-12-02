@@ -1,75 +1,95 @@
-import React from "react";
-import { Row, Col } from "antd";
-import { Table, Card } from "antd";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import React, { useEffect } from "react";
+import DataTable from "../../../components/DataTable";
+import { useDQ } from "../../../hooks/useDQ";
+import Typography from "@mui/material/Typography";
 
 const ImputedDetailPage = () => {
-  // Sample data for tables
-  const tableData = [
-    { key: '1', name: 'Statistic 1', value: 100 },
-    { key: '2', name: 'Statistic 2', value: 150 },
-    // Add more data as needed
-  ];
+  const {
+    jsDivergence,
+    missingRateTable, missingRateColumnName,
+    entropyTable, entropyColumnName,
+    jsDivergenceTable, jsDivergenceColumnName,
+    basicInfoBeforeTable, basicInfoBeforeColumnName,
+    basicInfoAfterTable, basicInfoAfterColumnName,
+    vifBeforeTable, vifBeforeColumnName,
+    vifAfterTable, vifAfterColumnName,
+    getImputedDetails,
+  } = useDQ();
 
-  // Sample data for graphs
-  const graphData = [
-    { name: 'Jan', value: 200 },
-    { name: 'Feb', value: 300 },
-    // Add more data as needed
-  ];
-
-  const columns = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Value",
-      dataIndex: "value",
-      key: "value",
-    },
-  ];
+  // useEffect(() => {
+  //   getImputedDetails();
+  // }, []);
 
   return (
-    <div>
-      <h1>ImputedDetail Page</h1>
-      <Row gutter={16}>
-        <Col xs={24} sm={24} md={12} lg={12}>
-          <Card title="Statistical Tables">
-            <Table columns={columns} dataSource={tableData} />
-          </Card>
-        </Col>
-        <Col xs={24} sm={24} md={12} lg={12}>
-          <Card title="Statistical Graphs">
-            <ResponsiveContainer width="100%" height={300} autoHideDuration={1000}>
-              <LineChart
-                data={graphData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" />
-              </LineChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
-      </Row>
+    <div className="flex flex-col items-center justify-center">
+      <div className="my-8">
+        <Typography
+          variant="h4"
+          gutterBottom
+          style={{
+            fontWeight: "bold",
+            color: "#007BFF", 
+            backgroundColor: "#cce5ff", 
+            borderRadius: "8px", 
+            padding: "8px", 
+          }}
+        >
+          {`JS Divergence: ${jsDivergence}`}
+        </Typography>
+      </div>
+
+      <div className="flex">
+        <div className="mr-4">
+          <Typography variant="h4" gutterBottom>
+            Missing Rate
+          </Typography>
+          <DataTable data={missingRateTable} keys={missingRateColumnName} />
+        </div>
+
+        <div className="mr-4">
+          <Typography variant="h4" gutterBottom>
+            VIF Before
+          </Typography>
+          <DataTable data={vifBeforeTable} keys={vifBeforeColumnName} />
+        </div>
+
+        <div>
+          <Typography variant="h4" gutterBottom>
+            VIF After
+          </Typography>
+          <DataTable data={vifAfterTable} keys={vifAfterColumnName} />
+        </div>
+      </div>
+
+      <div className="my-4"></div>
+
+      <Typography variant="h4" gutterBottom>
+        Entropy
+      </Typography>
+      <DataTable data={entropyTable} keys={entropyColumnName} />
+      <div className="my-4"></div>
+
+      <Typography variant="h4" gutterBottom>
+        JS-Divergence
+      </Typography>
+      <DataTable data={jsDivergenceTable} keys={jsDivergenceColumnName} />
+      <div className="my-4"></div>
+
+      <Typography variant="h4" gutterBottom>
+        Basic Info Before
+      </Typography>
+      <DataTable
+        data={basicInfoBeforeTable}
+        keys={basicInfoBeforeColumnName}
+      />
+      <div className="my-4"></div>
+
+      <Typography variant="h4" gutterBottom>
+        Basic Info After
+      </Typography>
+      <DataTable data={basicInfoAfterTable} keys={basicInfoAfterColumnName} />
     </div>
   );
 };
 
 export default ImputedDetailPage;
-
