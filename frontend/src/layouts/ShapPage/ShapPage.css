@@ -1,6 +1,6 @@
 .heading1{
     text-align: center;
-    font-family: "Koulen"; /* Change "Your Desired Font" to the actual font you want to use */
+    /* font-family: "Koulen"; Change "Your Desired Font" to the actual font you want to use */
     font-size: 45px; /* Change the font size as needed */
     font-weight: bold; /* You can adjust the font weight if necessary */
     /* margin-bottom: 5px; */
@@ -8,7 +8,7 @@
   }
   .cenheading2{
     text-align: center;
-    font-family: "Koulen"; /* Change "Your Desired Font" to the actual font you want to use */
+    /* font-family: "Koulen"; Change "Your Desired Font" to the actual font you want to use */
     font-size: 28px; /* Change the font size as needed */
     /* font-weight: bold; You can adjust the font weight if necessary */
     margin-top: 30px;/* Add any other styles you want */

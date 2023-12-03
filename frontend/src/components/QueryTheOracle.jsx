@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Select, Button } from 'antd';
+import { Select } from 'antd';
+import { Button } from "@mui/material";
 
 const { Option } = Select;
 
@@ -45,7 +46,7 @@ const QueryTheOracle = ({ queryIds, setQueryResults }) => {
           ))}
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px' }}>
-          <Button className="bg-white btn" 
+          <Button variant="contained"
                   onClick={handleSubmit} 
                   /*{style={{ position: 'absolute', bottom: '-60px', right: 0, margin: '20px', width: '120px' }} } */ >
             Submit

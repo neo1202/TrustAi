@@ -325,7 +325,7 @@ positive value means positive effect and negative value means neagative effect O
         {/*<div>ShapPage</div>*/}
         
         <div style={{ display: 'flex',  flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-        <h2 style={{ fontSize: '24px', fontFamily: 'Koulen' }}>Enter data value</h2>
+        <h2 style={{ fontSize: '24px'}}>Enter data value</h2>
           <div className="p-5 rounded-lg mb-4" style={{ border: '2px solid lightgrey', display: 'inline-block', height: '250px', width: '1400px', overflow: 'auto', marginRight: '20px'}}>
             <form onSubmit={handleInputXSubmit} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '100%' }}>
             <div  style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '1px' }}>

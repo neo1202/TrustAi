@@ -1,13 +1,19 @@
 import React, {useState, useEffect} from "react";
 import API_URL from "../../api";
 import SelectBlock from "../../components/SelectBlock";
-import { Button} from "antd";
+import { Button } from "@mui/material";
+import Confetti from "react-confetti";
+
+
 
 function ResultPage() {
+  const { width, height } = {width: 1500, height: 1000} // useWindowSize()};
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const [savedModels, setSavedModels] = useState([])
   const [selectedModel, setSelectedModel] = useState('');
   const [finalTeacherTestAcc, setFinalTeacherTestAcc] = useState(0)
+
 
   useEffect(() => {
     getSavedModels()
@@ -77,11 +83,20 @@ function ResultPage() {
     console.log("Training final teacher model...", data)
 
     setFinalTeacherTestAcc(data.testAcc)
+    setShowConfetti(true);
+    setTimeout(() => {
+      setShowConfetti(false);  // stop confetti after 5 seconds
+    }, 5000);
   }
 
   return <div>
-    
-    
+  
+    {(finalTeacherTestAcc != 0 && showConfetti) ? (
+      <Confetti tweenDuration= {0.5} width={width} height={height}/>
+    ) : (
+      <></>
+      
+    )}  
     <br/>
     {/* <p>Saved Model</p>
     {savedModels.map((model, i) => { // show model info when hover 
@@ -90,13 +105,13 @@ function ResultPage() {
                           selected={selectedModel === model}
                           onClick={handleSelectModel} />
     })} */}
-    <h2 style={{ fontSize: '45px', textAlign: 'center', fontWeight: 'bold' }}>Final Teacher Test Accuracy: </h2>
-    <p style={{ fontSize: '25px', textAlign: 'center' }}>{`${finalTeacherTestAcc? finalTeacherTestAcc:'Not yet trained.'}`}</p>
+    <h2 style={{ fontSize: '40px', textAlign: 'center', fontWeight: 'bold' }}>Final Teacher Test Accuracy: </h2>
+    <p style={{ fontSize: '64px', textAlign: 'center' }}>{`${finalTeacherTestAcc? parseFloat(finalTeacherTestAcc.toFixed(3)):'Not yet trained.'}`}</p>
     <br/>
     {/* <button className="bg-white btn" onClick={saveModel}>Save the Selected Model</button> */}
     <br/>
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-    <Button onClick={trainFinalTeacherModel}>Train Final Teacher Model</Button>
+    <Button variant="contained" onClick={trainFinalTeacherModel}>Train Final Teacher Model</Button>
   </div>
 
   </div>;

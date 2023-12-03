@@ -1,8 +1,12 @@
 import { useState } from "react";
 import API_URL from "../../api";
 import ComparisonTable from "../../components/ComparisonTable";
+import { Button } from "@mui/material";
+import Confetti from "react-confetti";
 
 const KDPage = () => {
+    const { width, height } = {width: 1500, height: 1000} // useWindowSize()};
+    const [showConfetti, setShowConfetti] = useState(false);
 
     const [finishKD, setFinishKD] = useState(false)
     const [finalStudentTestAcc, setFinalStudentTestAcc] = useState(0)
@@ -26,15 +30,24 @@ const KDPage = () => {
         setFinalStudentTestAcc(data.testAcc)
         setComparison(data.comparison)
         setFinishKD(true)
+        setShowConfetti(true);
+        setTimeout(() => {
+        setShowConfetti(false);  // stop confetti after 5 seconds
+        }, 5000);
     }
 
     return <div>
         
-
+    {(finalStudentTestAcc != 0 && showConfetti) ? (
+        <Confetti tweenDuration= {0.5} width={width} height={height}/>
+      ) : (
+        <></>
+        
+      )}  
         <br/>
         <br/>
-        <h2 style={{ fontSize: '45px', textAlign: 'center', fontWeight: 'bold'}}>Final Student Test Accuracy: </h2>
-        <p style={{ fontSize: '25px', textAlign: 'center', fontWeight: 'bold' }}>{`${finalStudentTestAcc? finalStudentTestAcc:'Not yet trained.'}`}</p>
+        <h2 style={{ fontSize: '40px', textAlign: 'center', fontWeight: 'bold'}}>Final Student Test Accuracy: </h2>
+        <p style={{ fontSize: '64px', textAlign: 'center', fontWeight: 'bold' }}>{`${finalStudentTestAcc? parseFloat(finalStudentTestAcc.toFixed(3)) :'Not yet trained.'}`}</p>
 
         <br/>
         {!buttonClicked && (
@@ -58,7 +71,7 @@ const KDPage = () => {
         
         {finishKD? <div>
             
-            <h2 style={{ fontSize: '30px', fontFamily: 'Koulen', textAlign: 'center' }}>KD Result</h2>
+            <h2 style={{ fontSize: '30px', textAlign: 'center', fontWeight: 'bold' }}>KD Result</h2>
             <ComparisonTable comparison={comparison} />
         </div> : <></>}
     </div>
