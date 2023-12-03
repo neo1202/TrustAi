@@ -23,11 +23,11 @@ const QueryTheOracle = ({ queryIds, setQueryResults }) => {
     };
   
     return (
-      <div style={{ maxWidth: '95%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-        <div style={{ maxHeight: '350px', overflowY: 'auto', display: 'flex', flexWrap: 'wrap' }}>
+      <div style={{ maxWidth: '95%', display: 'flex', flexDirection: 'column', position: 'relative'}}>
+        <div style={{ maxHeight: '350px', overflowY: 'auto', display: 'flex', flexWrap: 'wrap',  }}>
           {queryIds.map((qid, i) => (
-            <div key={qid} style={{ display: 'flex', alignItems: 'center', marginRight: '20px', marginBottom: '10px' }}>
-              <div style={{ width: qidWidth, marginRight: '10px' }}>{qid}</div>
+            <div key={qid} style={{ display: 'flex', alignItems: 'center' , marginRight: '20px', marginBottom: '10px' }}>
+              <div style={{ width: qidWidth, marginRight: '10px', marginBottom: '10px' }}>{qid}</div>
               <Select
                 style={{ width: 200 }}
                 value={selections[qid] || "1"}  // Set default value to "1" if not already selected
@@ -44,11 +44,13 @@ const QueryTheOracle = ({ queryIds, setQueryResults }) => {
             </div>
           ))}
         </div>
-        <Button className="bg-white btn" 
-                onClick={handleSubmit} 
-                style={{ position: 'absolute', bottom: '-60px', right: 0, margin: '20px', width: '120px' }}>
-          Submit
-        </Button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px' }}>
+          <Button className="bg-white btn" 
+                  onClick={handleSubmit} 
+                  /*{style={{ position: 'absolute', bottom: '-60px', right: 0, margin: '20px', width: '120px' }} } */ >
+            Submit
+          </Button>
+        </div>
       </div>
     );
   };

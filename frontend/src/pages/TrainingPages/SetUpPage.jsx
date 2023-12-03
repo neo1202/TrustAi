@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Select, Tooltip, Typography } from "antd";
+import { Input, Select, Tooltip, Typography, Steps } from "antd";
+import {
+  Button
+} from "@mui/material";
 import API_URL from "../../api";
 import { initialDatasetSelectMethod, models } from "../../config/config";
 import SelectBlock from "../../components/SelectBlock";
@@ -94,65 +97,104 @@ function SetUpPage() {
 
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <Title level={2}>Shape of Training Dataset</Title>
-      <Paragraph>
-        There are __{numRows ? numRows : "__"}__ rows in total. There are __{numCols ? numCols : "__"}__ features in total.
-      </Paragraph>
-      
     
-      <Title level={2}>Initial Setup</Title>
-      <Tooltip title="How many data shown">
-        <p>
-          How many data is desired to be shown? __{displayNumShownData ? displayNumShownData : "__"}__
-        </p>
-      </Tooltip>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <Input
-        style={{ width: "150px", marginBottom: "20px", marginTop: "10px"}}
-        value={numShownData}
-        onChange={(e) => setNumShownData(e.target.value)}
-        onPressEnter={handleNumShownDataEnter}
-        placeholder="Type a number and press Enter"
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <Title level={1} style={{ fontSize: '64px' }}>Initial Setup</Title>
+      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '90%'}}>
+        <div className="p-8 rounded-lg mb-4 mr-4" style={{ backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '20%', height: '90%' }}>
+          <Title level={2}>Total rows: </Title>
+          <div style={{ display: 'flex',flexDirection: 'row', alignItems: 'center' }}>
+            <Title level={1} style={{ fontSize: '50px', marginRight: '15px' }}> {numRows} </Title>
+            <Title level={4}>rows </Title>
+          </div>
+          
+        </div>  
+        <div className="p-8 rounded-lg mb-4 mr-4" style={{ backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '20%', height: '90%' }}>
+          <Title level={2}>Total Columns: </Title>
+          <div style={{ display: 'flex',flexDirection: 'row', alignItems: 'center' }}>
+            <Title level={1} style={{ fontSize: '50px', marginRight: '15px' }}> {numCols} </Title>
+            <Title level={4}>columns </Title>
+          </div>
+          
+        </div>  
+        <div className="p-8 rounded-lg mb-4 mr-4 " style={{ backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '35%', height: '90%' }}>
+          <Title level={2}>Setup</Title>
+          
+          
+          <div className="mb-1" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            
+              
+              
+              <p>
+                Initial Training Amount:  
+              </p>
+              <Input
+                style={{ width: "150px", marginLeft: "20px" }}
+                value={initNumData}
+                onChange={(e) => setInitNumData(e.target.value)}
+                onPressEnter={handleInitNumDataEnter}
+                placeholder="Type a number "
+                
+              />
+              <Button variant="contained" style={{ marginLeft: "20px", width: "80px" }}  onClick={handleInitNumDataEnter}>
+                Enter
+              </Button>
+              
+            
+          </div>
+          
+          <div style={{display: 'flex', flexDirection: 'row'}}>
+          <Button variant="contained" style={{ marginTop: "15px", backgroundColor: 'green' }}  onClick={trainInitModel}>
+            Go to train initial model
+          </Button>
+          
+          </div>
+        </div>
+        <div className="p-8 rounded-lg mb-4 " style={{ backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '25%', height: '90%' }}>
         
-      />
-      
-      <Button style={{ marginLeft: "20px", width: "80px" }}  onClick={handleNumShownDataEnter}>
-        Enter
-      </Button>
-      </div>
-      <br />
-      <p>
-        How many training data do you want to set in the beginning? __{displayInitNumData ? displayInitNumData : "__"}__
-      </p>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <Input
-        style={{ width: "150px" }}
-        value={initNumData}
-        onChange={(e) => setInitNumData(e.target.value)}
-        onPressEnter={handleInitNumDataEnter}
-        placeholder="Type a number and press Enter"
+        <Title level={2}>Initial Accuracy: </Title>
+          <div style={{ display: 'flex',flexDirection: 'row', alignItems: 'center' }}>
+            {initAcc === 100 ? (
+              <></>
+            ) : (
+              
+              <Title level={1} style={{ fontSize: '50px', marginRight: '15px' }}> {parseFloat(initAcc.toFixed(3))} </Title>
+            )}  
+            
+            
+          </div>
+          
+        </div> 
         
-      />
-      <Button style={{ marginLeft: "20px", width: "80px" }}  onClick={handleInitNumDataEnter}>
-        Enter
-      </Button>
       </div>
-      <br />
-      <br />
-      <Button style={{ marginTop: "10px" }}  onClick={trainInitModel}>
-        Go to train initial model
-      </Button>
-      {initAcc === 100 ? (
-        <></>
-      ) : (
-        <Paragraph>{`Accuracy of the initial model: ${initAcc}`}</Paragraph>
-      )}
-      <br />
-
-      <Title level={2}>Data</Title>
-      <DataTable data={shownData} keys={keys} />
-
+      <div className="p-8 rounded-lg mb-4" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '90%'}}>
+        <Title level={2}>Data</Title>
+        
+        
+          
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <p>
+              Show Data Amount:  
+            </p>
+            
+            <Input
+              style={{ width: "150px", marginBottom: "10px", marginTop: "10px", marginRight: "15px", marginLeft: "15px"}}
+              value={numShownData}
+              onChange={(e) => setNumShownData(e.target.value)}
+              onPressEnter={handleNumShownDataEnter}
+              placeholder="Type a number"
+              
+            />
+            
+            <Button variant="contained" style={{ marginLeft: "20px", width: "80px" }}  onClick={handleNumShownDataEnter}>
+              Enter
+            </Button>
+          </div>
+          <DataTable data={shownData} keys={keys} />
+          
+        </div>
+      </div>
     </div>
   );
 }

@@ -90,7 +90,7 @@ function ResultPage() {
                           selected={selectedModel === model}
                           onClick={handleSelectModel} />
     })} */}
-    <h2 style={{ fontSize: '30px', textAlign: 'center', fontWeight: 'bold' }}>Final Teacher Test Accuracy: </h2>
+    <h2 style={{ fontSize: '45px', textAlign: 'center', fontWeight: 'bold' }}>Final Teacher Test Accuracy: </h2>
     <p style={{ fontSize: '25px', textAlign: 'center' }}>{`${finalTeacherTestAcc? finalTeacherTestAcc:'Not yet trained.'}`}</p>
     <br/>
     {/* <button className="bg-white btn" onClick={saveModel}>Save the Selected Model</button> */}

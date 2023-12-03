@@ -33,8 +33,8 @@ const KDPage = () => {
 
         <br/>
         <br/>
-        <h2 style={{ fontSize: '30px', fontFamily: 'Koulen', textAlign: 'center' }}>Final Student Test Accuracy: </h2>
-        <p style={{ fontSize: '25px', fontFamily: 'Koulen', textAlign: 'center' }}>{`${finalStudentTestAcc? finalStudentTestAcc:'Not yet trained.'}`}</p>
+        <h2 style={{ fontSize: '45px', textAlign: 'center', fontWeight: 'bold'}}>Final Student Test Accuracy: </h2>
+        <p style={{ fontSize: '25px', textAlign: 'center', fontWeight: 'bold' }}>{`${finalStudentTestAcc? finalStudentTestAcc:'Not yet trained.'}`}</p>
 
         <br/>
         {!buttonClicked && (

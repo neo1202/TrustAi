@@ -1,9 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { usePage } from "../hooks/usePage";
-import Button from "@mui/material/Button";
+import homepic from "../assets/homepage_pic.jpg";
+
+
+import Box from '@mui/material/Box';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import StepContent from '@mui/material/StepContent';
+
+import Paper from '@mui/material/Paper';
+
+
 import {
-//   Button,
+  Button,
   Input,
   Select,
   MenuItem,
@@ -13,13 +24,27 @@ import {
 } from "@mui/material";
 import API_URL from "../api";
 
+
 const HomePage = () => {
+  const titleStyle = {
+    marginBottom: "16px",
+    lineHeight: "1",
+    fontWeight: "bold",
+    color: "#007BFF",
+    backgroundColor: "#cce5ff",
+    borderRadius: "8px",
+    padding: "10px",
+    display: 'inline-block',
+    fontSize: '20px',
+  };
+
   const [selectedOption, setSelectedOption] = useState('Gas Class');
   const [customText, setCustomText] = useState('');
   const [desireY, setDesireY] = useState('Gas Class');
   const [selectedFile, setSelectedFile] = useState(null);
   const { setCurrentPage } = usePage();
   const navigate = useNavigate();
+  
 
   const handleOptionChange = (event) => {
     const selectedValue = event.target.value;
@@ -167,77 +192,189 @@ const HomePage = () => {
     console.log(data.msg)
   };
 
+  {/*stepper */}
+  const steps = [
+    {
+      label: 'Upload Data for Trust AI',
+      description: ``,
+    },
+    {
+      label: 'Select a Y Label',
+      description:
+        'An ad group contains one or more ads which target a shared set of keywords.',
+    },
+   
+  ];
+  
+
+  const [activeStep, setActiveStep] = React.useState(0);
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
+  };
+
   return (
-    <div className="text-center p-8">
-      <h4 className="text-2xl mb-4">HomePage</h4>
-      <div className="flex flex-col md:flex-row">
-        <div className="mb-4 md:mr-4">
-          <input
-            type="file"
-            onChange={handleFileChange}
-            className="border p-2"
-          />
-          <Button
-            variant="contained"
-            style={{ margin: "10px" }}
-            onClick={uploadFile}
-          >
-            Upload File
-          </Button>
+    <div>
+    <div  style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <img src={homepic} alt="homepage pic" style={{ width: '50%', height: 'auto' }} />
+      <div style={{ width: '35%', padding: '8px' }}>
+        {/*stepper */}
+        
+        <h2 style={{ fontSize: '120px', textAlign: 'center', fontWeight: 'bold', fontFamily: 'sans-serif' }}>Trust AI</h2>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        
+          <Box sx={{ maxWidth: 800 }}>
+            <Stepper activeStep={activeStep} orientation="vertical" sx={{ fontSize: '30px', padding: '20px' }}>
+              {steps.map((step, index) => (
+                <Step key={step.label}>
+                  <StepLabel
+                    optional={
+                      index === 2 ? (
+                        <Typography variant="caption">Last step</Typography>
+                      ) : null
+                    }
+                    StepIconProps={{ style: { fontSize: '50px' } }}
+                  >
+                  <Typography variant="h5">{step.label}</Typography>
+                  </StepLabel>
+                  <StepContent>
+                    {/*<Typography>{step.description}</Typography>*/}
+                    {activeStep === 0 && (
+                      <>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                      
+                          <input
+                              type="file"
+                              onChange={handleFileChange}
+                              className="border p-2"
+                              style={{ width: '300px', height: '45px', fontSize: '16px' }}
+                          />
+                          <Button
+                              variant="contained"
+                              style={{ margin: "10px" , backgroundColor: 'black' }}
+                              onClick={uploadFile}
+                          >
+                              Upload File
+                          </Button>
+                        
+                      </div>
+                      
+                      </>
+                    )}
+                    {activeStep === 1 && (
+                      <>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                      
+                      <label className="block">
+              
+                      <select
+                        value={selectedOption}
+                        onChange={handleOptionChange}
+                        className="mt-2 border p-2"
+                        style={{ width: '300px', height: '45px', fontSize: '16px' }}
+                      >
+                      <option value="">-- Choose desire y label --</option>
+                      <option value="Gas Class">Gas Class</option>
+                      <option value="Gas Num">Gas Num</option>
+                      <option value="Other">Other</option>
+                    </select>
+                    </label>
+                    <Button
+                      variant="contained"
+                      style={{ margin: "10px", backgroundColor: 'black' }}
+                      onClick={handleEnterClick}
+                    >
+                      Enter
+                    </Button>
+                    </div>
+                    {selectedOption === 'Other' && (
+                      <div>
+                      {/*<label className="block" style={{  fontSize: '16px' }} >
+                          Type your desired y label:*/}
+                          <input
+                            type="text"
+                            value={customText}
+                            onChange={handleTextChange}
+                            className=" mt-2 border p-2"
+                            style={{ width: '300px', height: '45px', fontSize: '16px' }}
+                            placeholder="Type your desired y label" // Added placeholder
+                          />
+                        {/*</label>*/}
+                      </div>
+                    )}
+                    
+                        
+                      
+                      
+                      </>
+                    )}
+                    <Box sx={{ mb: 2 }}>
+
+                      <div>
+                        <Button
+                          variant="contained"
+                          onClick={handleNext}
+                          sx={{ mt: 1, mr: 1 }}
+                        >
+                          {index === steps.length - 1 ? 'Finish' : 'Continue'}
+                        </Button>
+                        <Button
+                          disabled={index === 0}
+                          onClick={handleBack}
+                          sx={{ mt: 1, mr: 1 }}
+                        >
+                          Back
+                        </Button>
+                      </div>
+                    </Box>
+                  </StepContent>
+                </Step>
+              ))}
+            </Stepper>
+            {activeStep === steps.length && (
+              <Paper square elevation={0} sx={{ p: 3 }}>
+              
+              <div style={titleStyle}>Data Upload Completed!</div>
+                <Button onClick={handleReset} sx={{ mt: 1, mr: 1, ml: 2 }}>
+                  Reset
+                </Button>
+              </Paper>
+            )}
+          </Box>
+        
         </div>
-        <div className="md:flex md:items-center">
-          <label className="block">
-            Select an option:
-            <select
-              value={selectedOption}
-              onChange={handleOptionChange}
-              className="mt-2 border p-2"
-            >
-              <option value="">-- Choose desire y label --</option>
-              <option value="Gas Class">Gas Class</option>
-              <option value="Gas Num">Gas Num</option>
-              <option value="Other">Other</option>
-            </select>
-          </label>
-          {selectedOption === 'Other' && (
-            <div className="mt-4 md:mt-0 md:ml-4">
-              <label className="block">
-                Type your desired y label:
-                <input
-                  type="text"
-                  value={customText}
-                  onChange={handleTextChange}
-                  className="mt-2 border p-2"
-                />
-              </label>
-            </div>
-          )}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button
-            variant="contained"
-            style={{ margin: "10px" }}
-            onClick={handleEnterClick}
+              variant="contained"
+              style={{ margin: "10px", backgroundColor: 'green' }}
+              onClick={handleDQButtonClick}
           >
-            Enter
+              Go to Data Quality
           </Button>
-        </div>
       </div>
-
-      <br />
-
-      <Button
-          variant="contained"
-          style={{ margin: "10px" }}
-          onClick={handleDQButtonClick}
-        >
-          Go to Data Quality
-      </Button>
-      {/* <button
-        className="bg-blue-500 text-white px-4 py-2 mt-4"
-        onClick={handleTrainingButtonClick}
-      >
-        Go to Training
-      </button> */}
+      </div>
     </div>
+        
+
+        
+      
+        
+        {/* <button
+          className="bg-blue-500 text-white px-4 py-2 mt-4"
+          onClick={handleTrainingButtonClick}
+        >
+          Go to Training
+        </button> */}
+    </div>
+    
   );
 }
 export default HomePage;

@@ -3,7 +3,9 @@ import API_URL from "../../api";
 import QueryTheOracle from "../../components/QueryTheOracle";
 import DataTable from "../../components/DataTable";
 import Dashboard from "../../components/Dashboard";
-import { Button } from "antd";
+import { Button } from "@mui/material";
+import { Typography } from "antd";
+const { Title } = Typography;
 
 function UserTypeLabelPage() {
 
@@ -132,46 +134,52 @@ function UserTypeLabelPage() {
   }
 
   return (
-    <div className="flex flex-col place-items-center justify-center h-screen bg-white-400">
-      <br />
-      <br />
-
-      <QueryTheOracle queryIds={uncertaintyId} setQueryResults={setQueryResults} />
-
-      <br />
-      <DataTable data={uncertainData} keys={keys} />
+    <div className="flex flex-col place-items-center justify-center bg-white-400">
       
-      <br />
-      {finishTraining ? (
-        <div>
-          <Dashboard
-            visible={isDashboardVisible}
-            onCancel={() => {
-              hideDashboard();
-              trainNextIter();
-            }}
-            imageUrls={[
-              `${API_URL}/getPlotImages/dashboard/${labeledToAllRatioPlot}`,
-              `${API_URL}/getPlotImages/dashboard/${labeledClassRatioPlot}`,
-              `${API_URL}/getPlotImages/dashboard/${cumuNumDataPlot}`,
-              `${API_URL}/getPlotImages/dashboard/${cumuTrainAccPlot}`,
-            //   `${API_URL}/getPlotImages/dashboard/${cumuTestAccPlot}`,
-            ]}
-            iterCount={iterCount}
-            cumulatedNumData={cumulatedNumData}
-            currTrainAcc={currTrainAcc}
-            currTestAcc={currTestAcc}
-          />
+        <Title level={1} style={{ fontSize: '64px' }}>Active Learning Label</Title>
+        <br />
+        <br />
+        
+        <div className="p-10 rounded-lg mb-4" style={{ display: 'flex', flexDirection: 'column', alignContent: 'center', justifyContent: 'center', alignItems: 'center' , backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '90%'}}>
+          <QueryTheOracle queryIds={uncertaintyId} setQueryResults={setQueryResults} />
         </div>
-      ) : (
-        <></>
-      )}
+        
 
-      <br />
-      <br />
-      <Button className="bg-white btn" style={{ marginLeft: '30px' }} onClick={train}>
-        Train
-      </Button>
+        <br />
+        <DataTable data={uncertainData} keys={keys} />
+        
+        <br />
+        {finishTraining ? (
+          <div>
+            <Dashboard
+              visible={isDashboardVisible}
+              onCancel={() => {
+                hideDashboard();
+                trainNextIter();
+              }}
+              imageUrls={[
+                `${API_URL}/getPlotImages/dashboard/${labeledToAllRatioPlot}`,
+                `${API_URL}/getPlotImages/dashboard/${labeledClassRatioPlot}`,
+                `${API_URL}/getPlotImages/dashboard/${cumuNumDataPlot}`,
+                `${API_URL}/getPlotImages/dashboard/${cumuTrainAccPlot}`,
+              //   `${API_URL}/getPlotImages/dashboard/${cumuTestAccPlot}`,
+              ]}
+              iterCount={iterCount}
+              cumulatedNumData={cumulatedNumData}
+              currTrainAcc={currTrainAcc}
+              currTestAcc={currTestAcc}
+            />
+          </div>
+        ) : (
+          <></>
+        )}
+
+        <br />
+        <br />
+        <Button variant="contained"  onClick={train}>
+          Train
+        </Button>
+      
     </div>
   );
   
