@@ -62,7 +62,7 @@ const ImputedDetailPage = () => {
           <Typography variant="h4" gutterBottom style={blueTitleStyle}>
             Pair Plot
           </Typography>
-          <img src={`${API_URL}/getPlotImages/edash/${covHeatmapAfter}`} alt="" />
+          <img src={`${API_URL}/getPlotImages/edash/${pairPlot}`} alt="" />
         </div>
       </div>
 

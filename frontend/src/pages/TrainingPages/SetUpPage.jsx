@@ -7,6 +7,9 @@ import API_URL from "../../api";
 import { initialDatasetSelectMethod, models } from "../../config/config";
 import SelectBlock from "../../components/SelectBlock";
 import DataTable from "../../components/DataTable";
+import { useStatus } from "../../hooks/useStatus";
+import popMessage from "../../utils/popMessage";
+import Loading from "../../components/Loading";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -28,11 +31,16 @@ function SetUpPage() {
 
   const [initAcc, setInitAcc] = useState(100);
 
+  const { isLoading, setIsLoading, loadingMsg, setLoadingMsg, loadingTime, setLoadingTime } = useStatus();
+
+
   useEffect(() => {
     getData()
   }, [])
 
   const getData = async () => { 
+    setIsLoading(true); setLoadingMsg("Getting complete data for training..."); setLoadingTime(0.5);
+
     const response = await fetch(
         `${API_URL}/getData/train-raw`, 
         {
@@ -47,6 +55,9 @@ function SetUpPage() {
     setKeys(data.keys)
     setNumRows(data.numRows)
     setNumCols(data.numCols)
+
+    setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+    popMessage(data.msg);
   }
   
   const handleNumShownDataEnter = () => {
@@ -75,9 +86,12 @@ function SetUpPage() {
 
     setDisplayInitNumData(initNumData);
     setInitNumData('');
+    popMessage(data.msg)
   }
 
   const trainInitModel = async () => {
+    setIsLoading(true); setLoadingMsg("Training initial model..."); setLoadingTime(0.5);
+
     const model = {'model': selectedModel}
 
     const response = await fetch(
@@ -93,12 +107,16 @@ function SetUpPage() {
     console.log("training initial model...", data)
 
     setInitAcc(data.acc)
+    
+    setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+    popMessage(data.msg);
   }
 
 
   return (
     
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      {isLoading? <Loading action={loadingMsg} waitTime={loadingTime}/> : <></>} 
       <Title level={1} style={{ fontSize: '64px' }}>Initial Setup</Title>
       <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '90%'}}>
         <div className="p-8 rounded-lg mb-4 mr-4" style={{ backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '20%', height: '90%' }}>

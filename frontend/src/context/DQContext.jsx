@@ -1,5 +1,7 @@
 import { createContext, useState } from "react";
+import { useStatus } from "../hooks/useStatus";
 import API_URL from "../api";
+import popMessage from "../utils/popMessage";
 
 const DQContext = createContext();
 
@@ -34,7 +36,11 @@ const DQProvider = ({ children }) => {
   const [recall, setRecall] = useState(0);
   const [f1, setF1] = useState(0);
 
+  const { setIsLoading, setLoadingMsg, setLoadingTime } = useStatus();
+
   const getImputedDetails = async () => {
+    setIsLoading(true); setLoadingMsg("Getting details of the imputation(might take long)..."); setLoadingTime(5);
+
     const response = await fetch(`${API_URL}/getImputedDetails/`, {
         method: "GET",
         headers: {
@@ -43,27 +49,32 @@ const DQProvider = ({ children }) => {
     });
     const data = await response.json();
     console.log("Get imputed details(tables)...", data);
-    setJsDivergence(data.simplifiedStablilty)
-    setMissingRateTable(data.missingRateTable)
-    setMissingRateColumnName(data.missingRateColumnName)
-    setEntropyTable(data.entropyTable)
-    setEntropyColumnName(data.entropyColumnName)
-    setJsDivergenceTable(data.jsDivergenceTable)
-    setJsDivergenceColumnName(data.jsDivergenceColumnName)
-    setBasicInfoBeforeTable(data.basicInfoBeforeTable)
-    setBasicInfoBeforeColumnName(data.basicInfoBeforeColumnName)
-    setBasicInfoAfterTable(data.basicInfoAfterTable)
-    setBasicInfoAfterColumnName(data.basicInfoAfterColumnName)
-    setVifBeforeTable(data.vifBeforeTable)
-    setVifBeforeColumnName(data.vifBeforeColumnName)
-    setVifAfterTable(data.vifAfterTable)
-    setVifAfterColumnName(data.vifAfterColumnName)
-    setCovHeatmapBefore(`${data.covHeatmapBefore}?timestamp=${Date.now()}`)
-    setCovHeatmapAfter(`${data.covHeatmapAfter}?timestamp=${Date.now()}`)
-    setPairPlot(`${data.pairPlot}?timestamp=${Date.now()}`)
+    setJsDivergence(data.comparison.simplifiedStablilty)
+    setMissingRateTable(data.comparison.missingRateTable)
+    setMissingRateColumnName(data.comparison.missingRateColumnName)
+    setEntropyTable(data.comparison.entropyTable)
+    setEntropyColumnName(data.comparison.entropyColumnName)
+    setJsDivergenceTable(data.comparison.jsDivergenceTable)
+    setJsDivergenceColumnName(data.comparison.jsDivergenceColumnName)
+    setBasicInfoBeforeTable(data.comparison.basicInfoBeforeTable)
+    setBasicInfoBeforeColumnName(data.comparison.basicInfoBeforeColumnName)
+    setBasicInfoAfterTable(data.comparison.basicInfoAfterTable)
+    setBasicInfoAfterColumnName(data.comparison.basicInfoAfterColumnName)
+    setVifBeforeTable(data.comparison.vifBeforeTable)
+    setVifBeforeColumnName(data.comparison.vifBeforeColumnName)
+    setVifAfterTable(data.comparison.vifAfterTable)
+    setVifAfterColumnName(data.comparison.vifAfterColumnName)
+    setCovHeatmapBefore(`${data.comparison.covHeatmapBefore}?timestamp=${Date.now()}`)
+    setCovHeatmapAfter(`${data.comparison.covHeatmapAfter}?timestamp=${Date.now()}`)
+    setPairPlot(`${data.comparison.pairPlot}?timestamp=${Date.now()}`)
+
+    setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+    popMessage(data.msg);
   }
 
   const getMetricValues = async () => {
+    setIsLoading(true); setLoadingMsg("Start evaluating the imputation..."); setLoadingTime(3);
+
     const response = await fetch(`${API_URL}/getMetricEvalValue/`, {
         method: "GET",
         headers: {
@@ -72,10 +83,13 @@ const DQProvider = ({ children }) => {
     });
     const data = await response.json();
     console.log("Get metric evaluation values...", data);
-    setAccuracy(data.Accuracy)
-    setPrecision(data.Precision)
-    setRecall(data.Recall)
-    setF1(data.F1)
+    setAccuracy(data.result.Accuracy)
+    setPrecision(data.result.Precision)
+    setRecall(data.result.Recall)
+    setF1(data.result.F1)
+
+    setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+    popMessage(data.msg);
   }
 
 

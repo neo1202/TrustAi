@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Select } from 'antd';
 import { Button } from "@mui/material";
+import popMessage from '../utils/popMessage';
 
 const { Option } = Select;
 
@@ -21,6 +22,7 @@ const QueryTheOracle = ({ queryIds, setQueryResults }) => {
         [qid]: selections[qid] || "1", // Set default value to "1" if not selected
       }));
       setQueryResults(results);
+      popMessage("Submit query results!");
     };
   
     return (

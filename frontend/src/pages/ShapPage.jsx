@@ -4,6 +4,9 @@ import Dropdown from "../components/Dropdown";
 import Navbar from "../components/Navbar";
 import "../layouts/ShapPage/ShapPage.css"; // Import the CSS file for styling
 import DataTable from "../components/DataTable";
+import { useStatus } from "../hooks/useStatus";
+import popMessage from "../utils/popMessage";
+import Loading from "../components/Loading";
 
 function ShapPage() {
   const [shapClass, setShapClass] = useState('');
@@ -16,7 +19,10 @@ function ShapPage() {
   const [XLabels, setXLabels] = useState([]);
   const [yLabel, setYLabel] = useState('');
   const [inputX, setInputX] = useState(Array(XLabels.length).fill('20')); // Initialize with an empty value
-  const [isLoading, setIsLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  const { isLoading, setIsLoading, loadingMsg, setLoadingMsg, loadingTime, setLoadingTime } = useStatus();
+
 
   useEffect(() => {
     getXLabels()
@@ -38,8 +44,12 @@ function ShapPage() {
   }
   useEffect(() => {
     const fetchData = async () => {
-            const response = await fetch(`${API_URL}/processShapAllClassPlot/`);
-            setIsLoading(false);
+        setIsLoading(true); setLoadingMsg("Going to SHAP explanation..."); setLoadingTime(0.5);
+
+        const response = await fetch(`${API_URL}/processShapAllClassPlot/`);
+        setIsPageLoading(false);
+        setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+        popMessage("Enter SHAP Explanation!");
     };
     fetchData();
   }, []);
@@ -96,6 +106,7 @@ function ShapPage() {
     e.preventDefault();
 
     try {
+      setIsLoading(true); setLoadingMsg(`Calculating SHAP value of Class ${shapClass}...`); setLoadingTime(0.5);
       const response = await fetch(
           `${API_URL}/processShapClassPlot/`, 
           {
@@ -105,6 +116,8 @@ function ShapPage() {
           },
           body: JSON.stringify(shapClass)
       })
+      setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+      popMessage(`Finish calculating SHAP value of Class ${shapClass}!`);
 
       const data = await response.json();
       setImagePath(`${data.image_path}?timestamp=${Date.now()}`)
@@ -121,8 +134,9 @@ function ShapPage() {
     e.preventDefault();
 
     try {
-
       const deps = {depClass1:depClass1, depClass2:depClass2, depY:depY}
+
+      setIsLoading(true); setLoadingMsg(`Calculating dependent SHAP value of feature ${depClass1} and feature ${depClass2} for Class ${depY}...`); setLoadingTime(0.5);
 
       const response = await fetch(
         `${API_URL}/processDepClassPlot/`, 
@@ -132,7 +146,10 @@ function ShapPage() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(deps)
-    })
+      })
+
+      setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+      popMessage(`Finish calculating dependent SHAP value!`);
 
       const data = await response.json();
       setImagePathD1(`${data.image_pathD1}?timestamp=${Date.now()}`);
@@ -146,13 +163,15 @@ function ShapPage() {
     backgroundColor: "#ffffff", // Set your desired background color here
   };
   
-  if (isLoading) {
+  if (isPageLoading) {
     return <p>Loading All Class SHAP...</p>; // replace with your loading image
-} 
+  }
   
   return (
     <div style={pageStyle}>
       <Navbar />
+      {isLoading? <Loading action={loadingMsg} waitTime={loadingTime}/> : <></>} 
+
       <div id="home" className="section">
         {/* Content for the Home section */}
       </div>

@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import API_URL from "../../api";
+import { useStatus } from "../../hooks/useStatus";
+import popMessage from "../../utils/popMessage";
+import Loading from "../../components/Loading";
 import QueryTheOracle from "../../components/QueryTheOracle";
 import DataTable from "../../components/DataTable";
 import Dashboard from "../../components/Dashboard";
@@ -27,6 +30,9 @@ function UserTypeLabelPage() {
 
   const [isDashboardVisible, setDashboardVisible] = useState(false);
 
+  const { isLoading, setIsLoading, loadingMsg, setLoadingMsg, loadingTime, setLoadingTime } = useStatus();
+
+
   const showDashboard = () => {
     setDashboardVisible(true);
   };
@@ -45,6 +51,8 @@ function UserTypeLabelPage() {
   }, [finishTraining])
 
   const getUncertaintyRank = async () => {
+    setIsLoading(true); setLoadingMsg(`Getting uncertainty ranking of prediction ${iterCount-1}...`); setLoadingTime(0.5);
+
     const response = await fetch(
         `${API_URL}/uncertaintyRank/${iterCount-1}/`, 
         {
@@ -58,6 +66,9 @@ function UserTypeLabelPage() {
     setUncertaintyId(data.uncertainIdx)
     setUncertainData(data.uncertainData)
     setKeys(data.keys)
+
+    setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+    popMessage(data.msg);
   }
 
   const modifyNumDataPerIter = () => {
@@ -85,6 +96,9 @@ function UserTypeLabelPage() {
 
   const train = async () => {
     const result = { uncertaintyId: uncertaintyId, queryResults: queryResults}
+
+    setIsLoading(true); setLoadingMsg(`Training model No.${iterCount}...`); setLoadingTime(0.5);
+
     const response = await fetch(
         `${API_URL}/trainALModel/${iterCount}/`, 
         {
@@ -103,6 +117,9 @@ function UserTypeLabelPage() {
     setCurrTestAcc(data.testAcc)
 
     setFinishTraining(true)
+
+    setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+    popMessage(data.msg);
   }
 
   const trainNextIter = () => {
@@ -135,6 +152,7 @@ function UserTypeLabelPage() {
 
   return (
     <div className="flex flex-col place-items-center justify-center bg-white-400">
+      {isLoading? <Loading action={loadingMsg} waitTime={loadingTime}/> : <></>} 
       
         <Title level={1} style={{ fontSize: '64px' }}>Active Learning Label</Title>
         <br />

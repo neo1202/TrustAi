@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
+import { useStatus } from "../hooks/useStatus";
 import { usePage } from "../hooks/usePage";
+import popMessage from "../utils/popMessage";
 import homepic from "../assets/homepage_pic.jpg";
-
+import Loading from "../components/Loading";
 
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
@@ -43,6 +45,12 @@ const HomePage = () => {
   const [desireY, setDesireY] = useState('Gas Class');
   const [selectedFile, setSelectedFile] = useState(null);
   const { setCurrentPage } = usePage();
+  const { 
+    isLoading, setIsLoading,
+    loadingMsg, setLoadingMsg,
+    loadingTime, setLoadingTime, 
+  } = useStatus();
+
   const navigate = useNavigate();
   
 
@@ -75,12 +83,15 @@ const HomePage = () => {
         },
         body: JSON.stringify(setting),
       });
-  
+      
       const data = await response.json();
       console.log("Settings...", data);
+      popMessage(data.msg)
   };
 
   const handleDQButtonClick = async () => {
+    setIsLoading(true); setLoadingMsg("Going to data quality process..."); setLoadingTime(0.5);
+
     // clear the previous process, i.e., the process id is always 1
     const response = await fetch(
         `${API_URL}/clearProcess/`, 
@@ -122,6 +133,9 @@ const HomePage = () => {
 
     setCurrentPage(`dataquality`);
     navigate(`/dataquality`);
+    
+    setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+    popMessage("Enter Data Quality Process!")
   }
 
   const handleTrainingButtonClick = async () => {
@@ -224,6 +238,8 @@ const HomePage = () => {
   return (
     <div>
     <div  style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      {isLoading? <Loading action={loadingMsg} waitTime={loadingTime}/> : <></>} 
+    
       <img src={homepic} alt="homepage pic" style={{ width: '50%', height: 'auto' }} />
       <div style={{ width: '35%', padding: '8px' }}>
         {/*stepper */}

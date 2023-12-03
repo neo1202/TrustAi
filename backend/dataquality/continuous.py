@@ -107,7 +107,7 @@ class continuous:
             return df.copy().fillna(0,inplace=True)
 
     def pair_plot(self, df_before, df_after, folder_path):
-        da, db = df_after.copy(), df_before.copy()
+        da, db = df_after.copy(deep=True), df_before.copy(deep=True)
         da['imputed'] = True
         db['imputed'] = False
         combined_df = pd.concat([db, da], ignore_index=True)
@@ -237,8 +237,8 @@ class continuous:
 
         import time
         start_time = time.time()
-
-        # pair_plot_name = self.pair_plot(df_before, df_after, folder_path)
+        print(f"start pair_plot... {start_time}")
+        pair_plot_name = self.pair_plot(df_before, df_after, folder_path)
 
         end_time = time.time()
         execution_time = end_time - start_time

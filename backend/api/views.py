@@ -247,7 +247,8 @@ def readALData(request):
         msg = 'dataset already exists, no need to store again'
     print(f"\n\n{msg}\n\n")
 
-    return Response({'msg':f'{msg}'})
+    return_msg = 'Enter Active Learning Process!'
+    return Response({'msg': return_msg, 'datasetMsg': f'{msg}'})
 
 
 @api_view(['GET'])
@@ -263,8 +264,10 @@ def getData(request, pk):
     numCols = df.shape[1] - 1 # 前端叫的是訓練集，所以欄位數量要扣掉標籤欄
 
     data = {
+        'msg': "Get complete data successfully!", 
         'rawData': rawData, 'keys': list(rawData[0].keys()),
-        'numRows': numRows, 'numCols': numCols}
+        'numRows': numRows, 'numCols': numCols
+    }
     return Response(data)
 
 
@@ -298,33 +301,57 @@ def setMethodsAndConfigs(request):
 
     process = FullProcess.objects.all().order_by("-id")[0]
 
+    type_name = ''
     if setting_type == 'SetYLabel':
+        type_name = 'Y label'
         process.yLabel = setting_value
+
     elif setting_type == 'SelectImputer':
+        type_name = 'imputer'
         process.imputerMethod = setting_value 
+
     elif setting_type == 'SetInitNumData':
+        type_name = 'initial training number of data'
         process.initTrainingDataNum = setting_value
+
     elif setting_type == 'SelectInitData':
+        type_name = 'initial training data selecting method'
         process.initTrainingDataSelectMethod = setting_value
+
     elif setting_type == 'SelectModel':
+        type_name = 'training model'
         process.trainingModel = setting_value
+
     elif setting_type == 'SetNumDataPerIter':
+        type_name = 'number of data add per iteration'
         process.querySize = setting_value
+
     elif setting_type == 'SelectUncertaintyMethod':
+        type_name = 'uncertainty query method'
         process.uncertaintyQueryMethod = setting_value
+
     elif setting_type == 'SetLearningRate':
+        type_name = 'learning rate'
         process.learningRate = setting_value
+
     elif setting_type == 'SetPoolingSize':
+        type_name = 'pooling size'
         process.poolingSize = setting_value
+
     elif setting_type == 'SetNumEpoch':
+        type_name = 'number of epochs'
         process.numEpochs = setting_value
+
     elif setting_type == 'SetBatchingSize':
+        type_name = 'batch size'
         process.batchSize = setting_value
-    
+
     process.save()
 
+    msg = f"Set {type_name} {data['value']} successfully!"
+
     print(f"\n\nsetting type = {data['type']}, value = {data['value']}\n\n")
-    return Response(data)
+    return Response({'msg': msg})
 
 
 @api_view(['POST'])
@@ -387,7 +414,7 @@ def doEDA(request):
     # df_test_des, miss_plot_test, label_class_ratio_test = EDA(df_test_miss, type='test')
 
     return Response({
-        'msg': "finish EDA of missing data",
+        'msg': "Finish EDA of the raw data!",
         # 'train': {
         #     'description': df_train_des.round(4).to_dict(orient='records'), 
         #     'missingValuePlot': miss_plot_train, 
@@ -452,24 +479,13 @@ def startImpute(request):
         after = fcmImputer.impute()
 
     elif imputeMethod == 'EM':
-        # result_train = impute_em(df_train_X, max_iter=25)
-        # result_test = impute_em(df_test_X, max_iter=25)
-        # df_train_imputed = result_train['X_imputed']
-        # df_test_imputed = result_test['X_imputed']
-
         result = impute_em(X, max_iter=25)
         df_imputed = result['X_imputed']
 
 
     elif imputeMethod == 'Miss-forest':
         imputer = MissForest()
-        # df_train_imputed = imputer.fit_transform(df_train_X)
-        # df_test_imputed = imputer.fit_transform(df_test_X) 
-
         df_imputed = imputer.fit_transform(X) 
-
-    # data_train = pd.concat([df_train_imputed, df_train_y], axis=1)
-    # data_test = pd.concat([df_test_imputed, df_test_y], axis=1)
 
     data_imputed = pd.concat([df_imputed, y], axis=1)
 
@@ -483,9 +499,8 @@ def startImpute(request):
     print("\n === TO_CSV === \n")
 
     data = { 
+        'msg': "Finish Data Imputation!",
         'imputeMethod': imputeMethod, 
-        # 'imputedTrainData': data_train.round(4).to_dict(orient='records'),
-        # 'imputedTestData': data_test.round(4).to_dict(orient='records'),
         'imputedData': data_imputed.round(4).to_dict(orient='records'),
     }
     return Response(data)
@@ -504,6 +519,9 @@ def getImputedDetails(request):
     df_miss = pd.concat([df_train_miss, df_test_miss], axis=0).reset_index(drop=True)
     df_complete = pd.concat([df_train_complete, df_test_complete], axis=0).reset_index(drop=True)
 
+    print(df_miss.shape)
+    print(df_complete.shape)
+
     df = pd.DataFrame(np.random.randn(1000, 7), columns=['var1', 'var2', 'var3', 'var4', 'var5', 'var6', 'var7'])
     tmp = pd.DataFrame(np.random.randn(100, 7), columns=['var1', 'var2', 'var3', 'var4', 'var5', 'var6', 'var7'])
 
@@ -515,7 +533,7 @@ def getImputedDetails(request):
 
     print(f"\n\n ====== got imputed details ====== \n\n")
 
-    return Response(comparison)
+    return Response({ 'msg': "Got details of the imputation!", 'comparison': comparison })
 
 
 @api_view(['GET'])
@@ -535,7 +553,7 @@ def getMetricEvalValue(request):
 
     result = generate_stack_prediction(X_train, y_train, X_test, y_test)
 
-    return Response(result)
+    return Response({ 'msg': "Finish evaluating the imputation!", 'result': result })
 
 
 @api_view(['GET'])
@@ -618,7 +636,7 @@ def getUncertaintyRank(request, iter):
 
     keys = list(['trueId'] + list(features))
     data = {
-        'msg': f"get uncertainty ranking iter {iteration}(an list or a bar chart figure)",
+        'msg': f"Get uncertainty ranking of prediction {iteration} successfully!",
         'uncertainIdx': uncertain_idx,
         'uncertainData': uncertain_data, # 這裡要是包好的 uncertain 資料
         'keys': keys,
@@ -793,7 +811,7 @@ def trainInitModel(request):
     
     al.save()
 
-    data = { 'acc':test_acc }
+    data = { 'msg': "Finish training initial model!", 'acc': test_acc }
     return Response(data)
 
 
@@ -889,7 +907,7 @@ def trainALModel(request, iter):
     al.save()
 
     data = {
-        'msg': f'train AL model {iteration}', 
+        'msg': f'Finish training model No.{iteration}!', 
         'status': 'successful',
         'iteration':iteration, 
         'cumuNumData': al.cumulatedNumData[-1],
@@ -960,7 +978,7 @@ def trainFinalTeacher(request):
     process.save()
 
     data = {
-        'msg':"train final teacher",
+        'msg':"Finish training the final model!",
         'testAcc': test_acc,
     }
     return Response(data)
@@ -1024,7 +1042,7 @@ def doKD(request): # actually train final student
     summary_student = summary(student_model, input_size=(batch_size, datasetConfig['num_feature']))
     
     data = {
-        'msg': 'do KD...',
+        'msg': 'Finish compressing the model with KD!',
         'testAcc': test_acc,
         'comparison': {
             'teacher':{

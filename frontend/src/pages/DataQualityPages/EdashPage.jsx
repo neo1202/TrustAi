@@ -3,6 +3,9 @@ import DataTable from "../../components/DataTable";
 import { blueTitleStyle } from "../../config/colors";
 import Typography from "@mui/material/Typography";
 import API_URL from "../../api";
+import { useStatus } from "../../hooks/useStatus";
+import popMessage from "../../utils/popMessage";
+import Loading from "../../components/Loading";
 
 
 const EdashPage = () => {
@@ -12,6 +15,8 @@ const EdashPage = () => {
   const [missingValueTableColumns, setMissingValueTableColumns] = useState([]);
   const [missingValuePlot, setMissingValuePlot] = useState('');
   const [labelClassRatioPlot, setLabelClassRatioPlot] = useState('');
+
+  const { isLoading, setIsLoading, loadingMsg, setLoadingMsg, loadingTime, setLoadingTime } = useStatus();
   
   useEffect(() => {
     doEDA();
@@ -31,6 +36,7 @@ const EdashPage = () => {
   }
   
   const doEDA = async () => {
+    setIsLoading(true); setLoadingMsg("Doing EDA for the raw data..."); setLoadingTime(0.5);
     const response = await fetch(
         `${API_URL}/doEDA/`, 
         {
@@ -47,11 +53,15 @@ const EdashPage = () => {
     setMissingValueTableColumns(data.all.missingValueTableColumns);
     setMissingValuePlot(`${data.all.missingValuePlot}?timestamp=${Date.now()}`);
     setLabelClassRatioPlot(`${data.all.labelClassRatioPlot}?timestamp=${Date.now()}`);
+
+    setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+    popMessage(data.msg)
   }
 
 
   return (
     <div className="flex flex-col place-items-center justify-center bg-white-400">
+      {isLoading? <Loading action={loadingMsg} waitTime={loadingTime}/> : <></>} 
       <Typography variant="h4" gutterBottom>
         Simple EDA Visualizaion
       </Typography>
