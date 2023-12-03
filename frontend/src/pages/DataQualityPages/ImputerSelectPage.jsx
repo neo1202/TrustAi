@@ -1,12 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
 
 import API_URL from "../../api";
 import { useDQ } from "../../hooks/useDQ"
 
 const ImputerSelectPage = () => {
+  const [selectedImputer, setSelectedImputer] = useState(null);
+
   const imputers = [
     {
       label: "Genetic-enhanced fuzzy c-means",
@@ -26,11 +28,12 @@ const ImputerSelectPage = () => {
   ];
 
   const {
-    setImputedTrainData, setImputedTestData,
+    setImputedData,
     getImputedDetails, getMetricValues, 
   } = useDQ();
 
   const handleImputerClick = async (imputerName) => {
+    setSelectedImputer(imputerName);
     const setting = {
       type: "SelectImputer",
       value: imputerName,
@@ -55,18 +58,20 @@ const ImputerSelectPage = () => {
     });
     const data = await response.json();
     console.log("finish imputing...", data);
-    setImputedTrainData(data.imputedTrainData)
-    setImputedTestData(data.imputedTestData)
+    setImputedData(data.imputedData);
   };
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
+      <Typography variant="h4" gutterBottom>
+        Select an Imputer
+      </Typography>
       <div style={{ display: "flex", justifyContent: "center" }}>
         {imputers.map((imputer, index) => (
           <Tooltip key={index} title={imputer.description}>
             <Button
               variant="contained"
-              style={{ margin: "10px" }}
+              style={{ margin: "10px", backgroundColor: selectedImputer === imputer.label ? "#4CAF50" : null }}
               onClick={imputer.onClick}
             >
               {imputer.label}

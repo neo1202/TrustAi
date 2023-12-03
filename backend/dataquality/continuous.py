@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 import scipy.integrate as integrate
@@ -105,14 +106,19 @@ class continuous:
         elif method == "zero":  
             return df.copy().fillna(0,inplace=True)
 
-    def pair_plot(self, df_before, df_after):
+    def pair_plot(self, df_before, df_after, folder_path):
         da, db = df_after.copy(), df_before.copy()
         da['imputed'] = True
         db['imputed'] = False
         combined_df = pd.concat([db, da], ignore_index=True)
+
+        pair_plot_name = f'pair_plot.png'
         sns.set(style='ticks')
         sns.pairplot(combined_df, kind='reg', hue='imputed', diag_kind='hist', diag_kws={'alpha': 0.5}, plot_kws={'scatter_kws': {'alpha': 0.3}})
-        plt.show()
+        plt.savefig(f'{folder_path}/{pair_plot_name}')
+        plt.close()
+
+        return pair_plot_name
 
     def simpStability(self, table):
         entropy_percentage_diff = table.iloc[3][1:]
@@ -127,6 +133,10 @@ class continuous:
         return (b-a)/a
     
     def comparison(self, df_before, df_after, method='all'):
+        folder_path = f'./edash'
+        if not os.path.isdir(folder_path):
+            print("\n === No folder for edash, make one now === \n")
+            os.mkdir(folder_path)
         """
         Compare some metrics to show difference percentage of imputed before/after
         """
@@ -195,18 +205,26 @@ class continuous:
         
 
         print('\n*** Covarience ***')
-        # # 繪製heatmap
-        # plt.figure(figsize=(8, 8))
+        # 繪製heatmap
+        cov_heatmap_before_name = f'cov_before.png'
+        plt.figure(figsize=(8, 8))
         # cov_mat = df_before.cov()
         # ax = sns.heatmap(cov_mat, annot=True, cmap='coolwarm')
+        cov_mat = df_before.corr()
+        ax = sns.heatmap(cov_mat, cmap='coolwarm', mask = (np.abs(cov_mat) >= 1))
         # plt.title('Covariance Matrix Before')
-        # plt.show()
+        plt.savefig(f'{folder_path}/{cov_heatmap_before_name}')
+        plt.close()
 
-        # plt.figure(figsize=(8, 8))
+        cov_heatmap_after_name = f'cov_after.png'
+        plt.figure(figsize=(8, 8))
         # cov_mat_2 = df_after.cov()
         # ax = sns.heatmap(cov_mat_2, annot=True, cmap='coolwarm')
+        cov_mat_2 = df_after.corr()
+        ax = sns.heatmap(cov_mat_2, cmap='coolwarm', mask = (np.abs(cov_mat_2) >= 1))
         # plt.title('Covariance Matrix After')
-        # plt.show()
+        plt.savefig(f'{folder_path}/{cov_heatmap_after_name}')
+        plt.close()
         
         print('\n*** Multi-Collinearity ***')
         print('\n--- Before ---')
@@ -214,8 +232,9 @@ class continuous:
         print('\n--- After ---')
         df_vif_after = self.multi_collinearity(df_after)
         
-        # print('\n*** Pairplot ***')
-        # self.pair_plot(df_before, df_after)
+        print('\n*** Pairplot ***')
+        pair_plot_name = ''
+        # pair_plot_name = self.pair_plot(df_before, df_after, folder_path)
         
         
         return_dict = {
@@ -234,6 +253,9 @@ class continuous:
             'vifBeforeColumnName': df_vif_before.columns.to_list(), 
             'vifAfterTable': df_vif_after.to_dict(orient='records'),
             'vifAfterColumnName': df_vif_after.columns.to_list(), 
+            'covHeatmapBefore': cov_heatmap_before_name, 
+            'covHeatmapAfter': cov_heatmap_after_name, 
+            'pairPlot': pair_plot_name,
         }
 
         return return_dict

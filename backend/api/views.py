@@ -341,7 +341,12 @@ def doEDA(request):
         """ data description: df.describe() """
         df_des = df.describe().reset_index().rename(columns={'index': 'Statistical Numbers'})
 
-        """ missing value """
+        """ missing value dataframe """
+        df_missing_value = df_miss.isnull().mean().reset_index()
+        df_missing_value.columns = ['Feature', 'Missing Rate(%)']
+        df_missing_value['Missing Rate(%)'] = df_missing_value['Missing Rate(%)'] * 100
+
+        """ missing value plot """
         missing_values = df.isnull().sum().sort_values(ascending=False)
 
         sns.set(style="whitegrid") # Set a nicer style using seaborn
@@ -364,30 +369,43 @@ def doEDA(request):
         label_class_pie_plot = f'label_class_ratio-{type}.png'
         plt.figure(figsize=(8, 8))  
         plt.pie(label_counts, labels=label_counts.index, autopct='%1.1f%%', startangle=140)
-        plt.title('Distribution of Label Classes')
+        # plt.title('Distribution of Label Classes')
         plt.savefig(f'{folder_path}/{label_class_pie_plot}')
         plt.close()
 
-        return df_des, missing_value_plot_name, label_class_pie_plot
+        return df_des, df_missing_value, missing_value_plot_name, label_class_pie_plot
 
     df_train_miss = Dataset.objects.get(name='train-miss').df
     df_test_miss = Dataset.objects.get(name='test-miss').df
 
-    df_train_des, miss_plot_train, label_class_ratio_train = EDA(df_train_miss, type='train')
-    df_test_des, miss_plot_test, label_class_ratio_test = EDA(df_test_miss, type='test')
+
+    df_miss = pd.concat([df_train_miss, df_test_miss], axis=0).reset_index(drop=True)
+    df_des, df_missing_value, miss_plot, label_class_ratio = EDA(df_miss, type='all')
+
+
+    # df_train_des, miss_plot_train, label_class_ratio_train = EDA(df_train_miss, type='train')
+    # df_test_des, miss_plot_test, label_class_ratio_test = EDA(df_test_miss, type='test')
 
     return Response({
         'msg': "finish EDA of missing data",
-        'train': {
-            'description': df_train_des.round(4).to_dict(orient='records'), 
-            'missingValuePlot': miss_plot_train, 
-            'labelClassRatioPlot': label_class_ratio_train, 
-        },
-        'test': {
-            'description': df_test_des.round(4).to_dict(orient='records'), 
-            'missingValuePlot': miss_plot_test, 
-            'labelClassRatioPlot': label_class_ratio_test, 
-        },
+        # 'train': {
+        #     'description': df_train_des.round(4).to_dict(orient='records'), 
+        #     'missingValuePlot': miss_plot_train, 
+        #     'labelClassRatioPlot': label_class_ratio_train, 
+        # },
+        # 'test': {
+        #     'description': df_test_des.round(4).to_dict(orient='records'), 
+        #     'missingValuePlot': miss_plot_test, 
+        #     'labelClassRatioPlot': label_class_ratio_test, 
+        # },
+        'all': {
+            # 'rawData': df_miss.round(4).to_dict(orient='records'), 
+            'description': df_des.round(4).to_dict(orient='records'), 
+            'missingValueTable': df_missing_value.round(4).to_dict(orient='records'),
+            'missingValueTableColumns': df_missing_value.columns.to_list(),
+            'missingValuePlot': miss_plot, 
+            'labelClassRatioPlot': label_class_ratio,
+        }
     })
 
 
@@ -421,6 +439,10 @@ def startImpute(request):
     df_test_X = df_test.drop(label_name, axis=1)
     df_test_y = df_test[label_name]
 
+    df = pd.concat([df_train, df_test], axis=0).reset_index(drop=True)
+    X = df.drop(label_name, axis=1)
+    y = df[label_name]
+
     if imputeMethod == 'Genetic-enhanced fuzzy c-means':
         data = random_data(42, 0.1, 100, 8)
         data[0:80, [1, 3, 6]] = np.nan
@@ -430,30 +452,41 @@ def startImpute(request):
         after = fcmImputer.impute()
 
     elif imputeMethod == 'EM':
-        result_train = impute_em(df_train_X, max_iter=25)
-        result_test = impute_em(df_test_X, max_iter=25)
-        df_train_imputed = result_train['X_imputed']
-        df_test_imputed = result_test['X_imputed']
+        # result_train = impute_em(df_train_X, max_iter=25)
+        # result_test = impute_em(df_test_X, max_iter=25)
+        # df_train_imputed = result_train['X_imputed']
+        # df_test_imputed = result_test['X_imputed']
+
+        result = impute_em(X, max_iter=25)
+        df_imputed = result['X_imputed']
+
 
     elif imputeMethod == 'Miss-forest':
         imputer = MissForest()
-        df_train_imputed = imputer.fit_transform(df_train_X)
-        df_test_imputed = imputer.fit_transform(df_test_X) 
+        # df_train_imputed = imputer.fit_transform(df_train_X)
+        # df_test_imputed = imputer.fit_transform(df_test_X) 
 
-    data_train = pd.concat([df_train_imputed, df_train_y], axis=1)
-    data_test = pd.concat([df_test_imputed, df_test_y], axis=1)
+        df_imputed = imputer.fit_transform(X) 
+
+    # data_train = pd.concat([df_train_imputed, df_train_y], axis=1)
+    # data_test = pd.concat([df_test_imputed, df_test_y], axis=1)
+
+    data_imputed = pd.concat([df_imputed, y], axis=1)
 
     print("\n === CONCATED === \n")
 
-    data_train.to_csv(f"{datasetConfig['train_data_path']}", index=False)
-    data_test.to_csv(f"{datasetConfig['test_data_path']}", index=False)
+    # data_train.to_csv(f"{datasetConfig['train_data_path']}", index=False)
+    # data_test.to_csv(f"{datasetConfig['test_data_path']}", index=False)
+
+    # data_imputed.to_csv(f"{datasetConfig['test_data_path']}", index=False)
 
     print("\n === TO_CSV === \n")
 
     data = { 
         'imputeMethod': imputeMethod, 
-        'imputedTrainData': data_train.round(4).to_dict(orient='records'),
-        'imputedTestData': data_test.round(4).to_dict(orient='records'),
+        # 'imputedTrainData': data_train.round(4).to_dict(orient='records'),
+        # 'imputedTestData': data_test.round(4).to_dict(orient='records'),
+        'imputedData': data_imputed.round(4).to_dict(orient='records'),
     }
     return Response(data)
 
@@ -479,6 +512,8 @@ def getImputedDetails(request):
     # comparison = cont.comparison(df, tmp)
     comparison = cont.comparison(df_miss, df_complete)
     print(comparison)
+
+    print(f"\n\n ====== got imputed details ====== \n\n")
 
     return Response(comparison)
 

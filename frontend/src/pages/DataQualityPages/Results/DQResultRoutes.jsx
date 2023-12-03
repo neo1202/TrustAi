@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import { usePage } from "../../../hooks/usePage";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
 
 import DQResultMainPage from "./DQResultMainPage";
 import DataframePage from "./DataframePage";
@@ -71,6 +72,9 @@ const DQResultRoutes = () => {
 
   return (
     <div>
+      {isOnMainResultPage? <Typography variant="h4" gutterBottom style={{ textAlign: "center" }}>
+        Select One From Below
+      </Typography> : <></>}
       <div style={{ display: "flex", justifyContent: "center" }}>
       {resultPages.map((page, index) => (
         <Tooltip key={index} title={page.description}>

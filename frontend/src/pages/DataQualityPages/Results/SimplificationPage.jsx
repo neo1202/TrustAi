@@ -1,20 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDQ } from "../../../hooks/useDQ";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { greenTitleStyle } from "../../../config/colors";
 import "@mui/material"; 
 
 const SimplificationPage = () => {
   const circleSize = 280;
   const circleMargin = 20; 
-  const titleStyle = {
-    marginBottom: "16px",
-    lineHeight: "1",
-    fontWeight: "bold",
-    color: "#007BFF",
-    backgroundColor: "#cce5ff",
-    borderRadius: "8px",
-    padding: "8px",
-  };
+
   const metrics = ["Accuracy", "Precision", "Recall", "F1"];
 
   const {
@@ -33,18 +26,18 @@ const SimplificationPage = () => {
     F1: f1,
   };
 
-  const [selectedOption, setSelectedOption] = useState(metrics[0]);
+//   useEffect(() => {
+//     getMetricValues();
+//   }, [])
 
-  //   useEffect(() => {
-  //     getMetricValues();
-  //   }, [])
+  const [selectedOption, setSelectedOption] = useState(metrics[0]);
 
   return (
     <div className="flex flex-col items-center justify-center mt-16">
       <div className="flex items-center">
         {/* Left Circle */}
         <div className="text-black text-2xl font-bold mr-4 flex flex-col items-center">
-          <div style={titleStyle}>JS-Divergence</div>
+          <div style={greenTitleStyle}>Stability</div>
           <div
             style={{
               width: `${circleSize}px`,
@@ -62,8 +55,8 @@ const SimplificationPage = () => {
         <div style={{ margin: `0 ${circleMargin}px` }} />
 
         {/* Right Circle */}
-        <div className="text-black text-2xl font-bold flex flex-col items-center">
-          <div style={titleStyle}>Metrics</div>
+        <div className="text-black text-2xl font-bold flex flex-col items-center mr-12">
+          <div style={greenTitleStyle}>Accuracy</div>
           <div
             style={{
               width: `${circleSize}px`,

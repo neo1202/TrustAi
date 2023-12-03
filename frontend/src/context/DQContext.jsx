@@ -4,6 +4,7 @@ import API_URL from "../api";
 const DQContext = createContext();
 
 const DQProvider = ({ children }) => {
+  const [imputedData, setImputedData] = useState([]);
   const [imputedTrainData, setImputedTrainData] = useState([]);
   const [imputedTestData, setImputedTestData] = useState([]);
 
@@ -22,6 +23,9 @@ const DQProvider = ({ children }) => {
   const [vifBeforeColumnName, setVifBeforeColumnName] = useState([]);
   const [vifAfterTable, setVifAfterTable] = useState([]);
   const [vifAfterColumnName, setVifAfterColumnName] = useState([]);
+  const [covHeatmapBefore, setCovHeatmapBefore] = useState('');
+  const [covHeatmapAfter, setCovHeatmapAfter] = useState('');
+  const [pairPlot, setPairPlot] = useState('');
 
   // simplification results
   const [jsDivergence, setJsDivergence] = useState(0);
@@ -54,6 +58,9 @@ const DQProvider = ({ children }) => {
     setVifBeforeColumnName(data.vifBeforeColumnName)
     setVifAfterTable(data.vifAfterTable)
     setVifAfterColumnName(data.vifAfterColumnName)
+    setCovHeatmapBefore(`${data.covHeatmapBefore}?timestamp=${Date.now()}`)
+    setCovHeatmapAfter(`${data.covHeatmapAfter}?timestamp=${Date.now()}`)
+    setPairPlot(`${data.pairPlot}?timestamp=${Date.now()}`)
   }
 
   const getMetricValues = async () => {
@@ -73,6 +80,7 @@ const DQProvider = ({ children }) => {
 
 
   const valueToShare = {
+    imputedData, setImputedData,
     imputedTrainData, setImputedTrainData,
     imputedTestData, setImputedTestData,
 
@@ -90,6 +98,9 @@ const DQProvider = ({ children }) => {
     vifBeforeColumnName, setVifBeforeColumnName,
     vifAfterTable, setVifAfterTable,
     vifAfterColumnName, setVifAfterColumnName,
+    covHeatmapBefore, setCovHeatmapBefore,
+    covHeatmapAfter, setCovHeatmapAfter,
+    pairPlot, setPairPlot,
 
     jsDivergence, setJsDivergence,
     accuracy, setAccuracy,

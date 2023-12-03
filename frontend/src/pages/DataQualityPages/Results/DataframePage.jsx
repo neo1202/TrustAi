@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import Typography from "@mui/material/Typography";
 import DataTable from "../../../components/DataTable"
 import { useDQ } from "../../../hooks/useDQ";
+import { blueTitleStyle } from "../../../config/colors";
 import API_URL from "../../../api";
 
 
 const DataframePage = () => {
   const [keys, setKeys] = useState([]);
-  const { imputedTrainData, imputedTestData } = useDQ();
+  const { imputedData, imputedTrainData, imputedTestData } = useDQ();
 
   const getKeys = async () => {
     const response = await fetch(`${API_URL}/getFeaturesAndLabel/complete`, {
@@ -26,20 +27,12 @@ const DataframePage = () => {
   }, [])
 
   return (
-    <div className="flex flex-col place-items-center justify-center h-screen bg-white-400">
+    <div className="flex flex-col place-items-center justify-center bg-white-400 mt-8">
 
-
-      <Typography variant="h4" gutterBottom>
-        Imputed Training Data
+      <Typography variant="h4" gutterBottom style={blueTitleStyle}>
+        Imputed Data
       </Typography>
-      <DataTable data={imputedTrainData} keys={keys}/>
-
-      <br />
-
-      <Typography variant="h4" gutterBottom>
-        Imputed Testing Data
-      </Typography>
-      <DataTable data={imputedTestData} keys={keys}/>
+      <DataTable data={imputedData} keys={keys}/>
     </div>
   )
 }
