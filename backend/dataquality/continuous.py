@@ -234,8 +234,15 @@ class continuous:
         
         print('\n*** Pairplot ***')
         pair_plot_name = ''
+
+        import time
+        start_time = time.time()
+
         # pair_plot_name = self.pair_plot(df_before, df_after, folder_path)
-        
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print(f"\npair_plot took {execution_time:.6f} seconds to execute.\n")
         
         return_dict = {
             'missingRateTable': missing_rate_df.to_dict(orient='records'),

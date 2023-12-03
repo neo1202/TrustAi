@@ -5,6 +5,10 @@ import { blueTitleStyle, greenTitleStyle } from "../../../config/colors";
 import Typography from "@mui/material/Typography";
 import API_URL from "../../../api";
 
+const blockClass = "text-black text-2xl font-bold flex flex-col items-center rounded-lg p-8 mx-4 my-4"
+const blockStyle = { backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)' }
+const dataTableStyle = { ...blockStyle, maxWidth: '95%' }
+
 const ImputedDetailPage = () => {
   const {
     jsDivergence,
@@ -28,12 +32,12 @@ const ImputedDetailPage = () => {
     vifAfterColumnName,
   } = useDQ();
 
-  useEffect(() => {
-    getImputedDetails();
-  }, []);
+//   useEffect(() => {
+//     getImputedDetails();
+//   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center"> {/*  style={{ maxWidth: '90%' }} */}
       <div className="my-8">
         <Typography variant="h4" gutterBottom style={greenTitleStyle}>
           {`Stability: ${jsDivergence} / 10`}
@@ -41,20 +45,20 @@ const ImputedDetailPage = () => {
       </div>
 
       {/* Figures */}
-      <div className="flex">
-        <div className="mr-4">
+      <div className="flex justify-between">
+        <div className={blockClass} style={blockStyle}>
           <Typography variant="h4" gutterBottom style={blueTitleStyle}>
             Correlation Matrix Before
           </Typography>
           <img src={`${API_URL}/getPlotImages/edash/${covHeatmapBefore}`} alt="" />
         </div>
-        <div className="mr-4">
+        <div className={blockClass} style={blockStyle}>
           <Typography variant="h4" gutterBottom style={blueTitleStyle}>
             Correlation Matrix After
           </Typography>
           <img src={`${API_URL}/getPlotImages/edash/${covHeatmapAfter}`} alt="" />
         </div>
-        <div>
+        <div className={blockClass} style={blockStyle}>
           <Typography variant="h4" gutterBottom style={blueTitleStyle}>
             Pair Plot
           </Typography>
@@ -62,22 +66,23 @@ const ImputedDetailPage = () => {
         </div>
       </div>
 
-      <div className="flex">
-        <div className="mr-4">
+      {/* short tables */}
+      <div className="flex justify-between">
+        <div className={blockClass} style={blockStyle}>
           <Typography variant="h4" gutterBottom style={blueTitleStyle}>
             Missing Rate
           </Typography>
           <DataTable data={missingRateTable} keys={missingRateColumnName} />
         </div>
 
-        <div className="mr-4">
+        <div className={blockClass} style={blockStyle}>
           <Typography variant="h4" gutterBottom style={blueTitleStyle}>
             VIF Before
           </Typography>
           <DataTable data={vifBeforeTable} keys={vifBeforeColumnName} />
         </div>
 
-        <div>
+        <div className={blockClass} style={blockStyle}>
           <Typography variant="h4" gutterBottom style={blueTitleStyle}>
             VIF After
           </Typography>
@@ -85,30 +90,34 @@ const ImputedDetailPage = () => {
         </div>
       </div>
 
-      <div className="my-4"></div>
+      {/* long tables */}
+      <div className={blockClass} style={dataTableStyle}>
+        <Typography variant="h4" gutterBottom style={blueTitleStyle}>
+            Entropy
+        </Typography>
+        <DataTable data={entropyTable} keys={entropyColumnName} />
+      </div>
 
-      <Typography variant="h4" gutterBottom style={blueTitleStyle}>
-        Entropy
-      </Typography>
-      <DataTable data={entropyTable} keys={entropyColumnName} />
-      <div className="my-4"></div>
+      <div className={blockClass} style={dataTableStyle}>
+        <Typography variant="h4" gutterBottom style={blueTitleStyle}>
+            JS-Divergence
+        </Typography>
+        <DataTable data={jsDivergenceTable} keys={jsDivergenceColumnName} />
+      </div>
 
-      <Typography variant="h4" gutterBottom style={blueTitleStyle}>
-        JS-Divergence
-      </Typography>
-      <DataTable data={jsDivergenceTable} keys={jsDivergenceColumnName} />
-      <div className="my-4"></div>
+      <div className={blockClass} style={dataTableStyle}>
+        <Typography variant="h4" gutterBottom style={blueTitleStyle}>
+            Basic Info Before
+        </Typography>
+        <DataTable data={basicInfoBeforeTable} keys={basicInfoBeforeColumnName} />
+      </div>
 
-      <Typography variant="h4" gutterBottom style={blueTitleStyle}>
-        Basic Info Before
-      </Typography>
-      <DataTable data={basicInfoBeforeTable} keys={basicInfoBeforeColumnName} />
-      <div className="my-4"></div>
-
-      <Typography variant="h4" gutterBottom style={blueTitleStyle}>
-        Basic Info After
-      </Typography>
-      <DataTable data={basicInfoAfterTable} keys={basicInfoAfterColumnName} />
+      <div className={blockClass} style={dataTableStyle}>
+        <Typography variant="h4" gutterBottom style={blueTitleStyle}>
+            Basic Info After
+        </Typography>
+        <DataTable data={basicInfoAfterTable} keys={basicInfoAfterColumnName} />
+      </div>
     </div>
   );
 };
