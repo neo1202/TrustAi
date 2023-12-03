@@ -55,26 +55,38 @@ const EdashPage = () => {
       <Typography variant="h4" gutterBottom>
         Simple EDA Visualizaion
       </Typography>
-      <div className="flex flex-row place-items-center justify-center" style={{ alignItems: 'flex-start', marginTop: '2%' }}>
-        <div>{/* element 1 */}
-            <Typography variant="h4" gutterBottom style={blueTitleStyle}>
-            Missing Value Percentage
-            </Typography>
-            <div style={{ marginBottom: '20%' }}></div>
-            <DataTable data={missingValueTable} keys={missingValueTableColumns}/>
+      
+        <div className="flex flex-row place-items-center justify-center" style={{ alignItems: 'flex-start', marginTop: '2%', width: '80%' }}>
+          <div className="p-10 rounded-lg mb-4" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '50%', height:'95%'}}>
+            <div>{/* element 1 */}
+                <Typography variant="h4" gutterBottom style={blueTitleStyle}>
+                Missing Value Percentage
+                </Typography>
+                <div style={{ marginBottom: '10%' }}></div>
+                <DataTable data={missingValueTable} keys={missingValueTableColumns}/>
+            </div>
+          </div>
+          <div className="p-10 rounded-lg mb-4 ml-4" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '50%', height:'95%'}}>
+            <div className="flex flex-col " style={{ maxWidth: '80%' }}>{/* element 2 */}
+                <Typography variant="h4" gutterBottom style={blueTitleStyle}>
+                Label Class Ratio
+                </Typography>
+                <div style={{ display: 'flex' }}>
+                  <img src={`${API_URL}/getPlotImages/edash/${labelClassRatioPlot}`} alt="" />
+                </div>
+                
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col justify-center items-center" style={{ maxWidth: '50%' }}>{/* element 2 */}
-            <Typography variant="h4" gutterBottom style={blueTitleStyle}>
-            Label Class Ratio
-            </Typography>
-            <img src={`${API_URL}/getPlotImages/edash/${labelClassRatioPlot}`} alt="" />
+        <div className="p-10 rounded-lg mb-4" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '80%'}}>
+          <Typography variant="h4" gutterBottom style={blueTitleStyle}>
+            Data Description of the Raw Data
+          </Typography>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <DataTable data={description} keys={edaColumns}/>
+          </div>
+          
         </div>
-      </div>
-
-      <Typography variant="h4" gutterBottom style={blueTitleStyle}>
-        Data Description of the Raw Data
-      </Typography>
-        <DataTable data={description} keys={edaColumns}/>
       <br />
       <br />
       <br />

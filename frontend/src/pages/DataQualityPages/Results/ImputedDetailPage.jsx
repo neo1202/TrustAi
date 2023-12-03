@@ -28,9 +28,9 @@ const ImputedDetailPage = () => {
     vifAfterColumnName,
   } = useDQ();
 
-  // useEffect(() => {
-  //   getImputedDetails();
-  // }, []);
+  useEffect(() => {
+    getImputedDetails();
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -58,7 +58,7 @@ const ImputedDetailPage = () => {
           <Typography variant="h4" gutterBottom style={blueTitleStyle}>
             Pair Plot
           </Typography>
-          <img src={`${API_URL}/getPlotImages/edash/${pairPlot}`} alt="" />
+          <img src={`${API_URL}/getPlotImages/edash/${covHeatmapAfter}`} alt="" />
         </div>
       </div>
 
