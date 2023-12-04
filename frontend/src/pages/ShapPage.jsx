@@ -200,7 +200,7 @@ function ShapPage() {
           - Y-axis indicates the feature names in order of importance from top to bottom. <br />
           - X-axis represents the SHAP value, which indicates the degree of change in log odds. <br />
           - Each point represents a row of data from the original dataset. <br />
-          - The color of each point on the graph represents the value of the corresponding feature, with red indicating high values and blue indicating low values. <br />
+          - The color of each point on the graph represents the value of the corresponding feature, with red indicating high values and grey indicating low values. <br />
           - In conclusion, features with reder dots on the right side of vertical line (SHAP = 0) 
           indicates higher feature value tend to positively affect the output.
           </p>
@@ -213,16 +213,16 @@ function ShapPage() {
             <div style={{ display: 'flex', flexDirection: 'row' , justifyContent: 'center', flexWrap: 'wrap'}}>
               
               <div className="image-container">
-                <div style={{ border: '2px solid blue', display: 'inline-block' }}>
+                <div style={{ border: '3px solid grey', display: 'inline-block' }}>
                   <img src={`${API_URL}/getPlotImages/shap-images/${imagePath}`} alt="Generated Plot" style={{ width: '500px', height: '500px' }}/>
                 </div>
-                <div style={{ border: '2px solid #38AC38', display: 'inline-block' , marginRight: '20px'}}>
+                <div style={{ border: '3px solid #38AC38', display: 'inline-block' , marginRight: '15px'}}>
                   <img src={`${API_URL}/getPlotImages/shap-images/${gBarImagePath}`} alt="Generated Plot" style={{ width: '500px', height: '500px' }}/>
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column' }}> 
                 <div style={{ display: 'flex', flexDirection: 'row' }} >
-                  <div style={{ border: '2px solid #38AC38', display: 'inline-block',  width: '200px', height: '180px', overflow: 'auto', marginRight: '20px'}}>
+                  <div style={{ border: '3px solid #38AC38', display: 'inline-block',  width: '200px', height: '180px', overflow: 'auto', marginRight: '15px'}}>
                     <h3 className='heading3'>Positive Effect:</h3>
                     
                     <ul>
@@ -232,7 +232,7 @@ function ShapPage() {
                     </ul>
                     
                   </div>
-                  <div style={{ border: '2px solid #38AC38', display: 'inline-block' ,  width: '200px', height: '180px', overflow: 'auto' }}>
+                  <div style={{ border: '3px solid #38AC38', display: 'inline-block' ,  width: '200px', height: '180px', overflow: 'auto' }}>
                     <h3 className='heading3'>Negative Effect:</h3>
                     <ul>
                     {negX.map((value, index) => (
@@ -241,7 +241,7 @@ function ShapPage() {
                     </ul>
                   </div>
                 </div>
-                  <div style={{ border: '2px solid #38AC38', display: 'inline-block' , marginTop: '20px'}}>
+                  <div style={{ border: '3px solid #38AC38', display: 'inline-block' , marginTop: '20px'}}>
                     <img src={`${API_URL}/getPlotImages/shap-images/${gPieImagePath}`} alt="Generated Plot" style={{ width: '400px', height: '300px' }}/>
                   </div>
                 {/* </div> */}
@@ -326,7 +326,7 @@ positive value means positive effect and negative value means neagative effect O
         
         <div style={{ display: 'flex',  flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <h2 style={{ fontSize: '24px'}}>Enter data value</h2>
-          <div className="p-5 rounded-lg mb-4" style={{ border: '2px solid lightgrey', display: 'inline-block', height: '250px', width: '1400px', overflow: 'auto', marginRight: '20px'}}>
+          <div className="p-5 rounded-lg mb-4" style={{ border: '3px solid lightgrey', display: 'inline-block', height: '250px', width: '1400px', overflow: 'auto', marginRight: '20px'}}>
             <form onSubmit={handleInputXSubmit} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '100%' }}>
             <div  style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '1px' }}>
                 <label >

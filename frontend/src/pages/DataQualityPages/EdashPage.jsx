@@ -67,7 +67,7 @@ const EdashPage = () => {
             </div>
           </div>
           <div className="p-10 rounded-lg mb-4 ml-4" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '50%', height:'95%'}}>
-            <div className="flex flex-col " style={{ maxWidth: '80%' }}>{/* element 2 */}
+            <div  style={{ maxWidth: '80%' }}>{/* element 2 */}
                 <Typography variant="h4" gutterBottom style={blueTitleStyle}>
                 Label Class Ratio
                 </Typography>
@@ -79,13 +79,14 @@ const EdashPage = () => {
           </div>
         </div>
         <div className="p-10 rounded-lg mb-4" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width: '80%'}}>
-          <Typography variant="h4" gutterBottom style={blueTitleStyle}>
-            Data Description of the Raw Data
-          </Typography>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <DataTable data={description} keys={edaColumns}/>
-          </div>
-          
+          <div> 
+            <Typography variant="h4" gutterBottom style={blueTitleStyle}>
+              Data Description of the Raw Data
+            </Typography>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            <DataTable data={description} keys={edaColumns}/>
+            </div>
+            </div> 
         </div>
       <br />
       <br />

@@ -74,7 +74,7 @@ function SetUpPage() {
     console.log("Settings...", data)
 
     setDisplayInitNumData(initNumData);
-    setInitNumData('');
+    
   }
 
   const trainInitModel = async () => {
