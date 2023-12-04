@@ -3,7 +3,9 @@ import API_URL from "../../api";
 import SelectBlock from "../../components/SelectBlock";
 import { Button } from "@mui/material";
 import Confetti from "react-confetti";
-
+import { useStatus } from "../../hooks/useStatus";
+import popMessage from "../../utils/popMessage";
+import Loading from "../../components/Loading";
 
 
 function ResultPage() {
@@ -14,6 +16,7 @@ function ResultPage() {
   const [selectedModel, setSelectedModel] = useState('');
   const [finalTeacherTestAcc, setFinalTeacherTestAcc] = useState(0)
 
+  const { isLoading, setIsLoading, loadingMsg, setLoadingMsg, loadingTime, setLoadingTime } = useStatus();
 
   useEffect(() => {
     getSavedModels()
@@ -70,6 +73,8 @@ function ResultPage() {
   }
 
   const trainFinalTeacherModel = async () => {
+    setIsLoading(true); setLoadingMsg("Training the final model..."); setLoadingTime(0.5);
+
     const response = await fetch(
         `${API_URL}/trainFinalTeacher/`, 
         {
@@ -84,13 +89,17 @@ function ResultPage() {
 
     setFinalTeacherTestAcc(data.testAcc)
     setShowConfetti(true);
+
+    setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+    popMessage(data.msg);
+
     setTimeout(() => {
       setShowConfetti(false);  // stop confetti after 5 seconds
     }, 5000);
   }
 
   return <div>
-  
+    {isLoading? <Loading action={loadingMsg} waitTime={loadingTime}/> : <></>} 
     {(finalTeacherTestAcc != 0 && showConfetti) ? (
       <Confetti tweenDuration= {0.5} width={width} height={height}/>
     ) : (

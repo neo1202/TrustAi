@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Input,  Select, Tooltip, Typography } from "antd";
 import { Button } from "@mui/material";
 import API_URL from "../../api";
+import popMessage from "../../utils/popMessage";
 import { uncertaintyQueryMethod } from "../../config/config";
 
 const { Option } = Select;
@@ -44,6 +45,7 @@ const MethodSelectPage = () => {
     });
     const data = await response.json();
     console.log("Settings...", data);
+    popMessage(data.msg);
   };
 
   const handleInputChange = (stateUpdater, e) => {
@@ -69,6 +71,7 @@ const MethodSelectPage = () => {
 
     displayUpdater(value);
     stateUpdater("");
+    popMessage(data.msg);
   };
 
   const renderSelectOptions = () => {

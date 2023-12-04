@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { usePage } from "../../../hooks/usePage";
+import { useStatus } from "../../../hooks/useStatus";
+import popMessage from "../../../utils/popMessage";
+import Loading from "../../../components/Loading";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
@@ -45,11 +48,14 @@ const DQResultRoutes = () => {
   const [isOnMainResultPage, setIsOnMainResultPage] = useState(true);
   const [currResultPage, setCurrResultPage] = useState("");
   const { setCurrentPage, setCurrentContextStep } = usePage();
+  const { isLoading, setIsLoading, loadingMsg, setLoadingMsg, loadingTime, setLoadingTime } = useStatus();
 
   const handleResultClick = async (route) => {
     if (route === "trustai") {
+      setIsLoading(true); setLoadingMsg("Going to active learning process..."); setLoadingTime(0.5);
+
       // read data(imputed data)
-      const response3 = await fetch(
+      const response = await fetch(
         `${API_URL}/readALData/`, 
         {
             method: "POST",
@@ -58,12 +64,15 @@ const DQResultRoutes = () => {
             },
         })
 
-      const data3 = await response3.json()
-      console.log(data3)
+      const data = await response.json()
+      console.log(data)
       
       setCurrentPage(`training`);
       setCurrentContextStep(1);
       navigate(`/training`);
+
+      setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+      popMessage(data.msg);
       return
     }
     route === ""? setIsOnMainResultPage(true) : setIsOnMainResultPage(false)
@@ -72,6 +81,7 @@ const DQResultRoutes = () => {
 
   return (
     <div>
+      {isLoading? <Loading action={loadingMsg} waitTime={loadingTime}/> : <></>} 
       {isOnMainResultPage? <Typography variant="h4" gutterBottom style={{ textAlign: "center" }}>
         Select One From Below
       </Typography> : <></>}

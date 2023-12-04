@@ -5,6 +5,9 @@ import Typography from "@mui/material/Typography";
 
 import API_URL from "../../api";
 import { useDQ } from "../../hooks/useDQ"
+import { useStatus } from "../../hooks/useStatus";
+import popMessage from "../../utils/popMessage";
+import Loading from "../../components/Loading";
 
 const ImputerSelectPage = () => {
   const [selectedImputer, setSelectedImputer] = useState(null);
@@ -32,6 +35,8 @@ const ImputerSelectPage = () => {
     getImputedDetails, getMetricValues, 
   } = useDQ();
 
+  const { isLoading, setIsLoading, loadingMsg, setLoadingMsg, loadingTime, setLoadingTime } = useStatus();
+
   const handleImputerClick = async (imputerName) => {
     setSelectedImputer(imputerName);
     const setting = {
@@ -47,9 +52,12 @@ const ImputerSelectPage = () => {
     });
     const data = await response.json();
     console.log("Settings...", data);
+    popMessage(data.msg)
   };
 
   const handleImpute = async () => {
+    setIsLoading(true); setLoadingMsg("Start imputing the missing data(might take long)..."); setLoadingTime(20);
+
     const response = await fetch(`${API_URL}/startImpute/`, {
       method: "GET",
       headers: {
@@ -59,10 +67,14 @@ const ImputerSelectPage = () => {
     const data = await response.json();
     console.log("finish imputing...", data);
     setImputedData(data.imputedData);
+
+    setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+    popMessage(data.msg)
   };
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
+      {isLoading? <Loading action={loadingMsg} waitTime={loadingTime}/> : <></>} 
       <Typography variant="h4" gutterBottom>
         Select an Imputer
       </Typography>
