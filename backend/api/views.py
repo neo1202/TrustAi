@@ -1115,7 +1115,7 @@ def processShapClassPlot(request):
     test_df = process.dataset.get(name='test-raw').df
     dataset_test = IndexedDataset(test_df, TestOrValid=True)
     batch_size = process.batchSize
-    test_loader = DataLoader(dataset_test, batch_size=200,shuffle=False, drop_last=True) #to be changed to 150
+    test_loader = DataLoader(dataset_test, batch_size=200,shuffle=False, drop_last=True) #to be changed to 200 or 150
     
     
     

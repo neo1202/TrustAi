@@ -244,7 +244,10 @@ const HomePage = () => {
       <div style={{ width: '35%', padding: '8px' }}>
         {/*stepper */}
         
-        <h2 style={{ fontSize: '120px', textAlign: 'center', fontWeight: 'bold', fontFamily: 'sans-serif' }}>Trust AI</h2>
+        <h2 style={{ fontSize: '120px', textAlign: 'center', fontFamily: 'sans-serif', fontWeight: 900, letterSpacing: '5px'  }}>
+          <span style={{ color: 'black' }}>TAI</span>
+          <span style={{ color: 'purple' }}>DQ</span>
+        </h2>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         
           <Box sx={{ maxWidth: 800 }}>

@@ -170,8 +170,12 @@ function ShapPage() {
   return (
     <div style={pageStyle}>
       <Navbar />
-      {isLoading? <Loading action={loadingMsg} waitTime={loadingTime}/> : <></>} 
-
+      
+      {isLoading?
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', position: 'fixed', width: '100%', zIndex: 9999 }}>
+          <Loading action={loadingMsg} waitTime={loadingTime}/> 
+          </div>: <></>} 
+      
       <div id="home" className="section">
         {/* Content for the Home section */}
       </div>
@@ -193,9 +197,12 @@ function ShapPage() {
           </p>
         </div>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <img src={`${API_URL}/getPlotImages/shap-images/all_class.png`} alt="Generated Plot" style={{ width: '600px', height: '600px' }} />
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div className="p-10 rounded-lg mb-4" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width:'50%'}}>
+            <img src={`${API_URL}/getPlotImages/shap-images/all_class.png`} alt="Generated Plot" style={{ width: '600px', height: '600px' }} />
+          </div>
         </div>
+        
         <h2 id="ft_imp_class" className="cenheading2">SHAP Value of One Class </h2>
         
         
@@ -231,39 +238,45 @@ function ShapPage() {
             
             <div style={{ display: 'flex', flexDirection: 'row' , justifyContent: 'center', flexWrap: 'wrap'}}>
               
-              <div className="image-container">
-                <div style={{ border: '3px solid grey', display: 'inline-block' }}>
-                  <img src={`${API_URL}/getPlotImages/shap-images/${imagePath}`} alt="Generated Plot" style={{ width: '500px', height: '500px' }}/>
+              {/*<div className="image-container">*/}
+                <div className="p-5 rounded-lg mb-4 mr-2" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)'}}>
+                  <div style={{ border: '3px solid grey', display: 'inline-block' }}>
+
+                    <img src={`${API_URL}/getPlotImages/shap-images/${imagePath}`} alt="Generated Plot" style={{ width: '500px', height: '500px' }}/>
+                  </div>
                 </div>
-                <div style={{ border: '3px solid #38AC38', display: 'inline-block' , marginRight: '15px'}}>
-                  <img src={`${API_URL}/getPlotImages/shap-images/${gBarImagePath}`} alt="Generated Plot" style={{ width: '500px', height: '500px' }}/>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}> 
-                <div style={{ display: 'flex', flexDirection: 'row' }} >
-                  <div style={{ border: '3px solid #38AC38', display: 'inline-block',  width: '200px', height: '180px', overflow: 'auto', marginRight: '15px'}}>
-                    <h3 className='heading3'>Positive Effect:</h3>
-                    
-                    <ul>
-                      {posX.map((value, index) => (
+                <div className="p-5 rounded-lg mb-4" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)'}}>
+                  <div style={{ border: '3px solid #38AC38', display: 'inline-block' , marginRight: '15px'}}>
+                    <img src={`${API_URL}/getPlotImages/shap-images/${gBarImagePath}`} alt="Generated Plot" style={{ width: '500px', height: '500px' }}/>
+                  </div>
+                
+              
+                <div style={{ display: 'flex', flexDirection: 'column' }}> 
+                  <div style={{ display: 'flex', flexDirection: 'row' }} >
+                    <div style={{ border: '3px solid #38AC38', display: 'inline-block',  width: '200px', height: '180px', overflow: 'auto', marginRight: '15px'}}>
+                      <h3 className='heading3'>Positive Effect:</h3>
+                      
+                      <ul>
+                        {posX.map((value, index) => (
+                          <li key={index}>{value}</li>
+                        ))}
+                      </ul>
+                      
+                    </div>
+                    <div style={{ border: '3px solid #38AC38', display: 'inline-block' ,  width: '200px', height: '180px', overflow: 'auto' }}>
+                      <h3 className='heading3'>Negative Effect:</h3>
+                      <ul>
+                      {negX.map((value, index) => (
                         <li key={index}>{value}</li>
                       ))}
-                    </ul>
-                    
+                      </ul>
+                    </div>
                   </div>
-                  <div style={{ border: '3px solid #38AC38', display: 'inline-block' ,  width: '200px', height: '180px', overflow: 'auto' }}>
-                    <h3 className='heading3'>Negative Effect:</h3>
-                    <ul>
-                    {negX.map((value, index) => (
-                      <li key={index}>{value}</li>
-                    ))}
-                    </ul>
-                  </div>
+                    <div style={{ border: '3px solid #38AC38', display: 'inline-block' , marginTop: '20px'}}>
+                      <img src={`${API_URL}/getPlotImages/shap-images/${gPieImagePath}`} alt="Generated Plot" style={{ width: '400px', height: '300px' }}/>
+                    </div>
+                  {/* </div> */}
                 </div>
-                  <div style={{ border: '3px solid #38AC38', display: 'inline-block' , marginTop: '20px'}}>
-                    <img src={`${API_URL}/getPlotImages/shap-images/${gPieImagePath}`} alt="Generated Plot" style={{ width: '400px', height: '300px' }}/>
-                  </div>
-                {/* </div> */}
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -330,8 +343,8 @@ positive value means positive effect and negative value means neagative effect O
         {imagePathD1 && (
           <div>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div className="image-container">
-            
+          <div className="p-5 rounded-lg mb-4 mt-6" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)'}}>
+
               <img src={`${API_URL}/getPlotImages/shap-images/${imagePathD1}`} alt="Generated Plot" />
               <img src={`${API_URL}/getPlotImages/shap-images/${imagePathD2}`} alt="Generated Plot" />
             </div>
@@ -379,9 +392,13 @@ positive value means positive effect and negative value means neagative effect O
           >Submit</button>
         </div>
         {isDataAvailable && (
-          <div className='wrap'  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <h2 style={{ fontSize: '24px', fontFamily: 'Koulen' }}>Results</h2>
-            <DataTable data={data} keys={XLabels.concat(yLabel)} />
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div className="p-4 rounded-lg mb-4 mt-6" style={{ justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', width:'90%'}}>
+            <div className='wrap'  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <h2 style={{ fontSize: '24px'}}>Results</h2>
+              <DataTable data={data} keys={XLabels.concat(yLabel)} />
+            </div>
+          </div>
           </div>
         )}
       </div>
