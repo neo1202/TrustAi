@@ -44,6 +44,13 @@ const ImputedDetailPage = () => {
         </Typography>
       </div>
 
+      <div className={blockClass} style={blockStyle}>
+        <Typography variant="h4" gutterBottom style={blueTitleStyle}>
+          Pair Plot
+        </Typography>
+        <img src={`${API_URL}/getPlotImages/edash/${pairPlot}`} alt="" />
+      </div>
+
       {/* Figures */}
       <div className="flex justify-between">
         <div className={blockClass} style={blockStyle}>
@@ -58,12 +65,7 @@ const ImputedDetailPage = () => {
           </Typography>
           <img src={`${API_URL}/getPlotImages/edash/${covHeatmapAfter}`} alt="" />
         </div>
-        <div className={blockClass} style={blockStyle}>
-          <Typography variant="h4" gutterBottom style={blueTitleStyle}>
-            Pair Plot
-          </Typography>
-          <img src={`${API_URL}/getPlotImages/edash/${pairPlot}`} alt="" />
-        </div>
+        
       </div>
 
       {/* short tables */}
