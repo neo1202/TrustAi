@@ -244,7 +244,7 @@ const HomePage = () => {
       <div style={{ width: '35%', padding: '8px' }}>
         {/*stepper */}
         
-        <h2 style={{ fontSize: '120px', textAlign: 'center', fontFamily: 'sans-serif', fontWeight: 900, letterSpacing: '5px'  }}>
+        <h2 style={{ fontSize: '140px', textAlign: 'center', fontFamily: 'sans-serif', fontWeight: 800, letterSpacing: '5px'  }}>
           <span style={{ color: 'black' }}>TAI</span>
           <span style={{ color: 'purple' }}>DQ</span>
         </h2>

@@ -1167,8 +1167,8 @@ def processShapClassPlot(request):
     df = pd.DataFrame([abs_mean], columns =valid_df.columns[:-1])
     # display the top 16 features
     k=16
-    id=df.loc[0].sort_values().index[:k]
-    val=df.loc[0].sort_values().values[:k]
+    id=df.loc[0].sort_values(ascending=False).index[:k]
+    val=df.loc[0].sort_values(ascending=False).values[:k]
     total=sum(val)
     labels = [f'{l}, {(s/total*100):0.1f}%' for l, s in zip(id, val)]
     pie = plt.pie(val,autopct='%1.1f%%', startangle=90)
