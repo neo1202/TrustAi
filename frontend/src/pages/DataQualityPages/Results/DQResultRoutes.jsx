@@ -28,7 +28,7 @@ const DQResultRoutes = () => {
       onClick: () => handleResultClick("Detail"),
     },
     {
-      label: "Simplification",
+      label: "Quick view",
       description: "View the mathematical results, including some evaluation indexes",
       onClick: () => handleResultClick("Simplification"),
     },

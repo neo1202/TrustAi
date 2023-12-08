@@ -11,19 +11,9 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
-
 import Paper from '@mui/material/Paper';
+import { Button, Typography } from "@mui/material";
 
-
-import {
-  Button,
-  Input,
-  Select,
-  MenuItem,
-  TextField,
-  Typography,
-  Grid,
-} from "@mui/material";
 import API_URL from "../api";
 
 
@@ -204,6 +194,7 @@ const HomePage = () => {
 
     const data = await response.json()
     console.log(data.msg)
+    popMessage("Upload file successfully!")
   };
 
   {/*stepper */}

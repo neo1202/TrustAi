@@ -107,14 +107,19 @@ class continuous:
             return df.copy().fillna(0,inplace=True)
 
     def pair_plot(self, df_before, df_after, folder_path):
-        da, db = df_after.copy(deep=True), df_before.copy(deep=True)
+        da, db = df_after.copy(), df_before.copy()
+        da, db = da.iloc[:, :10].sample(1000), db.iloc[:, :10].sample(1000)
+
         da['imputed'] = True
         db['imputed'] = False
         combined_df = pd.concat([db, da], ignore_index=True)
 
+        print(combined_df)
+
         pair_plot_name = f'pair_plot.png'
+        plt.figure(figsize=(8, 8))
         sns.set(style='ticks')
-        sns.pairplot(combined_df, kind='reg', hue='imputed', diag_kind='hist', diag_kws={'alpha': 0.5}, plot_kws={'scatter_kws': {'alpha': 0.3}})
+        sns.pairplot(combined_df, kind='reg', hue='imputed', diag_kind='kde', diag_kws={'alpha': 0.5}, plot_kws={'scatter_kws': {'alpha': 0.3}})
         plt.savefig(f'{folder_path}/{pair_plot_name}')
         plt.close()
 
