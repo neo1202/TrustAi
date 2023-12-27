@@ -75,23 +75,56 @@ def getRoutes(request):
 
 
 @api_view(['POST'])
-def uploadFile(request):
+def uploadTrainData(request):
 
-    print("\n\n ====== upload ====== \n\n")
+    print("\n\n ====== upload train data ====== \n\n")
     # data = json.loads(request.body)
     if request.method == 'POST' and request.FILES['file']:
+        print('========= file =========')
+        print(request.FILES['file'])
         uploaded_file = request.FILES['file']
-        destination = open(os.path.join('dataset', uploaded_file.name), 'wb+')
+
+        # if not os.path.exists('../dataquality/data'):
+        #     os.makedirs('../dataquality/data')
+
+        destination = open(os.path.join('./dataquality/data', 'train_data_miss.csv'), 'wb+')
 
         for chunk in uploaded_file.chunks():
+            print('========= writing =========')
+            print(chunk)
             destination.write(chunk)
         destination.close()
 
-        return JsonResponse({'msg': 'File uploaded successfully'})
+        return JsonResponse({'msg': 'Train data uploaded successfully'})
 
     return JsonResponse({'msg': 'Invalid request'}, status=400)
-    return Response(data)
+    # return Response(data)
 
+@api_view(['POST'])
+def uploadTestData(request):
+
+    print("\n\n ====== upload test data ====== \n\n")
+    # data = json.loads(request.body)
+    if request.method == 'POST' and request.FILES['file']:
+        print('========= file =========')
+        print(request.FILES['file'])
+        uploaded_file = request.FILES['file']
+
+        # if not os.path.exists('../dataquality/data'):
+        #     os.makedirs('../dataquality/data')
+
+        destination = open(os.path.join('./dataquality/data', 'test_data_miss.csv'), 'wb+')
+
+        for chunk in uploaded_file.chunks():
+            print('========= writing =========')
+            print(chunk)
+            destination.write(chunk)
+        destination.close()
+
+        return JsonResponse({'msg': 'Test data uploaded successfully'})
+
+    return JsonResponse({'msg': 'Invalid request'}, status=400)
+    # return Response(data)
 
 @api_view(['DELETE'])
 def clearProcess(request):
@@ -160,7 +193,7 @@ def readMissData(request):
     df_train_miss = pd.read_csv(datasetConfig['train_data_miss_path'])
     df_test_miss = pd.read_csv(datasetConfig['test_data_miss_path'])
     
-    if not Dataset.objects.filter(name = 'train-miss').exists():
+    if not Dataset.objects.filtershap(name = 'train-miss').exists():
         msg = 'dataset does not exist, now store one in'
         print(f"\n\n{msg}\n\n")
 

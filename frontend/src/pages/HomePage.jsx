@@ -30,10 +30,12 @@ const HomePage = () => {
     fontSize: '20px',
   };
 
+  const [labels, setLabels] = useState([]); // for y label selection
   const [selectedOption, setSelectedOption] = useState('Gas Class');
   const [customText, setCustomText] = useState('');
   const [desireY, setDesireY] = useState('Gas Class');
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedTrainData, setSelectedTrainData] = useState(null);
+  const [selectedTestData, setSelectedTestData] = useState(null);
   const { setCurrentPage } = usePage();
   const { 
     isLoading, setIsLoading,
@@ -42,6 +44,7 @@ const HomePage = () => {
   } = useStatus();
 
   const navigate = useNavigate();
+  
   
 
   const handleOptionChange = (event) => {
@@ -172,29 +175,60 @@ const HomePage = () => {
     navigate(`/training`);
   };
 
-  const handleFileChange = (event) => {
-    console.log("file changed")
-    setSelectedFile(event.target.files[0]);
+  const handleTrainDataChange = (event) => {
+    console.log("train data changed")
+    setSelectedTrainData(event.target.files[0]);
   };
 
-  const uploadFile = async () => {
+  const handleTestDataChange = (event) => {
+    console.log("test data changed")
+    setSelectedTestData(event.target.files[0]);
+  };
+
+  const uploadTrainData = async () => {
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    formData.append("file", selectedTrainData);
     console.log(formData)
+  //   for (let pair of formData.entries()) {
+  //     console.log(pair[0]+ ', ' + pair[1]); 
+  // }
 
     const response = await fetch(
-        `${API_URL}/upload/`, 
+        `${API_URL}/upload/trainData/`, 
         {
             method: "POST",
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+            // headers: {
+            //     'Content-Type': 'multipart/form-data',
+            // },
             body: formData
         })
 
     const data = await response.json()
     console.log(data.msg)
-    popMessage("Upload file successfully!")
+    popMessage(data.msg)
+  };
+
+  const uploadTestData = async () => {
+    const formData = new FormData();
+    formData.append("file", selectedTestData);
+    console.log(formData)
+  //   for (let pair of formData.entries()) {
+  //     console.log(pair[0]+ ', ' + pair[1]); 
+  // }
+
+    const response = await fetch(
+        `${API_URL}/upload/testData/`, 
+        {
+            method: "POST",
+            // headers: {
+            //     'Content-Type': 'multipart/form-data',
+            // },
+            body: formData
+        })
+
+    const data = await response.json()
+    console.log(data.msg)
+    popMessage(data.msg)
   };
 
   {/*stepper */}
@@ -259,21 +293,37 @@ const HomePage = () => {
                     {/*<Typography>{step.description}</Typography>*/}
                     {activeStep === 0 && (
                       <>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', marginBottom:'10px' }}>
                       
                           <input
                               type="file"
-                              onChange={handleFileChange}
+                              onChange={handleTrainDataChange}
                               className="border p-2"
                               style={{ width: '300px', height: '45px', fontSize: '16px' }}
                           />
                           <Button
                               variant="contained"
-                              style={{ margin: "10px" , backgroundColor: 'black' }}
-                              onClick={uploadFile}
+                              style={{ marginLeft: "10px" , backgroundColor: 'black' }}
+                              onClick={uploadTrainData}
                           >
-                              Upload File
+                              Upload Train Data
                           </Button>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <input
+                              type="file"
+                              onChange={handleTestDataChange}
+                              className="border p-2"
+                              style={{ width: '300px', height: '45px', fontSize: '16px' }}
+                          />
+                          <Button
+                              variant="contained"
+                              style={{ marginLeft: "10px" , backgroundColor: 'black' }}
+                              onClick={uploadTestData}
+                          >
+                              Upload Test Data
+                          </Button>
+
                         
                       </div>
                       
