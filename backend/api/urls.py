@@ -3,8 +3,10 @@ from . import views
 
 urlpatterns = [
     path('', views.getRoutes, name='routes'),
+    path('status/', views.getStatus, name='status'),
     path('upload/trainData/', views.uploadTrainData, name='uploadTrainData'),
     path('upload/testData/', views.uploadTestData, name='uploadTestData'),
+    path('setLabelAndColNum/', views.setLabelAndColNum, name='setLabelAndColNum'),
     path('clearProcess/', views.clearProcess, name='clearProcess'),
     path('initProcess/', views.initProcess, name='initProcess'),
     path('readMissData/', views.readMissData, name='readMissData'),

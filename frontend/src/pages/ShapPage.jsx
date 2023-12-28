@@ -20,15 +20,16 @@ function ShapPage() {
   const [yLabel, setYLabel] = useState('');
   const [inputX, setInputX] = useState(Array(XLabels.length).fill('20')); // Initialize with an empty value
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [labelsValue, setLabelsValue] = useState([]);
 
   const { isLoading, setIsLoading, loadingMsg, setLoadingMsg, loadingTime, setLoadingTime } = useStatus();
 
 
   useEffect(() => {
-    getXLabels()
+    getLabels()
   }, [])
   
-  const getXLabels = async () => {
+  const getLabels = async () => {
     const response = await fetch(
       `${API_URL}/getFeaturesAndLabel/complete`, 
       {
@@ -40,6 +41,7 @@ function ShapPage() {
     const data = await response.json()
     setXLabels(data.featureNames)
     setYLabel(data.labelName)
+    setLabelsValue(data.labelValue)
     setInputX(Array(data.featureNames.length).fill('20'))
   }
   useEffect(() => {
@@ -210,7 +212,20 @@ function ShapPage() {
           <div >
             <label >
               Choose A Class: 
-              <input type="text" className='whitebox' value={shapClass} onChange={(e) => setShapClass(e.target.value)} style={{ margin: '10px' }} />
+              {/* <input type="text" className='whitebox' value={shapClass} onChange={(e) => setShapClass(e.target.value)} style={{ margin: '10px' }} /> */}
+              <select
+                  value={shapClass}
+                  onChange={(e) => setShapClass(e.target.value)}
+                  className="mt-2 border p-2"
+                  style={{ width: '100px', height: '45px', fontSize: '16px', margin: '10px' }}
+                >
+                
+                {labelsValue.map((label, index) => (
+                  <option key={index} value={label}>
+                    {label}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
           
@@ -307,25 +322,65 @@ positive value means positive effect and negative value means neagative effect O
         <form onSubmit={handleShapDepSubmit} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
 
           <div>
-            <label>
+            <label style={{ marginLeft: '5px'}}>
               Choose Feature 1:
-              <input type="text" className='whitebox' value={depClass1} onChange={(e) => setDepClass1(e.target.value) } style={{ margin: '10px' }} />
+              {/* <input type="text" className='whitebox' value={depClass1} onChange={(e) => setDepClass1(e.target.value) } style={{ margin: '10px' }} /> */}
+              <select
+                  value={depClass1}
+                  onChange={(e) => setDepClass1(e.target.value) }
+                  className="mt-2 border p-2"
+                  style={{ margin: '10px' }}
+                >
+                
+                {XLabels.map((label, index) => (
+                  <option key={index} value={label}>
+                    {label}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
           <div>
-            <label>
+            <label style={{ marginLeft: '5px'}}>
               Choose Feature 2:
-              <input type="text" className='whitebox' value={depClass2} onChange={(e) => setDepClass2(e.target.value)} style={{ margin: '10px' }}/>
+              {/* <input type="text" className='whitebox' value={depClass2} onChange={(e) => setDepClass2(e.target.value)} style={{ margin: '10px' }}/> */}
+              <select
+                  value={depClass2}
+                  onChange={(e) => setDepClass2(e.target.value)}
+                  className="mt-2 border p-2"
+                  style={{ margin: '10px' }}
+                >
+                
+                {XLabels.map((label, index) => (
+                  <option key={index} value={label}>
+                    {label}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
           <div>
-            <label>
+            <label style={{ marginLeft: '5px'}}>
               Choose A Class:
-              <input type="text" className='whitebox' value={depY} onChange={(e) => setDepY(e.target.value)} style={{ margin: '10px' }}/>
+              {/* <input type="text" className='whitebox' value={depY} onChange={(e) => setDepY(e.target.value)} style={{ margin: '10px' }}/> */}
+              <select
+                  value={depY}
+                  onChange={(e) => setDepY(e.target.value)}
+                  className="mt-2 border p-2"
+                  style={{ margin: '10px' }}
+                >
+                
+                {labelsValue.map((label, index) => (
+                  <option key={index} value={label}>
+                    {label}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
           
           <button type="submit" className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-3 py-1 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+          style={{ marginLeft: '5px'}}
           >Submit</button>
         </form>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -365,14 +420,27 @@ positive value means positive effect and negative value means neagative effect O
                   <span style={{ marginRight: '20px' }}>
                   Choose A Desired Class of {yLabel}:
                   </span>
-                  <input type="text"  className='whitebox' value={desired_y} 
+                  {/* <input type="text"  className='whitebox' value={desired_y} 
                   onChange={(e) => setDesired_y(e.target.value)} 
-                  style={{ width: '20%' }}/>
+                  style={{ width: '20%' }}/> */}
+                  <select
+                    value={shapClass}
+                    onChange={(e) => setShapClass(e.target.value)}
+                    className="mt-2 border p-2"
+                    style={{ width: '100px', margin: '10px' }}
+                  >
+                  
+                  {labelsValue.map((label, index) => (
+                    <option key={index} value={label}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
                 </label>
               </div>  
             {XLabels.map((label, index) => (
-                <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', alignItems: 'center', width: '20%', padding: '1px' }}>
-                  <label >{label}</label>
+                <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '20%', padding: '1px' }}>
+                  <label style={{ width: '50%', marginLeft: '20px' }}>{label}</label>
                   <input
                     type="text" className='whitebox'
                     value={inputX[index]}

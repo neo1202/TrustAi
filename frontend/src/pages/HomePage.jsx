@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useStatus } from "../hooks/useStatus";
 import { usePage } from "../hooks/usePage";
 import popMessage from "../utils/popMessage";
@@ -31,9 +31,9 @@ const HomePage = () => {
   };
 
   const [labels, setLabels] = useState([]); // for y label selection
-  const [selectedOption, setSelectedOption] = useState('Gas Class');
+  const [selectedOption, setSelectedOption] = useState('-- Choose desire y label --');
   const [customText, setCustomText] = useState('');
-  const [desireY, setDesireY] = useState('Gas Class');
+  const [desireY, setDesireY] = useState('');
   const [selectedTrainData, setSelectedTrainData] = useState(null);
   const [selectedTestData, setSelectedTestData] = useState(null);
   const { setCurrentPage } = usePage();
@@ -45,17 +45,33 @@ const HomePage = () => {
 
   const navigate = useNavigate();
   
-  
+  // const getLabels = async () => {
+  //   const response = await fetch(
+  //     `${API_URL}/getFeaturesAndLabel/upload`, 
+  //     {
+  //       method: "GET",
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //     }
+  //   )
+  //   const data = await response.json()
+  //   setLabels(data.allColumns)
+  // }
+
+  // useEffect(() => {
+  //   getLabels();
+  // }, []);
 
   const handleOptionChange = (event) => {
     const selectedValue = event.target.value;
     setSelectedOption(selectedValue);
     setDesireY(selectedValue);
 
-    // If "Other" is selected, clear customText
-    if (selectedValue !== 'Other') {
-      setCustomText('');
-    }
+    // // If "Other" is selected, clear customText
+    // if (selectedValue !== 'Other') {
+    //   setCustomText('');
+    // }
   };
 
   const handleTextChange = (event) => {
@@ -83,6 +99,28 @@ const HomePage = () => {
   };
 
   const handleDQButtonClick = async () => {
+    // 因為改寫config.py會reload後端所以要等待後端重啟
+    try {
+      setIsLoading(true); setLoadingMsg("Setting Y Label..."); setLoadingTime(1);
+      const response = await fetch(`${API_URL}/status/`);
+      const data = await response.json();
+      if (data.status === 'running') {
+        console.log("Done Setting Y Label!")
+
+        // Backend is running, hide loading spinner
+        setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+        popMessage("Set Y Label Successfully!")
+      } else {
+        // Backend is not running, try again in 2 seconds
+        setTimeout(handleDQButtonClick, 2000);
+      }
+    } catch (error) {
+      // Error occurred, probably because backend is not running
+      // Try again in 2 seconds
+      setTimeout(handleDQButtonClick, 2000);
+    }
+
+    //go to data quality page
     setIsLoading(true); setLoadingMsg("Going to data quality process..."); setLoadingTime(0.5);
 
     // clear the previous process, i.e., the process id is always 1
@@ -248,9 +286,67 @@ const HomePage = () => {
 
   const [activeStep, setActiveStep] = React.useState(0);
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    
+    const response = await fetch(
+      `${API_URL}/getFeaturesAndLabel/upload`, 
+      {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      }
+    )
+    const data = await response.json()
+    setLabels(data.allColumns)
+    console.log(activeStep)
+
+    
+
+    if (activeStep === 1) {
+      
+      const response = await fetch(
+        `${API_URL}/setLabelAndColNum/`, 
+        {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({label: desireY})
+        }
+      )
+      const data = await response.json()
+      console.log(data.msg)
+      
+      // setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+      // popMessage("Set Y Label Successfully!")
+      
+    }
   };
+
+  async function checkBackendStatusForSetY() {
+    try {
+      setIsLoading(true); setLoadingMsg("Setting Y Label..."); setLoadingTime(1);
+      const response = await fetch(`${API_URL}/status/`);
+      const data = await response.json();
+      if (data.status === 'running') {
+        console.log("Done Setting Y Label!")
+
+        // Backend is running, hide loading spinner
+        setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+        popMessage("Set Y Label Successfully!")
+      } else {
+        // Backend is not running, try again in 2 seconds
+        setTimeout(checkBackendStatusForSetY, 2000);
+      }
+    } catch (error) {
+      // Error occurred, probably because backend is not running
+      // Try again in 2 seconds
+      setTimeout(checkBackendStatusForSetY, 2000);
+    }
+  }
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -342,9 +438,11 @@ const HomePage = () => {
                         style={{ width: '300px', height: '45px', fontSize: '16px' }}
                       >
                       <option value="">-- Choose desire y label --</option>
-                      <option value="Gas Class">Gas Class</option>
-                      <option value="Gas Num">Gas Num</option>
-                      <option value="Other">Other</option>
+                      {labels.map((label, index) => (
+                        <option key={index} value={label}>
+                          {label}
+                        </option>
+                      ))}
                     </select>
                     </label>
                     <Button

@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Select } from 'antd';
 import { Button } from "@mui/material";
 import popMessage from '../utils/popMessage';
+import API_URL from "../api";
 
 const { Option } = Select;
 
 const QueryTheOracle = ({ queryIds, setQueryResults }) => {
     const [selections, setSelections] = useState({});
+    const [labelsValue, setLabelsValue] = useState([])
   
     const qidWidth = '40px'; // Adjust the width based on your preference
   
@@ -24,6 +26,23 @@ const QueryTheOracle = ({ queryIds, setQueryResults }) => {
       setQueryResults(results);
       popMessage("Submit query results!");
     };
+
+    const getLabelsName = async () => {
+      const response = await fetch(
+        `${API_URL}/getFeaturesAndLabel/complete`, 
+        {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })
+      const data = await response.json()
+      setLabelsValue(data.labelValue)
+    }
+
+    useEffect(() => {
+      getLabelsName();
+    }, []);
   
     return (
       <div style={{ maxWidth: '95%', display: 'flex', flexDirection: 'column', position: 'relative'}}>
@@ -36,13 +55,10 @@ const QueryTheOracle = ({ queryIds, setQueryResults }) => {
                 value={selections[qid] || "1"}  // Set default value to "1" if not already selected
                 onChange={(value) => handleSelectionChange(qid, value)}
               >
-                <Option value="1">Class 1</Option>
-                <Option value="2">Class 2</Option>
-                <Option value="3">Class 3</Option>
-                <Option value="4">Class 4</Option>
-                <Option value="5">Class 5</Option>
-                <Option value="6">Class 6</Option>
-                <Option value="7">Class 7</Option>
+                {labelsValue.map((label, index) => (
+                    <Option key={index} value={label}>{label}</Option> // Generate Option components from labelsValue
+                ))}
+                
               </Select>
             </div>
           ))}

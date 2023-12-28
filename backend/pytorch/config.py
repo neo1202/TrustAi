@@ -19,8 +19,11 @@ datasetConfig = {
     'test_data_path':r'./pytorch/data/data_test.csv', 
     'train_data_miss_path':r'./dataquality/data/train_data_miss.csv', #upload data
     'test_data_miss_path':r'./dataquality/data/test_data_miss.csv', #upload data
-    'label_name':'Gas Class',
-    'num_feature':128, 
+    'data_info_path':r'./dataquality/data/data_info.csv', #store label_name, num_feature, class_amount
+    # 'label_name':'Class',
+    # 'num_feature':16, # original data 128
+    # 'class_amount':7,
+
     # 'train_data_path':r'./pytorch/data/preprocessed_beans_train.csv',
     # 'test_data_path':r'./pytorch/data/preprocessed_beans_test.csv',
     # 'label_name':'Class',

@@ -21,7 +21,7 @@ const ImputerSelectPage = () => {
     {
       label: "Expectation-Maximization",
       description: "Expectation-Maximization (EM) imputer description goes here.",
-      onClick: () => handleImputerClick("EM"),
+      onClick: () => handleImputerClick("Expectation-Maximization"),
     },
     {
       label: "Miss-forest",
