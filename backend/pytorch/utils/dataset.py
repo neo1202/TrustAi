@@ -4,14 +4,15 @@ from torch.utils.data import Dataset
 from ..config import datasetConfig
 import pandas as pd
 
-df_data_info_r=pd.read_csv(f"{datasetConfig['data_info_path']}")
-label_name = df_data_info_r.loc[0, 'label_name']
+
 
 
 class IndexedDataset(Dataset):
     # data loading
     def __init__(self, df, TestOrValid=False, Valid=False, ReVealY=False, revealIdx=None): # if ReVealY=False, revealIdx must be none. They are passed together
         #df = pd.read_csv(file_name)
+        df_data_info_r=pd.read_csv(f"{datasetConfig['data_info_path']}")
+        label_name = df_data_info_r.loc[0, 'label_name']
         print(f'label_name in indexeddataset: {label_name}')
         self.x = torch.from_numpy(df.drop(columns=[label_name]).to_numpy())
         self.x = self.x.to(torch.float32)

@@ -1,4 +1,4 @@
-# TrustAi website
+# TAI DQ website
 
 > frontend: React, Tailwind
 

@@ -7,6 +7,7 @@ services:
     volumes:
       - ./api:/app/api
       - ./core:/app/core
+      - ./dataquality/data:/app/dataquality/data
       - ./django-venv:/app/venv
       - ./pytorch:/app/pytorch
       # - ./env:/app/env

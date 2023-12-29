@@ -10,7 +10,7 @@ import Loading from "../components/Loading";
 
 function ShapPage() {
   const [shapClass, setShapClass] = useState('');
-  const [desired_y, setDesired_y] = useState(1);
+  const [desired_y, setDesired_y] = useState('');
   const [imagePath, setImagePath] = useState('');
   const [gBarImagePath, setGBarImagePath] = useState('');
   const [posX, setPosX] = useState([]);
@@ -86,8 +86,8 @@ function ShapPage() {
   const handleInputXSubmit = async (e) => {
     e.preventDefault();
 
-    const inputXAndDesiredY = { inputX:inputX, desired_y:desired_y, }
-
+    const inputXAndDesiredY = { inputX:inputX, desired_y:desired_y }
+    setIsLoading(true); setLoadingMsg("Calculating Counterfactual Explanation..."); setLoadingTime(0.5);
     const response = await fetch(
         `${API_URL}/processCF/`, 
         {
@@ -97,16 +97,26 @@ function ShapPage() {
         },
         body: JSON.stringify(inputXAndDesiredY)
     })
+
+    if (!response.ok) {
+      // If the API returned a 500 status code, handle the error
+      
+      alert(`Error: No counterfactuals found for any of the query points! Please change your input or label.`);
+      setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
+      return;
+    }
+
     const data = await response.json()
     const parsedData = JSON.parse(data.data)
     setData(parsedData); 
     setIsDataAvailable(true);
+    setIsLoading(false); setLoadingMsg(''); setLoadingTime(0);
     
   };
 
   const handleShapSubmit = async (e) => {
     e.preventDefault();
-
+    console.log(shapClass)
     try {
       setIsLoading(true); setLoadingMsg(`Calculating SHAP value of Class ${shapClass}...`); setLoadingTime(0.5);
       const response = await fetch(
@@ -137,7 +147,7 @@ function ShapPage() {
 
     try {
       const deps = {depClass1:depClass1, depClass2:depClass2, depY:depY}
-
+      console.log(deps)
       setIsLoading(true); setLoadingMsg(`Calculating dependent SHAP value of feature ${depClass1} and feature ${depClass2} for Class ${depY}...`); setLoadingTime(0.5);
 
       const response = await fetch(
@@ -217,10 +227,11 @@ function ShapPage() {
                   value={shapClass}
                   onChange={(e) => setShapClass(e.target.value)}
                   className="mt-2 border p-2"
-                  style={{ width: '100px', height: '45px', fontSize: '16px', margin: '10px' }}
+                  style={{ height: '45px', fontSize: '16px', margin: '10px' }}
                 >
-                
+                <option value="">-- Choose A Class --</option>
                 {labelsValue.map((label, index) => (
+                  
                   <option key={index} value={label}>
                     {label}
                   </option>
@@ -331,7 +342,7 @@ positive value means positive effect and negative value means neagative effect O
                   className="mt-2 border p-2"
                   style={{ margin: '10px' }}
                 >
-                
+                <option value="">-- Choose A Feature --</option>
                 {XLabels.map((label, index) => (
                   <option key={index} value={label}>
                     {label}
@@ -350,7 +361,7 @@ positive value means positive effect and negative value means neagative effect O
                   className="mt-2 border p-2"
                   style={{ margin: '10px' }}
                 >
-                
+                <option value="">-- Choose A Feature --</option>
                 {XLabels.map((label, index) => (
                   <option key={index} value={label}>
                     {label}
@@ -369,7 +380,7 @@ positive value means positive effect and negative value means neagative effect O
                   className="mt-2 border p-2"
                   style={{ margin: '10px' }}
                 >
-                
+                <option value="">-- Choose A Class --</option>
                 {labelsValue.map((label, index) => (
                   <option key={index} value={label}>
                     {label}
@@ -424,12 +435,12 @@ positive value means positive effect and negative value means neagative effect O
                   onChange={(e) => setDesired_y(e.target.value)} 
                   style={{ width: '20%' }}/> */}
                   <select
-                    value={shapClass}
-                    onChange={(e) => setShapClass(e.target.value)}
+                    value={desired_y}
+                    onChange={(e) => setDesired_y(e.target.value)}
                     className="mt-2 border p-2"
-                    style={{ width: '100px', margin: '10px' }}
+                    style={{ margin: '10px' }}
                   >
-                  
+                  <option value="">-- Choose A Class --</option>
                   {labelsValue.map((label, index) => (
                     <option key={index} value={label}>
                       {label}

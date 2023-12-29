@@ -31,11 +31,13 @@ import pandas as pd
 #         x = self.linear4(x)
 #         return x
 
-df_data_info_r=pd.read_csv(f"{datasetConfig['data_info_path']}")
-num_feature = df_data_info_r.loc[0, 'num_feature']    
-class_amount = df_data_info_r.loc[0, 'class_amount']  
+
 class ComplexModel(nn.Module):
             def __init__(self):
+                df_data_info_r=pd.read_csv(f"{datasetConfig['data_info_path']}")
+                num_feature = df_data_info_r.loc[0, 'num_feature']    
+                class_amount = df_data_info_r.loc[0, 'class_amount']  
+
                 super(ComplexModel, self).__init__()
                 self.linear1 = nn.Linear(num_feature, 216)
                 self.act1 = nn.LeakyReLU()
@@ -80,6 +82,10 @@ class ComplexModel(nn.Module):
     
 class SimpleModel(nn.Module):
             def __init__(self):
+                df_data_info_r=pd.read_csv(f"{datasetConfig['data_info_path']}")
+                num_feature = df_data_info_r.loc[0, 'num_feature']    
+                class_amount = df_data_info_r.loc[0, 'class_amount']  
+
                 super(SimpleModel, self).__init__()
                 self.linear1 = torch.nn.Linear(num_feature, 256)
                 self.linear2 = torch.nn.Linear(256, 112)
