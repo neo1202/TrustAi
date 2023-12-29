@@ -6,6 +6,23 @@
 
 Integrated backend with Docker for containerization.
 
+## Project Overview
+本專題聚焦於資料品質 (DQ) 及可解釋 AI (XAI) 兩大主題，致力於建立自動化流程，降低資料處理成本同時提升可靠度。
+
+#### 資料品質 (DQ)
+在資料品質方面，透過母數及無母數補值等補值方法提升資料可用性，並以 Differential Entropy & Canonical Relative Entropy、相關性等指標評估補值成果。
+#### 可解釋 AI (XAI)
+可解釋 AI 透過 Active Learning 與使用者互動，適應各種客製化資料和需求；結合 Knowledge Distillation 確保主動學習過程的穩定性和降低最終參數量；最後透過 SHAP 評估模型的可解釋性以及 Counterfactual Explanation 協助使用者根據模型結果做進一步決策。這些模組的結合旨在建立全面的資料處理流程，確保模型的可靠性和解釋性，以提升整體效能。
+
+## Demo 
+#### Demo Video
+https://drive.google.com/file/d/155tX3hSLL8DmC_Ts90cfWRs3gXJXQyK7/view
+
+#### Website Preview
+![ Upload Page Screenshot](./image/upload_page.png)
+
+
+
 ## To start the website
 
 ### Frontend:
