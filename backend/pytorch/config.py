@@ -15,8 +15,8 @@ config = {
 datasetConfig = {
     # 'train_data_miss_path':r'./dataquality/data/data_train_miss.csv', #original data
     # 'test_data_miss_path':r'./dataquality/data/data_test_miss.csv', #original data
-    'train_data_path':r'./pytorch/data/data_train.csv', 
-    'test_data_path':r'./pytorch/data/data_test.csv', 
+    'train_data_path':r'./pytorch/data/train_data.csv', 
+    'test_data_path':r'./pytorch/data/test_data.csv', 
     'train_data_miss_path':r'./dataquality/data/train_data_miss.csv', #upload data
     'test_data_miss_path':r'./dataquality/data/test_data_miss.csv', #upload data
     'data_info_path':r'./dataquality/data/data_info.csv', #store label_name, num_feature, class_amount
@@ -24,8 +24,4 @@ datasetConfig = {
     # 'num_feature':16, # original data 128
     # 'class_amount':7,
 
-    # 'train_data_path':r'./pytorch/data/preprocessed_beans_train.csv',
-    # 'test_data_path':r'./pytorch/data/preprocessed_beans_test.csv',
-    # 'label_name':'Class',
-    # 'num_feature':16, 
 }

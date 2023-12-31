@@ -386,7 +386,7 @@ const HomePage = () => {
                   <Typography variant="h5">{step.label}</Typography>
                   </StepLabel>
                   <StepContent>
-                    {/*<Typography>{step.description}</Typography>*/}
+                    
                     {activeStep === 0 && (
                       <>
                       <div style={{ display: 'flex', alignItems: 'center', marginBottom:'10px' }}>
@@ -431,20 +431,20 @@ const HomePage = () => {
                       
                       <label className="block">
               
-                      <select
-                        value={selectedOption}
-                        onChange={handleOptionChange}
-                        className="mt-2 border p-2"
-                        style={{ width: '300px', height: '45px', fontSize: '16px' }}
-                      >
-                      <option value="">-- Choose desire y label --</option>
-                      {labels.map((label, index) => (
-                        <option key={index} value={label}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                    </label>
+                        <select
+                          value={selectedOption}
+                          onChange={handleOptionChange}
+                          className="mt-2 border p-2"
+                          style={{ width: '300px', height: '45px', fontSize: '16px' }}
+                        >
+                        <option value="">-- Choose desire y label --</option>
+                        {labels.map((label, index) => (
+                          <option key={index} value={label}>
+                            {label}
+                          </option>
+                        ))}
+                        </select>
+                      </label>
                     <Button
                       variant="contained"
                       style={{ margin: "10px", backgroundColor: 'black' }}
@@ -454,24 +454,17 @@ const HomePage = () => {
                     </Button>
                     </div>
                     {selectedOption === 'Other' && (
-                      <div>
-                      {/*<label className="block" style={{  fontSize: '16px' }} >
-                          Type your desired y label:*/}
-                          <input
-                            type="text"
-                            value={customText}
-                            onChange={handleTextChange}
-                            className=" mt-2 border p-2"
-                            style={{ width: '300px', height: '45px', fontSize: '16px' }}
-                            placeholder="Type your desired y label" // Added placeholder
-                          />
-                        {/*</label>*/}
+                      <div>                      
+                        <input
+                          type="text"
+                          value={customText}
+                          onChange={handleTextChange}
+                          className=" mt-2 border p-2"
+                          style={{ width: '300px', height: '45px', fontSize: '16px' }}
+                          placeholder="Type your desired y label" // Added placeholder
+                        />
                       </div>
-                    )}
-                    
-                        
-                      
-                      
+                    )}                  
                       </>
                     )}
                     <Box sx={{ mb: 2 }}>
@@ -520,17 +513,7 @@ const HomePage = () => {
       </div>
       </div>
     </div>
-        
 
-        
-      
-        
-        {/* <button
-          className="bg-blue-500 text-white px-4 py-2 mt-4"
-          onClick={handleTrainingButtonClick}
-        >
-          Go to Training
-        </button> */}
     </div>
     
   );

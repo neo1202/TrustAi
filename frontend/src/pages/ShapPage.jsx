@@ -65,16 +65,7 @@ function ShapPage() {
   const [imagePathD1, setImagePathD1] = useState('');
   const [imagePathD2, setImagePathD2] = useState('');
 
-  //先放著之後可用的dropdown
-  const [dropdownSelection, setDropdownSelection] = useState(null);
-  const dropdownOptions = [
-    { label: "One", value: "one" },
-    { label: "Two", value: "two" },
-    { label: "Test", value: "test" },
-  ];
-  const handleDropdownSelection = (optionSelected) => {
-    setDropdownSelection(optionSelected);
-  };
+  
 
   const handleInputXChange = (index, value) => {
     // Create a copy of the inputValues array and update the value at the specified index
@@ -222,7 +213,7 @@ function ShapPage() {
           <div >
             <label >
               Choose A Class: 
-              {/* <input type="text" className='whitebox' value={shapClass} onChange={(e) => setShapClass(e.target.value)} style={{ margin: '10px' }} /> */}
+              
               <select
                   value={shapClass}
                   onChange={(e) => setShapClass(e.target.value)}
@@ -264,7 +255,7 @@ function ShapPage() {
             
             <div style={{ display: 'flex', flexDirection: 'row' , justifyContent: 'center', flexWrap: 'wrap'}}>
               
-              {/*<div className="image-container">*/}
+              
                 <div className="p-5 rounded-lg mb-4 mr-2" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: 'white', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)'}}>
                   <div style={{ border: '3px solid grey', display: 'inline-block' }}>
 
@@ -301,7 +292,7 @@ function ShapPage() {
                     <div style={{ border: '3px solid #38AC38', display: 'inline-block' , marginTop: '20px'}}>
                       <img src={`${API_URL}/getPlotImages/shap-images/${gPieImagePath}`} alt="Generated Plot" style={{ width: '400px', height: '300px' }}/>
                     </div>
-                  {/* </div> */}
+                  
                 </div>
               </div>
             </div>
@@ -321,21 +312,14 @@ function ShapPage() {
           </div>
         )}
 
-        {/* 之後可能會做local shap的部分所以這段先留著 */}
-        {/* <h1 id="local_shap">Local SHAP</h1>
-        <h2 id="ft_imp">Feature Influence</h2>
-        <p>
-        shap value means the contribution to a class, the larger the absoulute value the larger the contribution.
-positive value means positive effect and negative value means neagative effect ON a class.  
-        </p>
-        <h2 id="data">Data</h2> */}
+        
         <h1 className="cenheading2">Dependent SHAP</h1>
         <form onSubmit={handleShapDepSubmit} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
 
           <div>
             <label style={{ marginLeft: '5px'}}>
               Choose Feature 1:
-              {/* <input type="text" className='whitebox' value={depClass1} onChange={(e) => setDepClass1(e.target.value) } style={{ margin: '10px' }} /> */}
+              
               <select
                   value={depClass1}
                   onChange={(e) => setDepClass1(e.target.value) }
@@ -354,7 +338,7 @@ positive value means positive effect and negative value means neagative effect O
           <div>
             <label style={{ marginLeft: '5px'}}>
               Choose Feature 2:
-              {/* <input type="text" className='whitebox' value={depClass2} onChange={(e) => setDepClass2(e.target.value)} style={{ margin: '10px' }}/> */}
+              
               <select
                   value={depClass2}
                   onChange={(e) => setDepClass2(e.target.value)}
@@ -373,7 +357,7 @@ positive value means positive effect and negative value means neagative effect O
           <div>
             <label style={{ marginLeft: '5px'}}>
               Choose A Class:
-              {/* <input type="text" className='whitebox' value={depY} onChange={(e) => setDepY(e.target.value)} style={{ margin: '10px' }}/> */}
+              
               <select
                   value={depY}
                   onChange={(e) => setDepY(e.target.value)}
@@ -420,7 +404,7 @@ positive value means positive effect and negative value means neagative effect O
         
         <h1 id="cf_expl" className="heading1">Counterfactual Explanation</h1>
         
-        {/*<div>ShapPage</div>*/}
+      
         
         <div style={{ display: 'flex',  flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <h2 style={{ fontSize: '24px'}}>Enter data value</h2>
@@ -431,9 +415,7 @@ positive value means positive effect and negative value means neagative effect O
                   <span style={{ marginRight: '20px' }}>
                   Choose A Desired Class of {yLabel}:
                   </span>
-                  {/* <input type="text"  className='whitebox' value={desired_y} 
-                  onChange={(e) => setDesired_y(e.target.value)} 
-                  style={{ width: '20%' }}/> */}
+                 
                   <select
                     value={desired_y}
                     onChange={(e) => setDesired_y(e.target.value)}

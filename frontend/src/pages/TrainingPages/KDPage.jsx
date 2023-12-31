@@ -28,7 +28,6 @@ const KDPage = () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            // body: JSON.stringify(setting)
         })
         const data = await response.json()
         console.log("Doing KD...", data)

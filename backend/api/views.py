@@ -91,31 +91,15 @@ def uploadTrainData(request):
     print(request.FILES['file'])
     uploaded_file = request.FILES['file']
 
-    # if not os.path.exists('../dataquality/data'):
-    #     os.makedirs('../dataquality/data')
-
     destination1 = open(os.path.join('./dataquality/data', 'train_data_miss.csv'), 'wb+')
     destination2 = open(os.path.join('./pytorch/data', 'train_data.csv'), 'wb+') # 預設的補植後資料是上傳資料
 
     for chunk in uploaded_file.chunks():
-      # print('========= writing =========')
-      # print(chunk)
       destination1.write(chunk)
       destination2.write(chunk)
     destination1.close()
     destination2.close()
-
-    # df = pd.read_csv(datasetConfig['train_data_miss_path'])
-    # datasetConfig['num_feature'] = len(df.columns) - 1
-    # num_feature=len(df.columns) - 1
-    # with open('./pytorch/config.py', 'r') as file:
-    #   filedata = file.read()
-    # filedata = re.sub(r"'num_feature':\d+", f"'num_feature':{num_feature}", filedata)
-    # with open('./pytorch/config.py', 'w') as file:
-    #     file.write(filedata)
-    # print(f"\n\n ====== num_feature = {datasetConfig['num_feature']} ====== \n\n")
     
-
     return JsonResponse({'msg': 'Train data uploaded successfully'})
 
   return JsonResponse({'msg': 'Invalid request'}, status=400)
@@ -131,15 +115,11 @@ def uploadTestData(request):
     print(request.FILES['file'])
     uploaded_file = request.FILES['file']
 
-    # if not os.path.exists('../dataquality/data'):
-    #     os.makedirs('../dataquality/data')
 
     destination1 = open(os.path.join('./dataquality/data', 'test_data_miss.csv'), 'wb+')
     destination2 = open(os.path.join('./pytorch/data', 'test_data.csv'), 'wb+') # 預設的補植後資料是上傳資料
 
     for chunk in uploaded_file.chunks():
-      # print('========= writing =========')
-      # print(chunk)
       destination1.write(chunk)
       destination2.write(chunk)
     destination1.close()
@@ -165,22 +145,6 @@ def setLabelAndColNum(request):
   print(df_data_info)
   df_data_info.to_csv(f"{datasetConfig['data_info_path']}", index=False)
 
-  # with open('./pytorch/config.py', 'r') as file:
-  #   filedata = file.read()
-
-  # # Perform the substitutions
-  # filedata = re.sub(r"'label_name':'[^']*'", f"'label_name':'{setting_value}'", filedata)
-  # filedata = re.sub(r"'num_feature':\d+", f"'num_feature':{num_feature}", filedata)
-  # filedata = re.sub(r"'class_amount':\d+", f"'class_amount':{class_amount}", filedata)
-
-  # # Write the file
-  # with open('./pytorch/config.py', 'w') as file:
-  #   file.write(filedata)
-
-  # Print the values
-  # print(f"\n\n ====== label_name = {datasetConfig['label_name']} ====== \n\n")
-  # print(f"\n\n ====== num_feature = {datasetConfig['num_feature']} ====== \n\n")
-  # print(f"\n\n ====== class_amount = {datasetConfig['class_amount']} ====== \n\n")
   df_data_info_r=pd.read_csv(f"{datasetConfig['data_info_path']}")
   
   print(f"\n\n ====== label_name = {df_data_info_r.loc[0, 'label_name']} ====== \n\n")
@@ -260,7 +224,7 @@ def readMissData(request):
   print(f"\n\n ====== readMissData ====== \n\n")
   df_data_info_r=pd.read_csv(f"{datasetConfig['data_info_path']}")
   label_name = df_data_info_r.loc[0, 'label_name']
-  # print(f"\n\n ====== label_name = {label_name} ====== \n\n")
+  
 
   df_train_miss = pd.read_csv(datasetConfig['train_data_miss_path'])
   df_test_miss = pd.read_csv(datasetConfig['test_data_miss_path'])
@@ -403,6 +367,7 @@ def getFeaturesAndLabel(request, type):
   elif type == 'complete':
     df = pd.read_csv(datasetConfig['test_data_path'])
     all_columns = df.columns
+    
     features = list(df.columns)
     features.remove(label_name)
     classes=list(df[label_name].unique())
@@ -1209,7 +1174,7 @@ def processShapAllClassPlot(request):
   test_df = process.dataset.get(name='test-raw').df
   dataset_test = IndexedDataset(test_df, TestOrValid=True)
   batch_size = process.batchSize
-  test_loader = DataLoader(dataset_test, batch_size=20,shuffle=False, drop_last=True)
+  test_loader = DataLoader(dataset_test, batch_size=200,shuffle=False, drop_last=True)
   print("\n ================= running SHAP ================= \n")
   #SHAP
   device = connectDevice()
@@ -1244,7 +1209,7 @@ def processShapClassPlot(request):
   test_df = process.dataset.get(name='test-raw').df
   dataset_test = IndexedDataset(test_df, TestOrValid=True)
   batch_size = process.batchSize
-  test_loader = DataLoader(dataset_test, batch_size=20,shuffle=False, drop_last=True) #to be changed to 200 or 150
+  test_loader = DataLoader(dataset_test, batch_size=200,shuffle=False, drop_last=True) #to be changed to 200 or 150
   
   
   
@@ -1332,7 +1297,7 @@ def processDepClassPlot(request):
   test_df = process.dataset.get(name='test-raw').df
   dataset_test = IndexedDataset(test_df, TestOrValid=True)
   batch_size = process.batchSize
-  test_loader = DataLoader(dataset_test, batch_size=20,shuffle=False, drop_last=True)
+  test_loader = DataLoader(dataset_test, batch_size=200,shuffle=False, drop_last=True)
   
 
   #SHAP
@@ -1395,8 +1360,7 @@ def processCF(request):
 
   floatX = [[float(i) for i in inputX]]
   query_instances = pd.DataFrame(floatX, columns =Xcol)
-  # query_instances = test_df.iloc[4:5, :-1]  #######
-  # query_instances = query_instances.round(3)
+  
   print(query_instances)
   print("==============ready to generate counterfactuals==============")
   dice_exp = exp_random.generate_counterfactuals(query_instances, total_CFs=2, desired_class=desired_y, verbose=False)   
