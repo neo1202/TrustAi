@@ -15,7 +15,7 @@ Integrated backend with Docker for containerization.
 可解釋 AI 透過 Active Learning 與使用者互動，適應各種客製化資料和需求；結合 Knowledge Distillation 確保主動學習過程的穩定性和降低最終參數量；最後透過 SHAP 評估模型的可解釋性以及 Counterfactual Explanation 協助使用者根據模型結果做進一步決策。這些模組的結合旨在建立全面的資料處理流程，確保模型的可靠性和解釋性，以提升整體效能。
 
 #### Know More: [Presentation PPT](./專題簡報.pdf) 
-[Poster](./Poster.pdf)
+#### [Poster](./Poster.pdf)
 
 ## Demo 
 #### Demo Video
