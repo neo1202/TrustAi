@@ -1,204 +1,96 @@
-# TAI DQ website
+# Trust AI & Data Quality Pipeline
 
-> frontend: React, Tailwind
+## Overview
+Trust AI & Data Quality Pipeline is a comprehensive framework designed to enhance **data quality** (DQ) and integrate **explainable AI** (XAI) methodologies. It addresses challenges in real-world data processing and model reliability by establishing automated workflows that optimize data preprocessing, boost interpretability, and enable robust decision-making.
 
-> backend: Django Postgres
+### Key Features
+1. **Data Quality Enhancement**  
+   - Implements both parametric and non-parametric imputation methods such as Optimized Fuzzy C-Means (OFCM) and other ML/DL-based approaches.  
+   - Evaluates imputation effectiveness using metrics like Differential Entropy, Canonical Relative Entropy, and JS-Divergence.  
 
-Integrated backend with Docker for containerization.
+2. **Explainable AI (XAI) Framework**  
+   - **Active Learning**: Adapts dynamically to user requirements while ensuring efficient labeling through knowledge distillation.  
+   - **SHAP Interpretability**: Provides feature-level importance explanations.  
+   - **Counterfactual Explanations**: Offers actionable insights by generating alternative scenarios that would lead to different predictions.
 
-## Project Overview
-本專題聚焦於資料品質 (DQ) 及可解釋 AI (XAI) 兩大主題，致力於建立自動化流程，降低資料處理成本同時提升可靠度。
+3. **Pipeline Automation**  
+   - Combines the data quality module (EDASH) and XAI components to automate end-to-end workflows, ensuring reliable and interpretable AI solutions.
 
-#### 資料品質 (DQ)
-在資料品質方面，透過母數及無母數補值等補值方法提升資料可用性，並以 Differential Entropy & Canonical Relative Entropy、相關性等指標評估補值成果。關於DQ的詳細資訊，可以參考下面連結：
-#### DQ repo: [EDASH](https://github.com/forbes110/EDASH)
+---
 
-#### 可解釋 AI (XAI)
-可解釋 AI 透過 Active Learning 與使用者互動，適應各種客製化資料和需求；結合 Knowledge Distillation 確保主動學習過程的穩定性和降低最終參數量；最後透過 SHAP 評估模型的可解釋性以及 Counterfactual Explanation 協助使用者根據模型結果做進一步決策。這些模組的結合旨在建立全面的資料處理流程，確保模型的可靠性和解釋性，以提升整體效能。
+## Architecture
 
-#### Know More: [Presentation PPT](./專題簡報.pdf) | [Poster](./image/Poster.png)
+### Data Quality Module: EDASH
+1. **Imputation Algorithms**  
+   - **Optimized Fuzzy C-Means (OFCM)**: Incorporates weighting factors to optimize cluster accuracy and minimize overfitting.  
+   - Other methods include Expectation-Maximization and MissForest.
 
+2. **Evaluation Metrics**  
+   - **Differential Entropy**: Measures data distribution before and after imputation.  
+   - **JS-Divergence**: Quantifies similarities between datasets.  
+   - **NRMSE (Normalized Root Mean Square Error)**: Assesses reconstruction quality.
 
-## Demo 
-#### Demo Video
-https://drive.google.com/file/d/155tX3hSLL8DmC_Ts90cfWRs3gXJXQyK7/view
+---
 
-#### Website Preview
-![ Upload Page Screenshot](./image/upload_page.png)
+### Trust AI: Explainable AI (XAI) Modules
+1. **Active Learning**  
+   - **Query Strategy**: Includes uncertainty-based sampling and margin sampling to optimize labeled data acquisition.  
+   - **Human Annotation**: Ensures high-confidence labeling for critical datasets.
 
+2. **SHAP (Shapley Additive Explanations)**  
+   - Visualizes feature importance to highlight model decision logic.  
+   - Enhances trust by presenting interpretable insights to users.
 
+3. **Counterfactual Explanations**  
+   - Provides "what-if" scenarios to facilitate decision-making by adjusting critical feature values.
 
-## To start the website
+---
+
+### Case Study: Gas Sensor Dataset
+- Achieved an F1 score of 0.9928 in predictive tasks.  
+- Imputation tests demonstrated superior reconstruction accuracy using OFCM, outperforming baseline methods by >20%.  
+- Active Learning reduced labeling costs by >30% while maintaining high model accuracy.
+
+---
+
+## Demo
+
+### Demo Video
+[Watch the Demo Video](https://drive.google.com/file/d/139Pvr70YTwli5xncJ-YmR7Yg80sOhYu2/view?usp=sharing)
+
+### Website Preview
+![Upload Page Screenshot](./image/upload_page.png)
+
+---
+
+## Implementation Details
+
+### Technology Stack
+- **Frontend**: React.js with Tailwind CSS for responsive UI.  
+- **Backend**: Django with PostgreSQL, containerized using Docker.  
+- **Imputation Module**: Python with NumPy, SciPy, and custom ML algorithms.
+
+---
+
+## Running the System
 
 ### Frontend:
-
-<i>the website runs on</i> http://localhost:5173/
-
-```
+```bash
 cd frontend
 npm install
 npm run dev
 ```
+- Accessible at: `http://localhost:5173`
 
-### Backend&DB:
-
-- open your docker desktop (download from https://www.docker.com/products/docker-desktop/)
-- need to add the tag --build to build an image for the first time
-
-```
+### Backend & Database:
+```bash
 cd backend
 docker compose up --build
 ```
-
-<!-- # TrustAi
-
-TrustAi website
-
-> frontend: React, Tailwind
-
-> backend: Python Django
-
-## To start the Website
-
-### Virtual Environment
-Stay in the directory, create `.venv` folder
-
-```
-python3 -m venv .venv
-```
-
-Activate `.venv`
-
-```
-. .venv/bin/activate
-```
-
-Check activated Python
-
-```
-which python3
-```
-
-Upgrade `pip`
-
-```
-pip install --upgrade pip
-```
-
-Install packages
-
-```
-pip install -r requirements.txt
-```
+- Django API runs on: `http://127.0.0.1:8000`
 
 ---
 
-### Frontend
-Go to frontend and install packages
-
-```
-cd frontend
-yarn install
-```
-or `npm install` (whatever works)
-
-Start the frontend...
-
-```
-yarn run dev
-```
-
-the website runs on http://localhost:5173/
-
----
-
-### Backend
-Open another terminal and go to backend
-
-```
-cd backend
-```
-
-#### Set up PostgreSQL
-Note: MacOS instructions only
-
-##### Names for user, password, db, etc.
-- Host: `127.0.0.1` or `localhost`
-- Port: `5432`
-- User: `ntuimproject`
-- Password: `ntuim`
-- Database Name: `ntuimprojectdatabase`
-
-Install PostgreSQL and start it
-```
-brew tap homebrew/services
-brew install postgresql
-brew services start postgresql
-```
-
-Enter Postgresql
-
-```
-psql postgres
-```
-
-then the terminal will be like:
-
-```
-postgres=# blablabla
-```
-
-Create New User
-
-- ‘;’ cannot be omitted!
-- note the `postgres=#` is the start of the line, no need to type it
-
-```
-postgres=# CREATE ROLE username WITH LOGIN PASSWORD 'quoted password';
-```
-
-enter `\du` to check if user is created
-
-Add `CREATEDB` Permission to the Users to Allow Them to Create Databases:
-
-```
-ALTER ROLE username CREATEDB;
-```
-then quit by `\q`
-
-Re-enter Postgresql with User Identity
-
-```
-psql postgres -U username
-```
-
-then the terminal will be like:
-
-```
-postgres=> blablabla
-```
-
-Under the Identification of this User, Create a Database
-
-```
-postgres=> CREATE DATABASE database_name;
-```
-
-check database and its user by `\l`
-
-#### Download PgAdmin4
-link: https://www.pgadmin.org/download/
-
-and refer to this page for creating a database
-https://www.codementor.io/@engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb
-
-
-Finally, run the Django server
-
-```
-python3 manage.py runserver
-```
-
-and the server would run on port http://127.0.0.1:8000
-
-<i>The CORS policy is dealt by using vite proxy</i> -->
+## References
+1. **EDASH Repository**: [GitHub - EDASH](https://github.com/forbes110/EDASH)  
+2. **Presentation Materials**: [Poster](./image/Poster.png)
